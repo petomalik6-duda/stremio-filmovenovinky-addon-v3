@@ -33,7 +33,7 @@ async function fetchPage(url) {
   return data;
 }
 
-export async function scrapeMovies(maxItems = 500) {
+export async function scrapeMovies(maxItems = 1000) {
   const html = await fetchPage(MOVIES_SOURCE_URL);
   const sourceHash = crypto.createHash('sha1').update(html).digest('hex');
   const $ = cheerio.load(html);
@@ -80,7 +80,7 @@ function unique(items) {
   return items.filter(item => { if (seen.has(item.key)) return false; seen.add(item.key); return true; });
 }
 
-export async function scrapeFilmovenovinky(maxItems = 500) {
+export async function scrapeFilmovenovinky(maxItems = 1000) {
   const movies = await scrapeMovies(maxItems);
   let seriesResult = { sourceHash: '', items: [] };
   try { seriesResult = await scrapeSeries(Number(process.env.MAX_SERIES || 200)); }
