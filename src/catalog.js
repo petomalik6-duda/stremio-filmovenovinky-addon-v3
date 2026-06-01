@@ -3,7 +3,7 @@ import { fetchCsfdMeta, searchCsfd } from './csfd.js';
 import { tmdbByImdb, tmdbSearch } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 
-const MAX_ITEMS = Number(process.env.MAX_ITEMS || 500);
+const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 12) * 60 * 60 * 1000;
 const REFRESH_NEW_ONLY = String(process.env.REFRESH_NEW_ONLY || 'true').toLowerCase() !== 'false';
 const CSFD_SEARCH_FALLBACK = String(process.env.CSFD_SEARCH_FALLBACK || 'true').toLowerCase() !== 'false';
