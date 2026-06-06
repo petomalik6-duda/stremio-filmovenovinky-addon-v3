@@ -17,28 +17,26 @@ const AUTO_REFRESH = String(process.env.AUTO_REFRESH || 'false').toLowerCase() =
 const REFRESH_ON_START = String(process.env.REFRESH_ON_START || 'false').toLowerCase() === 'true';
 const AUTO_REFRESH_MINUTES = Math.max(15, Number(process.env.AUTO_REFRESH_MINUTES || 360));
 
-const baseCatalogs = [
-  { id: 'filmovenovinky-dabing', name: 'Nové dabované CZ/SK' },
-  { id: 'filmovenovinky-cz', name: 'Dabing CZ' },
-  { id: 'filmovenovinky-sk', name: 'Dabing SK' },
-  { id: 'filmovenovinky-czsk', name: 'Dabing CZ/SK' },
-  { id: 'filmovenovinky-top', name: 'Top hodnotené' }
+const catalogs = [
+  {
+    type: 'movie',
+    id: 'filmovenovinky-filmy',
+    name: 'FilmovéNovinky – CZ/SK filmy',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  }
 ];
 
-const catalogs = [
-  ...baseCatalogs.map(c => ({ type: 'movie', ...c })),
-  { type: 'series', id: 'filmovenovinky-serialy', name: 'Nové seriály' },
-  { type: 'series', id: 'filmovenovinky-top', name: 'Top seriály' }
-].map(c => ({ ...c, extra: [{ name: 'skip', isRequired: false }, { name: 'search', isRequired: false }] }));
-
 const manifest = {
-  id: 'sk.filmovenovinky.dabing.v3.fixed3',
-  version: '3.3.0',
-  name: 'FilmovéNovinky CZ/SK dabing+ Fixed3',
-  description: 'Stabilný katalóg CZ/SK dabovaných filmov a seriálov z FilmovéNovinky.sk. Cache-first, async refresh, bez timeoutu pri katalógu.',
+  id: 'sk.filmovenovinky.filmy.only.v341',
+  version: '3.4.1',
+  name: 'FilmovéNovinky CZ/SK filmy',
+  description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Bez seriálov a bez ďalších katalógov.'
   logo: `${PUBLIC_URL}/logo.png`,
   resources: ['catalog', 'meta'],
-  types: ['movie', 'series'],
+  types: ['movie'],
   catalogs,
   idPrefixes: ['tt', 'filmovenovinky:'],
   behaviorHints: { configurable: false }
@@ -72,7 +70,7 @@ function parseExtra(extraRaw = '') {
 }
 
 function typeOk(type) {
-  return type === 'movie' || type === 'series';
+  return type === 'movie';
 }
 
 function catalogOk(type, id) {
@@ -94,7 +92,7 @@ app.get('/', (_req, res) => {
     <html>
       <head><title>FilmovéNovinky Addon Fixed</title></head>
       <body>
-        <h1>FilmovéNovinky CZ/SK dabing+ Fixed3</h1>
+        <h1>FilmovéNovinky CZ/SK filmy</h1>
         <p>Manifest: <a href="/manifest.json">/manifest.json</a></p>
         <p>Health: <a href="/health">/health</a></p>
         <p>Stats: <a href="/stats">/stats</a></p>

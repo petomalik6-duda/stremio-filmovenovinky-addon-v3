@@ -1,7 +1,7 @@
 {
-  "name": "stremio-filmovenovinky-dabing-addon",
-  "version": "3.3.0",
-  "description": "Fixed v3.3: direct fetch + Jina reader fallback + text parser for Render timeouts.",
+  "name": "stremio-filmovenovinky-filmy-only",
+  "version": "3.4.1",
+  "description": "One-catalog FilmovéNovinky Stremio addon: only CZ/SK dubbed movies, no other catalogs.",
   "type": "module",
   "main": "server.js",
   "scripts": {

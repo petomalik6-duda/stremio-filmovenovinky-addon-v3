@@ -3,9 +3,10 @@ import { getWithRetry } from './http.js';
 import * as cheerio from 'cheerio';
 
 export const MOVIES_SOURCE_URL = process.env.MOVIES_SOURCE_URL || 'https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes';
-export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || 'https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami';
+export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';
+const DISABLE_SERIES = String(process.env.DISABLE_SERIES || 'true').toLowerCase() === 'true';
 
-const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.3; +https://www.stremio.com/)';
+const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.4.1; +https://www.stremio.com/)';
 const USE_READER_FALLBACK = String(process.env.USE_READER_FALLBACK || 'true').toLowerCase() !== 'false';
 
 function absUrl(href, base) { if (!href) return null; try { return new URL(href, base).toString(); } catch { return null; } }
@@ -127,7 +128,7 @@ function parseTextList(rawText, sourceUrl, fallbackType = 'movie') {
   return unique(items);
 }
 
-export async function scrapeMovies(maxItems = 120) {
+export async function scrapeMovies(maxItems = 1000) {
   const { data, mode } = await fetchPage(MOVIES_SOURCE_URL);
   const raw = String(data || '');
   let items = [];
@@ -208,14 +209,18 @@ function unique(items) {
   });
 }
 
-export async function scrapeFilmovenovinky(maxItems = 120) {
+export async function scrapeFilmovenovinky(maxItems = 1000) {
   const moviesResult = await scrapeMovies(maxItems);
-  let seriesResult = { sourceHash: '', items: [] };
 
-  try {
-    seriesResult = await scrapeSeries(Number(process.env.MAX_SERIES || 40));
-  } catch (e) {
-    console.error('Series scrape failed:', e.message);
+  let seriesResult = { sourceHash: '', items: [] };
+  if (!DISABLE_SERIES && Number(process.env.MAX_SERIES || 0) > 0 && SERIES_SOURCE_URL) {
+    try {
+      seriesResult = await scrapeSeries(Number(process.env.MAX_SERIES || 0));
+    } catch (e) {
+      console.error('Series scrape failed:', e.message);
+    }
+  } else {
+    console.log('[scrape] series disabled');
   }
 
   const sourceHash = crypto.createHash('sha1').update(`${moviesResult.sourceHash}|${seriesResult.sourceHash}`).digest('hex');

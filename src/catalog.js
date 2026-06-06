@@ -3,7 +3,7 @@ import { fetchCsfdMeta, searchCsfd } from './csfd.js';
 import { tmdbByImdb, tmdbSearch } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 
-const MAX_ITEMS = Number(process.env.MAX_ITEMS || 120);
+const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
 const REFRESH_NEW_ONLY = String(process.env.REFRESH_NEW_ONLY || 'true').toLowerCase() !== 'false';
 const CSFD_SEARCH_FALLBACK = String(process.env.CSFD_SEARCH_FALLBACK || 'false').toLowerCase() === 'true';
@@ -253,13 +253,9 @@ export function searchCatalog(metas, query) {
 }
 
 export function filterCatalog(metas, id, type) {
-  let arr = [...metas].filter(m => !type || m.type === type);
+  let arr = [...metas].filter(m => m.type === 'movie');
 
-  if (id === 'filmovenovinky-cz') arr = arr.filter(m => m._addon?.lang === 'CZ');
-  if (id === 'filmovenovinky-sk') arr = arr.filter(m => m._addon?.lang === 'SK');
-  if (id === 'filmovenovinky-czsk') arr = arr.filter(m => m._addon?.lang === 'CZ/SK');
-  if (id === 'filmovenovinky-serialy') arr = arr.filter(m => m.type === 'series');
-  if (id === 'filmovenovinky-top') return arr.filter(m => score(m) > 0).sort((a, b) => score(b) - score(a));
+  if (id !== 'filmovenovinky-filmy') return [];
 
   return arr.sort((a, b) => String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || '')));
 }

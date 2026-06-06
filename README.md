@@ -1,19 +1,25 @@
-# FilmovéNovinky CZ/SK dabing+ Stremio addon v3.3 Fixed3
+# FilmovéNovinky CZ/SK filmy – jeden katalóg
 
-Táto verzia rieši chybu:
+Táto verzia má v Stremiu iba jeden katalóg:
 
-```json
-"lastError": "timeout of 20000ms exceeded"
+```text
+FilmovéNovinky – CZ/SK filmy
 ```
 
-To znamená, že Render nevie načítať FilmovéNovinky priamo. Fixed3 preto robí:
+Odstránené sú:
 
-1. skúsi priamo FilmovéNovinky.sk,
-2. ak je timeout, použije textový reader fallback,
-3. vie parsovať aj markdown/text zo stránky,
-4. katalóg nečaká na refresh.
+```text
+Dabing CZ
+Dabing SK
+Dabing CZ/SK
+Top hodnotené
+Nové seriály
+Top seriály
+```
 
-## Render Environment pre prvý test
+## Nastavenie Render Environment
+
+Použi:
 
 ```env
 PORT=10000
@@ -21,22 +27,27 @@ PUBLIC_URL=https://tvoja-sluzba.onrender.com
 AUTO_REFRESH=false
 REFRESH_ON_START=false
 CACHE_TTL_HOURS=24
-MAX_ITEMS=120
-MAX_SERIES=40
+
+MAX_ITEMS=1000
+MAX_SERIES=0
+DISABLE_SERIES=true
+
 ENRICH_LIMIT=0
 ENABLE_TMDB=false
 CSFD_SEARCH_FALLBACK=false
+
 REQUEST_TIMEOUT_MS=15000
 HTTP_RETRIES=1
 REFRESH_LOCK_TIMEOUT_MS=180000
 USE_READER_FALLBACK=true
+
 MOVIES_SOURCE_URL=https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes
-SERIES_SOURCE_URL=https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami
+SERIES_SOURCE_URL=
 ```
 
 ## Po deployi
 
-Použi:
+V Renderi daj:
 
 ```text
 Manual Deploy → Clear build cache & deploy
@@ -45,24 +56,33 @@ Manual Deploy → Clear build cache & deploy
 Potom otvor:
 
 ```text
-/refresh
+https://tvoja-sluzba.onrender.com/refresh
 ```
 
-a sleduj:
+Sleduj:
 
 ```text
-/stats
+https://tvoja-sluzba.onrender.com/stats
 ```
 
-Ak je `stage: done` a `items > 0`, Stremio katalóg už pôjde.
-
-## Endpointy
+Katalóg:
 
 ```text
-/health
-/stats
-/refresh
-/refresh-now
-/catalog/movie/filmovenovinky-dabing.json
-/catalog/series/filmovenovinky-serialy.json
+https://tvoja-sluzba.onrender.com/catalog/movie/filmovenovinky-filmy.json
+```
+
+Manifest do Stremia:
+
+```text
+https://tvoja-sluzba.onrender.com/manifest.json
+```
+
+## Poznámka
+
+TMDB metadata sú zatiaľ vypnuté kvôli rýchlosti pri veľkom počte filmov. Keď bude katalóg plný, môžeš ich zapnúť postupne cez:
+
+```env
+ENABLE_TMDB=true
+TMDB_API_KEY=tvoj_kluc
+ENRICH_LIMIT=25
 ```
