@@ -1,25 +1,16 @@
-# FilmovéNovinky CZ/SK filmy – jeden katalóg
+# FilmovéNovinky CZ/SK filmy – jeden katalóg + GitHub cache
 
-Táto verzia má v Stremiu iba jeden katalóg:
+Táto verzia rieši problém Renderu: cache v `data/catalog-cache.json` sa ukladá priamo do GitHub repozitára.
+
+Aj keď Render zmaže disk alebo spravíš nový deploy, addon po štarte načíta poslednú commitnutú cache z repozitára.
+
+## V Stremiu bude iba jeden katalóg
 
 ```text
 FilmovéNovinky – CZ/SK filmy
 ```
 
-Odstránené sú:
-
-```text
-Dabing CZ
-Dabing SK
-Dabing CZ/SK
-Top hodnotené
-Nové seriály
-Top seriály
-```
-
-## Nastavenie Render Environment
-
-Použi:
+## Render Environment
 
 ```env
 PORT=10000
@@ -45,44 +36,82 @@ MOVIES_SOURCE_URL=https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom
 SERIES_SOURCE_URL=
 ```
 
-## Po deployi
+## GitHub Secret
 
-V Renderi daj:
-
-```text
-Manual Deploy → Clear build cache & deploy
-```
-
-Potom otvor:
+V GitHube pridaj secret:
 
 ```text
-https://tvoja-sluzba.onrender.com/refresh
+TMDB_API_KEY
 ```
 
-Sleduj:
+Cesta:
 
 ```text
-https://tvoja-sluzba.onrender.com/stats
+Settings → Secrets and variables → Actions → New repository secret
 ```
 
-Katalóg:
+## Ako uložiť aktuálnu cache z Renderu
+
+Po nahratí tejto verzie do GitHubu choď na:
 
 ```text
-https://tvoja-sluzba.onrender.com/catalog/movie/filmovenovinky-filmy.json
+Actions → Import cache from running addon URL → Run workflow
 ```
 
-Manifest do Stremia:
+Do `cache_url` vlož:
 
 ```text
-https://tvoja-sluzba.onrender.com/manifest.json
+https://tvoja-sluzba.onrender.com/cache.json
 ```
 
-## Poznámka
+Tým sa aktuálna cache z Renderu uloží do:
 
-TMDB metadata sú zatiaľ vypnuté kvôli rýchlosti pri veľkom počte filmov. Keď bude katalóg plný, môžeš ich zapnúť postupne cez:
+```text
+data/catalog-cache.json
+```
 
-```env
-ENABLE_TMDB=true
-TMDB_API_KEY=tvoj_kluc
-ENRICH_LIMIT=25
+a commitne sa do GitHubu.
+
+## Automatický denný refresh
+
+Workflow:
+
+```text
+.github/workflows/refresh-cache.yml
+```
+
+beží 1× denne a commitne novú cache do GitHubu.
+
+Manuálne ho spustíš cez:
+
+```text
+Actions → Refresh FilmovéNovinky cache → Run workflow
+```
+
+## Dôležité po dokončení obohatenia
+
+Keď budeš mať dobré čísla, napríklad:
+
+```text
+items: 666
+withTmdb: 600+
+withImdb: 600+
+```
+
+spusti workflow:
+
+```text
+Import cache from running addon URL
+```
+
+Tým si uložíš hotovú obohatenú cache a Render ju už nestratí.
+
+## Endpointy
+
+```text
+/manifest.json
+/stats
+/cache.json
+/refresh
+/catalog/movie/filmovenovinky-filmy.json
 ```
