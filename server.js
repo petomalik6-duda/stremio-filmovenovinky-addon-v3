@@ -30,10 +30,10 @@ const catalogs = [
 ];
 
 const manifest = {
-  id: 'sk.filmovenovinky.filmy.only.v341',
-  version: '3.4.1',
+  id: 'sk.filmovenovinky.filmy.only.v342',
+  version: '3.4.2',
   name: 'FilmovéNovinky CZ/SK filmy',
-  description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Bez seriálov a bez ďalších katalógov.'
+  description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Bez seriálov a bez ďalších katalógov.',
   logo: `${PUBLIC_URL}/logo.png`,
   resources: ['catalog', 'meta'],
   types: ['movie'],
@@ -132,7 +132,7 @@ app.get('/meta/:type/:id.json', async (req, res, next) => {
 
 app.get('/search/:type/:query.json', async (req, res, next) => {
   try {
-    const metas = searchCatalog(filterCatalog(await getCatalog(), 'filmovenovinky-dabing', req.params.type), req.params.query);
+    const metas = searchCatalog(filterCatalog(await getCatalog(), 'filmovenovinky-filmy', req.params.type), req.params.query);
     res.json({ metas: metas.slice(0, 100).map(cleanMeta) });
   } catch (e) {
     next(e);

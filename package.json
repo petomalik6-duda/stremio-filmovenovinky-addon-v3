@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.4.1",
-  "description": "One-catalog FilmovéNovinky Stremio addon: only CZ/SK dubbed movies, no other catalogs.",
+  "version": "3.4.2",
+  "description": "One-catalog FilmovéNovinky Stremio addon: syntax fixed.",
   "type": "module",
   "main": "server.js",
   "scripts": {
