@@ -9,7 +9,7 @@ on:
         default: "false"
   schedule:
     # každý deň o 03:20 UTC
-    - cron: "20 3 * * *"
+    - cron: "20 9 * * *"
 
 permissions:
   contents: write
