@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmovenovinky-dabing-addon",
-  "version": "3.1.0",
-  "description": "Fixed Stremio FilmovéNovinky addon: cache-first catalog, async refresh, safer scraper.",
+  "version": "3.2.0",
+  "description": "Fixed v3.2: refresh lock timeout, debug stages, no hanging refresh, safer FilmovéNovinky fallback.",
   "type": "module",
   "main": "server.js",
   "scripts": {

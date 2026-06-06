@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio';
 
 export const MOVIES_SOURCE_URL = process.env.MOVIES_SOURCE_URL || 'https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes';
 export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || 'https://www.filmovenovinky.sk/';
-const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.1; +https://www.stremio.com/)';
+const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.2; +https://www.stremio.com/)';
 
 function absUrl(href, base) { if (!href) return null; try { return new URL(href, base).toString(); } catch { return null; } }
 function clean(text) { return String(text || '').replace(/\s+/g, ' ').trim(); }
@@ -36,7 +36,9 @@ function parseTitleParts(raw, fallbackType='movie') {
 }
 
 async function fetchPage(url) {
+  console.log('[scrape] fetching', url);
   const { data } = await getWithRetry(url, { headers: { 'User-Agent': UA } });
+  console.log('[scrape] fetched', url, 'bytes=', String(data || '').length);
   return data;
 }
 

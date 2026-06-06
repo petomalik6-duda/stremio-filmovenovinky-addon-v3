@@ -3,20 +3,32 @@ import { fetchCsfdMeta, searchCsfd } from './csfd.js';
 import { tmdbByImdb, tmdbSearch } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 
-const MAX_ITEMS = Number(process.env.MAX_ITEMS || 250);
+const MAX_ITEMS = Number(process.env.MAX_ITEMS || 120);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
 const REFRESH_NEW_ONLY = String(process.env.REFRESH_NEW_ONLY || 'true').toLowerCase() !== 'false';
 const CSFD_SEARCH_FALLBACK = String(process.env.CSFD_SEARCH_FALLBACK || 'false').toLowerCase() === 'true';
-const ENRICH_LIMIT = Number(process.env.ENRICH_LIMIT || 25);
+const ENRICH_LIMIT = Number(process.env.ENRICH_LIMIT || 0);
+const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
+let runningStartedAt = 0;
+let stage = 'idle';
+
+function setStage(value) {
+  stage = value;
+  console.log('[refresh-stage]', value);
+}
 
 function buildIndex(metas) { return new Map((metas || []).map(m => [m.id, m])); }
 function stremioId(item, csfd, tmdb) { return tmdb?.imdbId || csfd?.imdbId || `filmovenovinky:${Buffer.from(`${item.type}-${item.name}-${item.year}-${item.lang}`).toString('base64url')}`; }
 function score(meta) { const n = Number(meta.imdbRating || 0); return Number.isFinite(n) ? n : 0; }
 function tmdbUrl(type, id) { return `https://www.themoviedb.org/${type === 'series' ? 'tv' : 'movie'}/${id}`; }
 function placeholderPoster(name) { return `https://placehold.co/500x750?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`; }
+
+function localMeta(item) {
+  return toMeta(item, {}, null);
+}
 
 function toMeta(item, csfd = {}, tmdb = null) {
   const type = item.type === 'series' ? 'series' : 'movie';
@@ -81,7 +93,7 @@ async function enrichItem(item) {
 
 async function loadFromDisk() {
   const store = await readStore();
-  cache = { ...store, byId: buildIndex(store.metas), lastError: cache.lastError || null };
+  cache = { ...store, byId: buildIndex(store.metas), lastError: cache.lastError || store.lastError || null };
   return cache;
 }
 
@@ -89,80 +101,114 @@ function isStale() {
   return !cache.at || Date.now() - cache.at > CACHE_TTL_MS;
 }
 
+function runningExpired() {
+  return running && runningStartedAt && Date.now() - runningStartedAt > REFRESH_LOCK_TIMEOUT_MS;
+}
+
 export function isRefreshRunning() {
+  if (runningExpired()) {
+    cache.lastError = `Refresh lock expired after ${REFRESH_LOCK_TIMEOUT_MS}ms at stage: ${stage}`;
+    running = null;
+    runningStartedAt = 0;
+    setStage('expired');
+    return false;
+  }
   return Boolean(running);
 }
 
 export function refreshCacheBackground(options = {}) {
-  if (running) return running;
-  running = refreshCache(options).catch(e => {
+  if (isRefreshRunning()) return running;
+  return refreshCache(options).catch(e => {
     cache.lastError = e.message;
-    console.error('Background refresh failed:', e.message);
+    setStage('failed');
+    console.error('Background refresh failed:', e);
     return cache.metas || [];
   });
-  return running;
 }
 
 export async function refreshCache({ forceFull = false } = {}) {
-  if (running) return running;
+  if (isRefreshRunning()) return running;
+
+  runningStartedAt = Date.now();
 
   running = (async () => {
-    const current = cache.at ? cache : await loadFromDisk();
-    const scraped = await scrapeFilmovenovinky(MAX_ITEMS);
+    try {
+      setStage('load-disk-cache');
+      const current = cache.at ? cache : await loadFromDisk();
 
-    if (!forceFull && current.sourceHash === scraped.sourceHash && current.metas.length) {
-      cache = { ...current, at: Date.now(), byId: buildIndex(current.metas), lastError: null };
-      await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas });
-      return cache.metas;
+      setStage('scrape-filmovenovinky');
+      const scraped = await scrapeFilmovenovinky(MAX_ITEMS);
+
+      setStage(`scraped-${scraped.items.length}-items`);
+
+      if (!scraped.items.length) {
+        cache.lastError = 'Scraper returned 0 items. Check MOVIES_SOURCE_URL or website HTML.';
+        await writeStore({ at: current.at || 0, sourceHash: current.sourceHash || '', items: current.items || [], metas: current.metas || [], lastError: cache.lastError });
+        return current.metas || [];
+      }
+
+      if (!forceFull && current.sourceHash === scraped.sourceHash && current.metas.length) {
+        setStage('source-unchanged');
+        cache = { ...current, at: Date.now(), byId: buildIndex(current.metas), lastError: null };
+        await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas, lastError: null });
+        return cache.metas;
+      }
+
+      setStage('build-metadata');
+      const oldByKey = new Map((current.metas || []).map(m => [m._addon?.key, m]).filter(([k]) => k));
+      const metas = [];
+      let enriched = 0;
+
+      for (const item of scraped.items) {
+        const key = item.key || itemKey(item);
+        const reusable = !forceFull && REFRESH_NEW_ONLY && oldByKey.get(key);
+
+        if (reusable) {
+          metas.push(reusable);
+          continue;
+        }
+
+        // ENRICH_LIMIT=0 znamená: žiadne CSFD/TMDB HTTP volania, iba rýchle lokálne metadata.
+        if (ENRICH_LIMIT <= 0 || (!forceFull && enriched >= ENRICH_LIMIT)) {
+          metas.push(localMeta(item));
+          continue;
+        }
+
+        try {
+          metas.push(await enrichItem(item));
+          enriched += 1;
+        } catch (e) {
+          console.error('Enrich failed:', item.name, e.message);
+          metas.push(localMeta(item));
+        }
+      }
+
+      setStage('write-cache');
+      cache = { at: Date.now(), sourceHash: scraped.sourceHash, items: scraped.items, metas, byId: buildIndex(metas), lastError: null };
+      await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas, lastError: null });
+
+      setStage('done');
+      return metas;
+    } catch (e) {
+      cache.lastError = e.message;
+      setStage('failed');
+      await writeStore({ at: cache.at || 0, sourceHash: cache.sourceHash || '', items: cache.items || [], metas: cache.metas || [], lastError: e.message }).catch(() => {});
+      throw e;
     }
-
-    const oldByKey = new Map((current.metas || []).map(m => [m._addon?.key, m]).filter(([k]) => k));
-    const metas = [];
-    let enriched = 0;
-
-    for (const item of scraped.items) {
-      const key = item.key || itemKey(item);
-      const reusable = !forceFull && REFRESH_NEW_ONLY && oldByKey.get(key);
-
-      if (reusable) {
-        metas.push(reusable);
-        continue;
-      }
-
-      if (!forceFull && enriched >= ENRICH_LIMIT) {
-        // Dôležité: keď narazíme na limit, nevykonávame ďalšie HTTP enrichment volania.
-        // Nové položky uložíme aspoň s lokálnymi metadátami, aby katalóg nebol prázdny.
-        metas.push(toMeta(item));
-        continue;
-      }
-
-      try {
-        metas.push(await enrichItem(item));
-        enriched += 1;
-      } catch (e) {
-        console.error('Enrich failed:', item.name, e.message);
-        metas.push(toMeta(item));
-      }
-    }
-
-    cache = { at: Date.now(), sourceHash: scraped.sourceHash, items: scraped.items, metas, byId: buildIndex(metas), lastError: null };
-    await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas });
-    return metas;
   })();
 
   try {
     return await running;
   } finally {
     running = null;
+    runningStartedAt = 0;
   }
 }
 
-// Cache-first: Stremio katalóg nikdy nečaká na dlhý scraper.
-// Ak cache nie je alebo je stará, spustí sa refresh na pozadí a endpoint hneď vráti uložené dáta.
 export async function getCatalog() {
   if (!cache.at) await loadFromDisk();
 
-  if (isStale() && !running) {
+  if (isStale() && !isRefreshRunning()) {
     refreshCacheBackground().catch(() => {});
   }
 
@@ -182,7 +228,10 @@ export async function getCatalogStats() {
     at: cache.at,
     generatedAt: cache.at ? new Date(cache.at).toISOString() : null,
     stale: isStale(),
-    refreshRunning: Boolean(running),
+    refreshRunning: isRefreshRunning(),
+    refreshStartedAt: runningStartedAt ? new Date(runningStartedAt).toISOString() : null,
+    refreshAgeSeconds: runningStartedAt ? Math.round((Date.now() - runningStartedAt) / 1000) : 0,
+    stage,
     lastError: cache.lastError,
     items: metas.length,
     cacheFile: storePath(),
