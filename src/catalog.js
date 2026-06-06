@@ -9,6 +9,7 @@ const REFRESH_NEW_ONLY = String(process.env.REFRESH_NEW_ONLY || 'true').toLowerC
 const CSFD_SEARCH_FALLBACK = String(process.env.CSFD_SEARCH_FALLBACK || 'false').toLowerCase() === 'true';
 const ENRICH_LIMIT = Number(process.env.ENRICH_LIMIT || 0);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
+const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
@@ -234,6 +235,10 @@ export async function getCatalogStats() {
     stage,
     lastError: cache.lastError,
     items: metas.length,
+    visibleItems: HIDE_UNMATCHED_ITEMS
+      ? metas.filter(m => Boolean(m._addon?.tmdbId) || Boolean(m._addon?.imdbId) || Boolean(m._addon?.csfdUrl) || (typeof m.id === 'string' && m.id.startsWith('tt'))).length
+      : metas.length,
+    hideUnmatchedItems: HIDE_UNMATCHED_ITEMS,
     cacheFile: storePath(),
     movies: metas.filter(m => m.type === 'movie').length,
     series: metas.filter(m => m.type === 'series').length,
@@ -256,6 +261,15 @@ export function filterCatalog(metas, id, type) {
   let arr = [...metas].filter(m => m.type === 'movie');
 
   if (id !== 'filmovenovinky-filmy') return [];
+
+  if (HIDE_UNMATCHED_ITEMS) {
+    arr = arr.filter(m =>
+      Boolean(m._addon?.tmdbId) ||
+      Boolean(m._addon?.imdbId) ||
+      Boolean(m._addon?.csfdUrl) ||
+      (typeof m.id === 'string' && m.id.startsWith('tt'))
+    );
+  }
 
   return arr.sort((a, b) => String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || '')));
 }

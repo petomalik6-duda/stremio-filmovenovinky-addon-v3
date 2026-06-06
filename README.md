@@ -126,3 +126,22 @@ cache: npm
 ```
 
 Preto GitHub Actions už nebude vyžadovať `package-lock.json`.
+
+
+## Skryť filmy bez TMDB/IMDb/ČSFD
+
+V Render Environment nastav:
+
+```env
+HIDE_UNMATCHED_ITEMS=true
+```
+
+Potom sa v Stremio katalógu zobrazia iba položky, ktoré majú aspoň jedno z týchto polí:
+
+```text
+tmdbId
+imdbId
+csfdUrl
+```
+
+Dôležité: táto verzia neobsahuje priečinok `data`, aby neprepísala tvoju existujúcu databázu/cache.
