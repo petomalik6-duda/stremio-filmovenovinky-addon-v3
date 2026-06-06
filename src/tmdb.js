@@ -5,7 +5,8 @@ const IMG = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP = 'https://image.tmdb.org/t/p/w1280';
 const LANG = process.env.TMDB_LANGUAGE || 'cs-CZ';
 
-function key() { return process.env.TMDB_API_KEY || ''; }
+function tmdbEnabled() { return String(process.env.ENABLE_TMDB || 'false').toLowerCase() === 'true'; }
+function key() { return tmdbEnabled() ? (process.env.TMDB_API_KEY || '') : ''; }
 async function tmdbGet(path, params = {}) {
   if (!key()) return null;
   const { data } = await axios.get(`${TMDB}${path}`, { params: { api_key: key(), language: LANG, ...params }, timeout: 15000 });

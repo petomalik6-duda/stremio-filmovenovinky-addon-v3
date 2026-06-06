@@ -1,54 +1,77 @@
-# FilmovéNovinky CZ/SK dabing+ Stremio addon v3
+# FilmovéNovinky CZ/SK dabing+ Stremio addon v3.1 Fixed
 
-Funkcie:
-- filmy s CZ/SK dabingom
-- seriálový katalóg z kategórie TV seriály / seriálových článkov
-- česká lokalizácia TMDB (`TMDB_LANGUAGE=cs-CZ`)
-- ČSFD → IMDb → TMDB párovanie pri filmoch
-- TMDB párovanie pri seriáloch
-- fulltext vyhľadávanie cez Stremio `search` extra
-- cache do `data/catalog-cache.json`
-- incremental refresh iba nových položiek
-- automatický refresh cez `AUTO_REFRESH=true`
+Táto verzia opravuje hlavný problém v3:
 
-## Render
+- katalógové endpointy už nečakajú na dlhý scraper,
+- `/refresh` odpovie hneď a refresh beží na pozadí,
+- `getCatalog()` servíruje uloženú cache,
+- scraper už nevráti 0 len preto, že web zmenil dátumové nadpisy,
+- Render port je predvolene `10000`,
+- TMDB a ČSFD search fallback sú predvolene vypnuté, aby refresh netrval príliš dlho.
+
+## Render nastavenia
 
 Build command:
+
 ```bash
 npm install --omit=dev
 ```
 
 Start command:
+
 ```bash
 npm start
 ```
 
 Environment variables:
+
 ```env
-TMDB_API_KEY=xxxxx
+PORT=10000
 PUBLIC_URL=https://tvoja-sluzba.onrender.com
-NODE_VERSION=20
-TMDB_LANGUAGE=cs-CZ
-AUTO_REFRESH=true
-AUTO_REFRESH_MINUTES=360
+AUTO_REFRESH=false
+REFRESH_ON_START=false
+CACHE_TTL_HOURS=24
+MAX_ITEMS=250
+MAX_SERIES=80
+ENRICH_LIMIT=25
+ENABLE_TMDB=false
+CSFD_SEARCH_FALLBACK=false
+REQUEST_TIMEOUT_MS=60000
+HTTP_RETRIES=2
 ```
 
-Manifest:
-```text
-https://tvoja-sluzba.onrender.com/manifest.json
+Keď bude základný katalóg fungovať, môžeš zapnúť TMDB:
+
+```env
+ENABLE_TMDB=true
+TMDB_API_KEY=tvoj_tmdb_kluc
+ENRICH_LIMIT=25
 ```
 
-Kontrola:
+## Kontrola
+
 ```text
 /health
 /stats
 /refresh
-/refresh?full=1
+/refresh-now
+/cache.json
 /catalog/movie/filmovenovinky-dabing.json
 /catalog/series/filmovenovinky-serialy.json
 ```
 
-Poznámka: Balík neobsahuje `node_modules` ani `package-lock.json`. Render si závislosti nainštaluje sám.
+## Dôležité
 
-## K stream odkazom
-Táto verzia nepridáva automatické Webshare/Sosáč streamy ani priame odkazy na neoficiálne zdroje. Metadata a katalógy sú pripravené tak, aby sa dali použiť s legálnymi stream providermi alebo s vlastným súkromným zdrojom právne dostupného obsahu.
+Po deployi otvor:
+
+```text
+https://tvoja-sluzba.onrender.com/refresh
+```
+
+Potom sleduj:
+
+```text
+https://tvoja-sluzba.onrender.com/stats
+```
+
+Keď `items` bude viac ako 0, katalóg v Stremiu začne zobrazovať položky.
