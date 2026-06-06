@@ -1,22 +1,19 @@
-# FilmovéNovinky CZ/SK dabing+ Stremio addon v3.2 Fixed2
+# FilmovéNovinky CZ/SK dabing+ Stremio addon v3.3 Fixed3
 
-Táto verzia rieši stav:
+Táto verzia rieši chybu:
 
 ```json
-{"at":0,"refreshRunning":true,"items":0}
+"lastError": "timeout of 20000ms exceeded"
 ```
 
-Hlavné zmeny:
+To znamená, že Render nevie načítať FilmovéNovinky priamo. Fixed3 preto robí:
 
-- refresh má lock timeout a nemôže visieť donekonečna,
-- `/stats` ukazuje `stage`, `refreshStartedAt`, `refreshAgeSeconds`,
-- `ENRICH_LIMIT=0` je default, takže sa nepúšťajú pomalé CSFD/TMDB volania,
-- scraper loguje sťahovanie stránok,
-- request timeout je znížený na 20s, aby sa chyba ukázala skôr.
+1. skúsi priamo FilmovéNovinky.sk,
+2. ak je timeout, použije textový reader fallback,
+3. vie parsovať aj markdown/text zo stránky,
+4. katalóg nečaká na refresh.
 
-## Render Environment
-
-Použi presne toto na prvý test:
+## Render Environment pre prvý test
 
 ```env
 PORT=10000
@@ -29,35 +26,43 @@ MAX_SERIES=40
 ENRICH_LIMIT=0
 ENABLE_TMDB=false
 CSFD_SEARCH_FALLBACK=false
-REQUEST_TIMEOUT_MS=20000
+REQUEST_TIMEOUT_MS=15000
 HTTP_RETRIES=1
 REFRESH_LOCK_TIMEOUT_MS=180000
+USE_READER_FALLBACK=true
 MOVIES_SOURCE_URL=https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes
-SERIES_SOURCE_URL=https://www.filmovenovinky.sk/
+SERIES_SOURCE_URL=https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami
 ```
 
 ## Po deployi
 
-1. Reštartuj Render službu.
-2. Otvor:
+Použi:
 
 ```text
-https://tvoja-sluzba.onrender.com/refresh
+Manual Deploy → Clear build cache & deploy
 ```
 
-3. Sleduj:
+Potom otvor:
 
 ```text
-https://tvoja-sluzba.onrender.com/stats
+/refresh
 ```
 
-Ak `stage` zostane na `scrape-filmovenovinky`, Render nevie stiahnuť FilmovéNovinky.sk.
-Ak `stage` bude `scraped-0-items`, zmenila sa HTML štruktúra alebo URL.
-Ak `stage` bude `done`, katalóg je hotový.
-
-## Katalóg
+a sleduj:
 
 ```text
+/stats
+```
+
+Ak je `stage: done` a `items > 0`, Stremio katalóg už pôjde.
+
+## Endpointy
+
+```text
+/health
+/stats
+/refresh
+/refresh-now
 /catalog/movie/filmovenovinky-dabing.json
 /catalog/series/filmovenovinky-serialy.json
 ```

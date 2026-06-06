@@ -32,9 +32,9 @@ const catalogs = [
 ].map(c => ({ ...c, extra: [{ name: 'skip', isRequired: false }, { name: 'search', isRequired: false }] }));
 
 const manifest = {
-  id: 'sk.filmovenovinky.dabing.v3.fixed2',
-  version: '3.2.0',
-  name: 'FilmovéNovinky CZ/SK dabing+ Fixed2',
+  id: 'sk.filmovenovinky.dabing.v3.fixed3',
+  version: '3.3.0',
+  name: 'FilmovéNovinky CZ/SK dabing+ Fixed3',
   description: 'Stabilný katalóg CZ/SK dabovaných filmov a seriálov z FilmovéNovinky.sk. Cache-first, async refresh, bez timeoutu pri katalógu.',
   logo: `${PUBLIC_URL}/logo.png`,
   resources: ['catalog', 'meta'],
@@ -94,7 +94,7 @@ app.get('/', (_req, res) => {
     <html>
       <head><title>FilmovéNovinky Addon Fixed</title></head>
       <body>
-        <h1>FilmovéNovinky CZ/SK dabing+ Fixed2</h1>
+        <h1>FilmovéNovinky CZ/SK dabing+ Fixed3</h1>
         <p>Manifest: <a href="/manifest.json">/manifest.json</a></p>
         <p>Health: <a href="/health">/health</a></p>
         <p>Stats: <a href="/stats">/stats</a></p>
