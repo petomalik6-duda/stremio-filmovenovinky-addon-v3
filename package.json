@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.5.0",
-  "description": "One-catalog FilmovéNovinky Stremio addon with GitHub-persisted cache.",
+  "version": "3.5.1",
+  "description": "One-catalog FilmovéNovinky Stremio addon with GitHub cache; workflow fixed without package-lock requirement.",
   "type": "module",
   "main": "server.js",
   "scripts": {

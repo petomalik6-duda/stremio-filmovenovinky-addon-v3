@@ -115,3 +115,14 @@ Tým si uložíš hotovú obohatenú cache a Render ju už nestratí.
 /refresh
 /catalog/movie/filmovenovinky-filmy.json
 ```
+
+
+## Fix workflow bez package-lock
+
+Vo workflow je odstránené:
+
+```yaml
+cache: npm
+```
+
+Preto GitHub Actions už nebude vyžadovať `package-lock.json`.
