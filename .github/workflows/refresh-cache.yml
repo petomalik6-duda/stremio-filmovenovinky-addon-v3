@@ -51,6 +51,7 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           ENRICH_LIMIT: 50
           CSFD_SEARCH_FALLBACK: "false"
+          HIDE_UNMATCHED_ITEMS: "true"
           FORCE_FULL_REFRESH: ${{ github.event.inputs.force_full || 'false' }}
           MOVIES_SOURCE_URL: https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes
           SERIES_SOURCE_URL: ""
