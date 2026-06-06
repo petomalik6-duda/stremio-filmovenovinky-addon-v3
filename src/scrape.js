@@ -8,6 +8,8 @@ const DISABLE_SERIES = String(process.env.DISABLE_SERIES || 'true').toLowerCase(
 
 const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.4.1; +https://www.stremio.com/)';
 const USE_READER_FALLBACK = String(process.env.USE_READER_FALLBACK || 'true').toLowerCase() !== 'false';
+const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
+const REQUIRE_YEAR_FOR_LOCAL_ITEMS = String(process.env.REQUIRE_YEAR_FOR_LOCAL_ITEMS || 'true').toLowerCase() !== 'false';
 
 function absUrl(href, base) { if (!href) return null; try { return new URL(href, base).toString(); } catch { return null; } }
 function clean(text) { return String(text || '').replace(/\s+/g, ' ').trim(); }
@@ -73,9 +75,99 @@ function safeHost(url) {
   try { return new URL(url).hostname; } catch { return ''; }
 }
 
+
+function isProbablyNotMovieLine(text) {
+  const t = clean(text).toLowerCase();
+
+  if (!t) return true;
+  if (t.length < 5 || t.length > 220) return true;
+
+  const badPatterns = [
+    /cookie/,
+    /reklama/,
+    /newsletter/,
+    /facebook|instagram|youtube|tiktok/,
+    /kontakt/,
+    /podmienky/,
+    /ochrana osobných údajov/,
+    /prihlás/i,
+    /registr/i,
+    /menu/,
+    /domov/,
+    /najnovšie/,
+    /trailery podľa žánru/,
+    /skip to/,
+    /komentár/,
+    /diskusia/,
+    /zdroj:/,
+    /tagy:/,
+    /kategórie:/,
+    /zdieľať/,
+    /prečítať/,
+    /pokračovať/,
+    /filmovenovinky\.sk/,
+    /nové filmy s dabingom/,
+    /zistite čo pribudlo/,
+    /tipy na dobrý film/,
+    /streamovacie služby/,
+    /netflix|disney\+|prime video|hbo max|apple tv/,
+    /seriály? s dabingom/,
+    /tv program/
+  ];
+
+  if (badPatterns.some(rx => rx.test(t))) return true;
+
+  // Neber extrémne všeobecné riadky typu "CZ dabing", "SK titulky" atď.
+  if (/^(cz|sk|cz\/sk|dabing|titulky|film|filmy)\b/i.test(t) && t.split(' ').length < 4) return true;
+
+  return false;
+}
+
+function hasMovieShape(text) {
+  const t = clean(text);
+
+  // Najbezpečnejší tvar stránky: Názov / Original (2026) (CZ)
+  const hasLang = /\((CZ\/SK|SK\/CZ|CZ|SK)\)/i.test(t);
+  const hasYear = /\((19\d{2}|20\d{2})\)/.test(t) || /\b(19\d{2}|20\d{2})\b/.test(t);
+
+  if (!hasLang) return false;
+  if (REQUIRE_YEAR_FOR_LOCAL_ITEMS && !hasYear) return false;
+
+  // Musí mať aspoň trochu názvu pred značkou jazyka.
+  const beforeLang = clean(t.split(/\((CZ\/SK|SK\/CZ|CZ|SK)\)/i)[0]);
+  if (beforeLang.length < 3) return false;
+
+  return true;
+}
+
+function normalizeMovieNameForReject(name) {
+  return clean(name)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function isBadParsedTitle(name) {
+  const n = normalizeMovieNameForReject(name);
+
+  if (!n || n.length < 2 || n.length > 120) return true;
+
+  const bad = [
+    'cz', 'sk', 'cz sk', 'dabing', 'titulky',
+    'nove filmy', 'filmove novinky', 'filmy online',
+    'tipy na dobry film', 'serialy', 'tv serialy',
+    'netflix', 'disney', 'prime video', 'hbo', 'max',
+    'komentar', 'reklama', 'menu'
+  ];
+
+  return bad.some(x => n === x || n.startsWith(x + ' '));
+}
+
 function makeMovieItemFromText(text, currentDate, sourceUrl = MOVIES_SOURCE_URL, fallbackType = 'movie') {
+  if (STRICT_MOVIE_FILTER && (isProbablyNotMovieLine(text) || !hasMovieShape(text))) return null;
+
   const parts = parseTitleParts(text, fallbackType);
-  if (!parts.name || parts.name.length < 2 || parts.name.length > 150) return null;
+  if (!parts.name || parts.name.length < 2 || parts.name.length > 150 || isBadParsedTitle(parts.name)) return null;
 
   const item = {
     titleRaw: clean(text),
@@ -139,7 +231,7 @@ export async function scrapeMovies(maxItems = 1000) {
     const $ = cheerio.load(raw);
     let currentDate = null;
 
-    $('h1, h2, h3, h4, li, p, article, div').each((_i, el) => {
+    $('h1, h2, h3, h4, li, p, article').each((_i, el) => {
       const tag = el.tagName?.toLowerCase();
       const text = clean($(el).text());
       const maybeDate = parseDate(text);

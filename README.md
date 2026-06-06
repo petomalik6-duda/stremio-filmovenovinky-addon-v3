@@ -145,3 +145,23 @@ csfdUrl
 ```
 
 Dôležité: táto verzia neobsahuje priečinok `data`, aby neprepísala tvoju existujúcu databázu/cache.
+
+
+## Prísny filter iba na skutočné filmy
+
+Pridané premenné:
+
+```env
+STRICT_MOVIE_FILTER=true
+REQUIRE_YEAR_FOR_LOCAL_ITEMS=true
+```
+
+Filter odstraňuje položky typu menu, články, kategórie, reklamy alebo texty zo stránky. Lokálne položky bez TMDB/IMDb/ČSFD musia mať rok filmu.
+
+Ak chceš v Stremiu zobrazovať iba filmy nájdené v TMDB/IMDb/ČSFD, nechaj:
+
+```env
+HIDE_UNMATCHED_ITEMS=true
+```
+
+Tento ZIP neobsahuje `data/`, takže neprepíše existujúcu cache.

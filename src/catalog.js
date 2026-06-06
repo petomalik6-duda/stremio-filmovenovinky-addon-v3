@@ -10,6 +10,7 @@ const CSFD_SEARCH_FALLBACK = String(process.env.CSFD_SEARCH_FALLBACK || 'false')
 const ENRICH_LIMIT = Number(process.env.ENRICH_LIMIT || 0);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
+const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
@@ -257,8 +258,28 @@ export function searchCatalog(metas, query) {
   return metas.filter(m => `${m.name} ${m.description || ''} ${(m.genres || []).join(' ')} ${m._addon?.titleRaw || ''}`.toLowerCase().includes(q));
 }
 
+
+function looksLikeRealMovieMeta(meta) {
+  if (!STRICT_MOVIE_FILTER) return true;
+
+  const name = String(meta.name || '').trim();
+  if (!name || name.length < 2 || name.length > 120) return false;
+
+  const raw = String(meta._addon?.titleRaw || meta.description || name);
+  const hasYear = Boolean(meta.year || meta.releaseInfo || /\b(19\d{2}|20\d{2})\b/.test(raw));
+  const hasExternal = Boolean(meta._addon?.tmdbId || meta._addon?.imdbId || meta._addon?.csfdUrl || (typeof meta.id === 'string' && meta.id.startsWith('tt')));
+
+  const bad = /cookie|reklama|menu|kontakt|newsletter|facebook|instagram|youtube|filmovenovinky\.sk|nové filmy s dabingom|tipy na dobrý film|seriály|streamovacie služby/i;
+  if (bad.test(name) || bad.test(raw)) return false;
+
+  // Ak nemá externé ID, musí mať aspoň rok. Tým sa odstránia textové položky zo stránky.
+  if (!hasExternal && !hasYear) return false;
+
+  return true;
+}
+
 export function filterCatalog(metas, id, type) {
-  let arr = [...metas].filter(m => m.type === 'movie');
+  let arr = [...metas].filter(m => m.type === 'movie').filter(looksLikeRealMovieMeta);
 
   if (id !== 'filmovenovinky-filmy') return [];
 
