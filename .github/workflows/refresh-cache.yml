@@ -49,7 +49,9 @@ jobs:
           USE_READER_FALLBACK: "true"
           ENABLE_TMDB: ${{ secrets.TMDB_API_KEY != '' && 'true' || 'false' }}
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          ENRICH_LIMIT: 50
+          ENRICH_LIMIT: 1000
+          TMDB_YEAR_TOLERANCE: 1
+          TMDB_SEARCH_LIMIT: 8
           CSFD_SEARCH_FALLBACK: "false"
           HIDE_UNMATCHED_ITEMS: "true"
           FORCE_FULL_REFRESH: ${{ github.event.inputs.force_full || 'false' }}
