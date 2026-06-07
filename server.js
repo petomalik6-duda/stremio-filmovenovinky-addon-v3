@@ -31,7 +31,7 @@ const catalogs = [
 
 const manifest = {
   id: 'sk.filmovenovinky.filmy.only.v370',
-  version: '3.7.0',
+  version: '3.5.0',
   name: 'FilmovéNovinky CZ/SK filmy',
   description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',
   logo: `${PUBLIC_URL}/logo.png`,

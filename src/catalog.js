@@ -76,6 +76,36 @@ function toMeta(item, csfd = {}, tmdb = null) {
   };
 }
 
+function titleCandidates(item) {
+  const values = [
+    item.originalName,
+    item.name,
+    item.titleRaw,
+  ];
+
+  const out = [];
+
+  for (const value of values) {
+    const clean = String(value || '')
+      .replace(/^[-*•\s]+/g, '')
+      .replace(/\((CZ\/SK|SK\/CZ|CZ|SK)\)/ig, '')
+      .replace(/\((19\d{2}|20\d{2})\)/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!clean) continue;
+
+    if (clean.includes('/')) {
+      const parts = clean.split('/').map(x => x.trim()).filter(Boolean);
+      for (const part of parts.reverse()) out.push(part);
+    } else {
+      out.push(clean);
+    }
+  }
+
+  return [...new Set(out.filter(x => x.length >= 2))];
+}
+
 async function enrichItem(item) {
   let csfdUrl = item.csfdUrl;
 
@@ -87,8 +117,13 @@ async function enrichItem(item) {
   const csfd = item.type === 'series' ? {} : await fetchCsfdMeta(csfdUrl);
 
   let tmdb = await tmdbByImdb(csfd.imdbId, item.type);
-  if (!tmdb) tmdb = await tmdbSearch(item.originalName || item.name, item.year, item.type);
-  if (!tmdb && item.originalName) tmdb = await tmdbSearch(item.name, item.year, item.type);
+
+  if (!tmdb) {
+    for (const title of titleCandidates(item)) {
+      tmdb = await tmdbSearch(title, item.year, item.type);
+      if (tmdb) break;
+    }
+  }
 
   return toMeta(normalizedItem, csfd, tmdb);
 }
@@ -248,7 +283,8 @@ export async function getCatalogStats() {
     czsk: metas.filter(m => m._addon?.lang === 'CZ/SK').length,
     withCsfd: metas.filter(m => m._addon?.csfdUrl).length,
     withImdb: metas.filter(m => m._addon?.imdbId).length,
-    withTmdb: metas.filter(m => m._addon?.tmdbId).length
+    withTmdb: metas.filter(m => m._addon?.tmdbId).length,
+    localIds: metas.filter(m => typeof m.id === 'string' && m.id.startsWith('filmovenovinky:')).length
   };
 }
 

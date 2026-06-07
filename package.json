@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.7.0",
-  "description": "One-catalog FilmovéNovinky Stremio addon with strict movie filter and no data folder.",
+  "version": "3.5.0",
+  "description": "FilmoveNovinky Stremio addon with stronger TMDB matching for latest movies.",
   "type": "module",
   "main": "server.js",
   "scripts": {

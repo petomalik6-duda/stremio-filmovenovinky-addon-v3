@@ -165,3 +165,27 @@ HIDE_UNMATCHED_ITEMS=true
 ```
 
 Tento ZIP neobsahuje `data/`, takže neprepíše existujúcu cache.
+
+
+## v3.5 oprava najnovších filmov bez detailu/streamu
+
+Nové filmy na začiatku katalógu niekedy ostali s lokálnym ID:
+
+```text
+filmovenovinky:...
+```
+
+Preto nemali plný detail ani streamy. Táto verzia zlepšuje TMDB párovanie:
+
+- skúša originálny názov aj lokálny názov,
+- skúša názov aj bez presného roku,
+- vyberá lepšieho TMDB kandidáta podľa názvu a roku,
+- `/stats` pridáva `localIds`.
+
+Po nasadení spusti:
+
+```text
+/refresh-now?full=1
+```
+
+a skontroluj, že `localIds` výrazne klesne.
