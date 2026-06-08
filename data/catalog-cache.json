@@ -1,42 +1,5 @@
-{
-  "at": 1780898413846,
-  "sourceHash": "7b473c017ca4e5261ad8f8904b663ff449bbce5b",
-  "items": [
-    {
-      "titleRaw": "Fotr na zkoušku / Sin instrucciones (2024) (CZ)",
-      "name": "Fotr na zkoušku",
-      "originalName": "Sin instrucciones",
-      "year": "2024",
-      "lang": "CZ",
-      "type": "movie",
-      "dateAdded": "2026-06-08",
-      "sourceUrl": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes",
-      "detailUrl": null,
-      "csfdUrl": "https://www.csfd.cz/sk/film/1562812-foter-na-skusku/prehlad/",
-      "links": [
-        "https://www.csfd.cz/sk/film/1562812-foter-na-skusku/prehlad/"
-      ],
-      "key": "movie|fotr na zkoušku|sin instrucciones|2024|cz",
-      "order": 0
-    },
-    {
-      "titleRaw": "Kolonisté / Colonials (2023) (CZ)",
-      "name": "Kolonisté",
-      "originalName": "Colonials",
-      "year": "2023",
-      "lang": "CZ",
-      "type": "movie",
-      "dateAdded": "2026-06-08",
-      "sourceUrl": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes",
-      "detailUrl": null,
-      "csfdUrl": "https://www.csfd.cz/sk/film/1333780-koloniste/prehlad/",
-      "links": [
-        "https://www.csfd.cz/sk/film/1333780-koloniste/prehlad/"
-      ],
-      "key": "movie|kolonisté|colonials|2023|cz",
-      "order": 1
-    },
-    {
+
+   {
       "titleRaw": "Spasitel / Project Hail Mary (2026) (CZ)",
       "name": "Spasitel",
       "originalName": "Project Hail Mary",
