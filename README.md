@@ -1,191 +1,74 @@
-# FilmovéNovinky CZ/SK filmy – jeden katalóg + GitHub cache
+# FilmovéNovinky refresh-cache repair balík
 
-Táto verzia rieši problém Renderu: cache v `data/catalog-cache.json` sa ukladá priamo do GitHub repozitára.
+Tento balík pridá opravy priamo do `refresh-cache` procesu.
 
-Aj keď Render zmaže disk alebo spravíš nový deploy, addon po štarte načíta poslednú commitnutú cache z repozitára.
+Rieši dva prípady:
 
-## V Stremiu bude iba jeden katalóg
+## 1. Chýba TMDB detail
 
-```text
-FilmovéNovinky – CZ/SK filmy
+Film je v cache, ale nemá `tmdbId`, poster alebo popis.
+
+## 2. Chýba stream source
+
+Typický problém:
+
+```json
+{
+  "name": "Barvy zla: Černá",
+  "sourceUrl": "https://www.filmovenovinky.sk/nove-filmy/...",
+  "detailUrl": null,
+  "csfdUrl": "https://www.csfd.cz/sk/film/..."
+}
 ```
 
-## Render Environment
+Film má ČSFD/TMDB detail, ale stream nenájde, lebo chýba `detailUrl`.
 
-```env
-PORT=10000
-PUBLIC_URL=https://tvoja-sluzba.onrender.com
-AUTO_REFRESH=false
-REFRESH_ON_START=false
-CACHE_TTL_HOURS=24
+## Ako nahrať
 
-MAX_ITEMS=1000
-MAX_SERIES=0
-DISABLE_SERIES=true
-
-ENRICH_LIMIT=0
-ENABLE_TMDB=false
-CSFD_SEARCH_FALLBACK=false
-
-REQUEST_TIMEOUT_MS=15000
-HTTP_RETRIES=1
-REFRESH_LOCK_TIMEOUT_MS=180000
-USE_READER_FALLBACK=true
-
-MOVIES_SOURCE_URL=https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes
-SERIES_SOURCE_URL=
-```
-
-## GitHub Secret
-
-V GitHube pridaj secret:
-
-```text
-TMDB_API_KEY
-```
-
-Cesta:
-
-```text
-Settings → Secrets and variables → Actions → New repository secret
-```
-
-## Ako uložiť aktuálnu cache z Renderu
-
-Po nahratí tejto verzie do GitHubu choď na:
-
-```text
-Actions → Import cache from running addon URL → Run workflow
-```
-
-Do `cache_url` vlož:
-
-```text
-https://tvoja-sluzba.onrender.com/cache.json
-```
-
-Tým sa aktuálna cache z Renderu uloží do:
-
-```text
-data/catalog-cache.json
-```
-
-a commitne sa do GitHubu.
-
-## Automatický denný refresh
-
-Workflow:
-
-```text
-.github/workflows/refresh-cache.yml
-```
-
-beží 1× denne a commitne novú cache do GitHubu.
-
-Manuálne ho spustíš cez:
-
-```text
-Actions → Refresh FilmovéNovinky cache → Run workflow
-```
-
-## Dôležité po dokončení obohatenia
-
-Keď budeš mať dobré čísla, napríklad:
-
-```text
-items: 666
-withTmdb: 600+
-withImdb: 600+
-```
-
-spusti workflow:
-
-```text
-Import cache from running addon URL
-```
-
-Tým si uložíš hotovú obohatenú cache a Render ju už nestratí.
-
-## Endpointy
-
-```text
-/manifest.json
-/stats
-/cache.json
-/refresh
-/catalog/movie/filmovenovinky-filmy.json
-```
-
-
-## Fix workflow bez package-lock
-
-Vo workflow je odstránené:
+1. Skopíruj do projektu priečinok `scripts`.
+2. V `package.json` pridaj script podľa `PATCH-package.json.txt`.
+3. Workflow môžeš nahradiť súborom `.github/workflows/refresh-cache.yml`, alebo si z neho skopíruj iba krok:
 
 ```yaml
-cache: npm
+- name: Refresh cache with TMDB and stream repair
+  env:
+    TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+    REPAIR_TMDB_LIMIT: "300"
+    REPAIR_STREAM_LIMIT: "300"
+  run: npm run refresh-cache
 ```
 
-Preto GitHub Actions už nebude vyžadovať `package-lock.json`.
+## Ako to funguje
 
+`scripts/refresh-cache-with-repair.js` spraví:
 
-## Skryť filmy bez TMDB/IMDb/ČSFD
-
-V Render Environment nastav:
-
-```env
-HIDE_UNMATCHED_ITEMS=true
+```txt
+1. spustí pôvodný scripts/refresh-cache.js
+2. spustí TMDB repair
+3. spustí detailUrl / stream source repair
+4. uloží cache
 ```
 
-Potom sa v Stremio katalógu zobrazia iba položky, ktoré majú aspoň jedno z týchto polí:
+## Dôležité
 
-```text
-tmdbId
-imdbId
-csfdUrl
+Ak máš cache pod iným názvom ako `data/cache.json`, uprav buď env:
+
+```txt
+CACHE_FILE=data/tvoj-subor.json
 ```
 
-Dôležité: táto verzia neobsahuje priečinok `data`, aby neprepísala tvoju existujúcu databázu/cache.
+alebo zoznam ciest v:
 
-
-## Prísny filter iba na skutočné filmy
-
-Pridané premenné:
-
-```env
-STRICT_MOVIE_FILTER=true
-REQUIRE_YEAR_FOR_LOCAL_ITEMS=true
+```txt
+scripts/repair-filmovenovinky-after-refresh.js
 ```
 
-Filter odstraňuje položky typu menu, články, kategórie, reklamy alebo texty zo stránky. Lokálne položky bez TMDB/IMDb/ČSFD musia mať rok filmu.
+## Výsledok
 
-Ak chceš v Stremiu zobrazovať iba filmy nájdené v TMDB/IMDb/ČSFD, nechaj:
+Pri každom automatickom refresh-cache sa nové filmy hneď pokúsia opraviť, aby nezostali s:
 
-```env
-HIDE_UNMATCHED_ITEMS=true
+```json
+"detailUrl": null
 ```
 
-Tento ZIP neobsahuje `data/`, takže neprepíše existujúcu cache.
-
-
-## v3.5 oprava najnovších filmov bez detailu/streamu
-
-Nové filmy na začiatku katalógu niekedy ostali s lokálnym ID:
-
-```text
-filmovenovinky:...
-```
-
-Preto nemali plný detail ani streamy. Táto verzia zlepšuje TMDB párovanie:
-
-- skúša originálny názov aj lokálny názov,
-- skúša názov aj bez presného roku,
-- vyberá lepšieho TMDB kandidáta podľa názvu a roku,
-- `/stats` pridáva `localIds`.
-
-Po nasadení spusti:
-
-```text
-/refresh-now?full=1
-```
-
-a skontroluj, že `localIds` výrazne klesne.
+alebo bez TMDB detailu.
