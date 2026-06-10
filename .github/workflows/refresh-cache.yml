@@ -2,86 +2,40 @@ name: Refresh FilmovéNovinky cache
 
 on:
   workflow_dispatch:
-    inputs:
-      force_full:
-        description: "Run full refresh? true/false"
-        required: false
-        default: "false"
-
   schedule:
-    # Každý deň o 03:20 UTC
-    # Slovensko: približne 05:20 v lete / 04:20 v zime
     - cron: "20 3 * * *"
 
 permissions:
   contents: write
 
 jobs:
-  refresh-cache:
+  refresh:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
 
       - name: Install dependencies
-        run: npm install --omit=dev
+        run: npm install
 
-      - name: Refresh cache
-        run: npm run refresh
+      - name: Refresh cache with safe repair
         env:
-          PORT: 10000
-          PUBLIC_URL: https://example.onrender.com
-
-          AUTO_REFRESH: "false"
-          REFRESH_ON_START: "false"
-          CACHE_TTL_HOURS: 24
-
-          MAX_ITEMS: 1000
-          MAX_SERIES: 0
-          DISABLE_SERIES: "true"
-
-          ENABLE_TMDB: "true"
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          TMDB_LANGUAGE: cs-CZ
-          ENRICH_LIMIT: 50
-
-          TMDB_YEAR_TOLERANCE: 1
-          TMDB_SEARCH_LIMIT: 8
-
-          REQUEST_TIMEOUT_MS: 20000
-          HTTP_RETRIES: 2
-          REFRESH_LOCK_TIMEOUT_MS: 900000
-
-          HIDE_UNMATCHED_ITEMS: "false"
-          STRICT_MOVIE_FILTER: "true"
-          REQUIRE_YEAR_FOR_LOCAL_ITEMS: "false"
-          CSFD_SEARCH_FALLBACK: "true"
-
-          MOVIES_SOURCE_URL: https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes
-          SERIES_SOURCE_URL: ""
-
-          FORCE_FULL_REFRESH: ${{ github.event.inputs.force_full || 'false' }}
+          REPAIR_LIMIT: 300
+          # Ak máš cache inde, odkomentuj a uprav:
+          # CACHE_FILE: data/cache.json
+        run: npm run refresh-cache-with-safe-repair
 
       - name: Commit updated cache
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-
-          git add data/catalog-cache.json
-
-          if git diff --cached --quiet; then
-            echo "No cache changes"
-            exit 0
-          fi
-
-          git commit -m "Refresh FilmovéNovinky cache"
-          git pull --rebase --autostash
+          git add data cache *.json || true
+          git commit -m "Refresh cache with safe stream repair" || echo "No changes"
           git push
