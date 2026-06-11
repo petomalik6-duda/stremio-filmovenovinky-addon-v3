@@ -1,5 +1,5 @@
 {
-  "at": 1781190546981,
+  "at": 1781198117703,
   "sourceHash": "8f4b2b6a49fd3683f018063ef12d47c53f1dced7",
   "items": [
     {
@@ -11563,28 +11563,28 @@
       "type": "movie",
       "name": "Barvy zla: Černá",
       "poster": "https://image.tmdb.org/t/p/w500/v6J7FYPywQFF8ANoRRtceqIGpDM.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/2D3W3Jp0VYsLhXTEfnvhbMvQEzk.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/7JHEgs57oIsF8Cl0TfY7xlJkkgR.jpg",
       "description": "V ospalém městečku se ztratí malý kluk. Nový státní zástupce pak postupně odhaluje nečekané souvislosti s dávným případem pohřešovaných lidí.\n\nOriginálny názov: Kolory zła: Czerń\n\nDabing: CZ\n\nPridané: 2026-06-10\n\nČSFD: https://www.csfd.cz/sk/film/1749889-barvy-zla-cerna/prehlad/\n\nIMDb: tt38681832\n\nTMDB: 1560681",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "110 min",
       "genres": [
         "Thriller",
         "Mysteriózní",
         "Krimi",
-        "Drama",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "7.8",
       "director": "Adrian Panek",
       "cast": [
         "Jakub Gierszał",
         "Marianna Zydek",
-        "Zdzisław Wardejn",
         "Andrzej Chyra",
-        "Robert Gonera",
         "Beata Ścibakówna",
+        "Adam Bobik",
+        "Robert Gonera",
         "Piotr Żurawski",
-        "Julian Świeżewski"
+        "Jan Sałasiński"
       ],
       "links": [
         {
@@ -11765,7 +11765,7 @@
         "CZ"
       ],
       "imdbRating": "4.3",
-      "director": "Andrew Balek, Joe Bland",
+      "director": "Joe Bland, Andrew Balek",
       "cast": [
         "Greg Kriek",
         "Sean Kanan",
@@ -12147,7 +12147,7 @@
       "type": "movie",
       "name": "Pracovní romance",
       "poster": "https://image.tmdb.org/t/p/w500/1HRUTqEVDmJC4L6tp6zd85MI6uH.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/ixjsQuOhdx6mKlyeMMzd80WjT6K.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/1N5yz1IDw6Ci8le1YgeM6xtBijA.jpg",
       "description": "Jennifer Lopez a Brett Goldstein v hlavních rolích peprné romantické komedie o jedné tajné lásce a dvou workoholicích, které hlas srdce zavede rovnou do průšvihu.\n\nOriginálny názov: Office Romance\n\nDabing: CZ\n\nPridané: 2026-06-05\n\nIMDb: tt33397980\n\nTMDB: 1358005",
       "releaseInfo": "2026",
       "year": 2026,
@@ -12220,7 +12220,7 @@
         "Krimi",
         "CZ"
       ],
-      "imdbRating": "4.8",
+      "imdbRating": "4.9",
       "director": "Gabe Ibáñez",
       "cast": [
         "Candela Peña",
@@ -12530,7 +12530,7 @@
         "Horor",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "7.1",
       "director": "Кирилл Соколов",
       "cast": [
         "Zazie Beetz",
@@ -17178,7 +17178,7 @@
         "Akční",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "7.4",
       "director": "Jesse V. Johnson",
       "cast": [
         "Aaron Eckhart",
@@ -19088,7 +19088,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.5",
+      "imdbRating": "7.6",
       "director": "James Vanderbilt",
       "cast": [
         "Rami Malek",
@@ -19215,7 +19215,7 @@
         "Dobrodružný",
         "CZ"
       ],
-      "imdbRating": "7.7",
+      "imdbRating": "7.8",
       "director": "Derek Lee, Clif Prowse",
       "cast": [
         "Lin Shaye",
@@ -19657,7 +19657,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "6.5",
+      "imdbRating": "6.1",
       "director": "Maria Brendle",
       "cast": [
         "Julia Buchmann",
@@ -23127,7 +23127,7 @@
         "CZ"
       ],
       "imdbRating": "7.4",
-      "director": "Thérèse Ahlbeck, Marcus Olsson",
+      "director": "Marcus Olsson, Thérèse Ahlbeck",
       "cast": [
         "Henrik Dorsin",
         "Sissela Benn",
@@ -24311,9 +24311,11 @@
       "year": 2025,
       "runtime": "108 min",
       "genres": [
+        "Akční",
         "Dobrodružný",
         "Animovaný",
         "Komedie",
+        "Krimi",
         "Rodinný",
         "Mysteriózní",
         "CZ"
@@ -24768,7 +24770,7 @@
         "CZ"
       ],
       "imdbRating": "6.3",
-      "director": "Johnny Marchetta, Björn Franklin",
+      "director": "Björn Franklin, Johnny Marchetta",
       "cast": [
         "Toby Kebbell",
         "Shia LaBeouf",
@@ -25135,7 +25137,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.3",
+      "imdbRating": "7.2",
       "director": "Lilly Hu",
       "cast": [
         "陈宣宇",
@@ -30632,7 +30634,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Billy Bryk, Finn Wolfhard",
+      "director": "Finn Wolfhard, Billy Bryk",
       "cast": [
         "Finn Wolfhard",
         "Billy Bryk",
@@ -35544,7 +35546,7 @@
         "CZ"
       ],
       "imdbRating": "6.3",
-      "director": "Jesper Møller, Piet De Rycker, Jens Møller",
+      "director": "Jens Møller, Piet De Rycker, Jesper Møller",
       "cast": [
         "Dalia Mya Schmidt-Foß",
         "Oliver Kalkofe",
@@ -37958,7 +37960,7 @@
         "CZ"
       ],
       "imdbRating": "7",
-      "director": "Logan Giese, John Burd",
+      "director": "John Burd, Logan Giese",
       "cast": [
         "Christa Rose",
         "Eva Igo",
@@ -38786,7 +38788,7 @@
         "CZ"
       ],
       "imdbRating": "6",
-      "director": "Samantha Speirs, Bertie Speirs",
+      "director": "Bertie Speirs, Samantha Speirs",
       "cast": [
         "Ladi Emeruwa",
         "Charlotte Price",
@@ -38964,7 +38966,7 @@
       "type": "movie",
       "name": "Steve",
       "poster": "https://image.tmdb.org/t/p/w500/wmLoMyofbseLfxiGgk1Iz5H97c3.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/sb8Aq1RohASXyjT0uEOUUZJi5oI.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/m5UwDL3nLNQn9UDfteylgFIpxCJ.jpg",
       "description": "Náročný den v životě poctivého ředitele školy pro problémové kluky, který se snaží zkrotit svoje studenty. Sám toho ale má nad hlavu.\n\nDabing: CZ\n\nPridané: 2025-10-03\n\nIMDb: tt32985279\n\nTMDB: 1242404",
       "releaseInfo": "2025",
       "year": 2025,
@@ -39354,7 +39356,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Kristina Grozeva, Petar Valchanov",
+      "director": "Petar Valchanov, Kristina Grozeva",
       "cast": [
         "Maria Bakalovová",
         "Margita Gosheva",
@@ -41463,7 +41465,7 @@
         "CZ"
       ],
       "imdbRating": "6",
-      "director": "Christine Dallaire-Dupont, Nicola Lemay",
+      "director": "Nicola Lemay, Christine Dallaire-Dupont",
       "cast": [
         "Alexandre Bacon",
         "Nancy Bernier",
@@ -46156,7 +46158,7 @@
         "CZ"
       ],
       "imdbRating": "7.3",
-      "director": "مریم مقدم, Behtash Sanaeeha",
+      "director": "Behtash Sanaeeha, مریم مقدم",
       "cast": [
         "لیلی فرهادپور",
         "اسماعیل محرابی",
