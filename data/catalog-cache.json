@@ -1,5 +1,5 @@
 {
-  "at": 1781274101133,
+  "at": 1781350206341,
   "sourceHash": "6379d24454690d4e4ac95f9009d6638f9e02ce5f",
   "items": [
     {
@@ -11633,7 +11633,7 @@
       "name": "Vrať mi ji",
       "poster": "https://image.tmdb.org/t/p/w500/2nTo7jACbt5OG8zeSyS9c2zC8xQ.jpg",
       "background": "https://image.tmdb.org/t/p/w1280/2IIKts2A9vnUdM9tTC76B8tDmuZ.jpg",
-      "description": "Bratr a sestra odhalí děsivý rituál v odlehlém domě své nové pěstounky.\n\nOriginálny názov: Bring Her Back\n\nDabing: CZ\n\nPridané: 2026-06-12\n\nIMDb: tt32246771\n\nTMDB: 1151031",
+      "description": "Dva sourozenci se dostanou do náhradní péče Laury, která nedávno přišla o dceru. V ústraní nového domova začínají bratr a sestra tušit, že pěstounská matka ukrývá temné tajemství – a brzy odhalí zlověstný rituál, který měl zůstat navždy skryt.\n\nOriginálny názov: Bring Her Back\n\nDabing: CZ\n\nPridané: 2026-06-12\n\nIMDb: tt32246771\n\nTMDB: 1151031",
       "releaseInfo": "2025",
       "year": 2025,
       "runtime": "104 min",
@@ -11642,7 +11642,7 @@
         "CZ"
       ],
       "imdbRating": "7.4",
-      "director": "Danny Philippou, Michael Philippou",
+      "director": "Michael Philippou, Danny Philippou",
       "cast": [
         "Billy Barratt",
         "Sally Hawkins",
@@ -11893,7 +11893,7 @@
         "Krimi",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "6.6",
       "director": "Adrian Panek",
       "cast": [
         "Jakub Gierszał",
@@ -11945,7 +11945,7 @@
       "id": "tt17490712",
       "type": "movie",
       "name": "Mortal Kombat II",
-      "poster": "https://image.tmdb.org/t/p/w500/hwRdDFIhaEmpRgoki805YvyyjZf.jpg",
+      "poster": "https://image.tmdb.org/t/p/w500/vbat0zQYrJ3nEPdcIcmDBV4TZfQ.jpg",
       "background": "https://image.tmdb.org/t/p/w1280/4EAAwpylq313qrDqpCxulUrXBNF.jpg",
       "description": "V Mortal Kombat II se šampioni Zeměříše, včetně oblíbených postav z prvního dílu, vydávají do ještě brutálnějšího a neúprosného turnaje, kde budou bojovat nejen mezi sebou, ale především proti síle temného vládce Shao Kahna, jehož cílem je zničit Zemi a podrobit si její obránce\n\nDabing: CZ\n\nPridané: 2026-06-09\n\nIMDb: tt17490712\n\nTMDB: 931285",
       "releaseInfo": "2026",
@@ -12084,7 +12084,7 @@
         "CZ"
       ],
       "imdbRating": "4.3",
-      "director": "Andrew Balek, Joe Bland",
+      "director": "Joe Bland, Andrew Balek",
       "cast": [
         "Greg Kriek",
         "Sean Kanan",
@@ -12466,7 +12466,7 @@
       "type": "movie",
       "name": "Pracovní romance",
       "poster": "https://image.tmdb.org/t/p/w500/1HRUTqEVDmJC4L6tp6zd85MI6uH.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/1N5yz1IDw6Ci8le1YgeM6xtBijA.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/ixjsQuOhdx6mKlyeMMzd80WjT6K.jpg",
       "description": "Jennifer Lopez a Brett Goldstein v hlavních rolích peprné romantické komedie o jedné tajné lásce a dvou workoholicích, které hlas srdce zavede rovnou do průšvihu.\n\nOriginálny názov: Office Romance\n\nDabing: CZ\n\nPridané: 2026-06-05\n\nIMDb: tt33397980\n\nTMDB: 1358005",
       "releaseInfo": "2026",
       "year": 2026,
@@ -12539,7 +12539,7 @@
         "Krimi",
         "CZ"
       ],
-      "imdbRating": "4.9",
+      "imdbRating": "5.1",
       "director": "Gabe Ibáñez",
       "cast": [
         "Candela Peña",
@@ -12844,9 +12844,9 @@
       "year": 2026,
       "runtime": "95 min",
       "genres": [
-        "Akční",
-        "Komedie",
         "Horor",
+        "Komedie",
+        "Akční",
         "CZ"
       ],
       "imdbRating": "7.1",
@@ -12913,7 +12913,7 @@
         "Hudební",
         "CZ"
       ],
-      "imdbRating": "6.3",
+      "imdbRating": "6.2",
       "director": "Anderson .Paak",
       "cast": [
         "Anderson .Paak",
@@ -15863,7 +15863,7 @@
         "Mysteriózní",
         "CZ"
       ],
-      "imdbRating": "6.6",
+      "imdbRating": "6.5",
       "director": "Vincenzo Alfieri",
       "cast": [
         "Giuseppe Battiston",
@@ -17307,7 +17307,7 @@
         "Thriller",
         "CZ"
       ],
-      "imdbRating": "7.2",
+      "imdbRating": "7.3",
       "director": "Paul Feig",
       "cast": [
         "Sydney Sweeney",
@@ -17497,7 +17497,7 @@
         "Akční",
         "CZ"
       ],
-      "imdbRating": "7.5",
+      "imdbRating": "7.4",
       "director": "Jesse V. Johnson",
       "cast": [
         "Aaron Eckhart",
@@ -18834,7 +18834,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "6.5",
+      "imdbRating": "6.6",
       "director": "Philipp Stölzl",
       "cast": [
         "Tom Payne",
@@ -19534,7 +19534,7 @@
         "Dobrodružný",
         "CZ"
       ],
-      "imdbRating": "7.8",
+      "imdbRating": "7.9",
       "director": "Derek Lee, Clif Prowse",
       "cast": [
         "Lin Shaye",
@@ -20103,7 +20103,7 @@
       "description": "Pět balerín cestou na taneční soutěž uváznou v odlehlém lese a vyhledají útočiště v podivném zájezdním hostinci, který vede Devora Kasimerová. Dívky musí využít svůj špičkový trénink, aby přežily.\n\nOriginálny názov: Pretty Lethal\n\nDabing: CZ\n\nPridané: 2026-03-26\n\nIMDb: tt26678938\n\nTMDB: 1084187",
       "releaseInfo": "2026",
       "year": 2026,
-      "runtime": "89 min",
+      "runtime": "90 min",
       "genres": [
         "Hudební",
         "Thriller",
@@ -23446,7 +23446,7 @@
         "CZ"
       ],
       "imdbRating": "7.4",
-      "director": "Marcus Olsson, Thérèse Ahlbeck",
+      "director": "Thérèse Ahlbeck, Marcus Olsson",
       "cast": [
         "Henrik Dorsin",
         "Sissela Benn",
@@ -24630,13 +24630,11 @@
       "year": 2025,
       "runtime": "108 min",
       "genres": [
-        "Akční",
-        "Dobrodružný",
         "Animovaný",
+        "Dobrodružný",
         "Komedie",
-        "Krimi",
-        "Rodinný",
         "Mysteriózní",
+        "Rodinný",
         "CZ"
       ],
       "imdbRating": "7.7",
@@ -25089,7 +25087,7 @@
         "CZ"
       ],
       "imdbRating": "6.3",
-      "director": "Björn Franklin, Johnny Marchetta",
+      "director": "Johnny Marchetta, Björn Franklin",
       "cast": [
         "Toby Kebbell",
         "Shia LaBeouf",
@@ -25955,7 +25953,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "4.7",
+      "imdbRating": "4.6",
       "director": "Philippe Mechelen",
       "cast": [
         "Hakim Jemili",
@@ -26959,30 +26957,25 @@
       }
     },
     {
-      "id": "tt13499272",
+      "id": "tt37578186",
       "type": "movie",
       "name": "Z popela: Jáma",
-      "poster": "https://image.tmdb.org/t/p/w500/aEUH2ECoZHvSmoMzJpca0STF2CZ.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/ru0r5MYhIwcU0IddhRLqJpIPkiV.jpg",
-      "description": "Žena, která je uvězněna za zločin svého manžela, zjistí, že jedinou cestou ven je vyřešit hádanky ze své záhadné minulosti.\n\nOriginálny názov: From the Ashes: The Pit\n\nDabing: CZ\n\nPridané: 2026-01-22\n\nČSFD: https://www.csfd.cz/sk/film/1792825-z-popela-jama/prehlad/\n\nIMDb: tt13499272\n\nTMDB: 1191876",
-      "releaseInfo": "2027",
-      "year": 2027,
-      "runtime": "92 min",
+      "poster": "https://image.tmdb.org/t/p/w500/xAKy2IlZBxaLzhNfsGGZHcZzMy3.jpg",
+      "background": "https://image.tmdb.org/t/p/w500/xAKy2IlZBxaLzhNfsGGZHcZzMy3.jpg",
+      "description": "Originálny názov: From the Ashes: The Pit\n\nDabing: CZ\n\nPridané: 2026-01-22\n\nČSFD: https://www.csfd.cz/sk/film/1792825-z-popela-jama/prehlad/\n\nIMDb: tt37578186\n\nTMDB: 1605511",
+      "releaseInfo": "2026",
+      "year": 2026,
+      "runtime": "20 min",
       "genres": [
-        "Drama",
-        "Krimi",
-        "Mysteriózní",
+        "Horor",
         "CZ"
       ],
-      "director": "Jeremy Wiles",
+      "director": "Shane R. Preston",
       "cast": [
-        "Jeanne Neilson",
-        "Paul du Toit",
-        "Syreeta Banks",
-        "Jeremy John Wells",
-        "Lucy Capri",
-        "Debbie Sutcliffe",
-        "Dolores Dermody"
+        "Daniel-Paul Sampson",
+        "Darius Rathe",
+        "Daniel Christian Jones",
+        "Laura Van Puymbroeck"
       ],
       "links": [
         {
@@ -26993,12 +26986,12 @@
         {
           "name": "IMDb",
           "category": "Info",
-          "url": "https://www.imdb.com/title/tt13499272/"
+          "url": "https://www.imdb.com/title/tt37578186/"
         },
         {
           "name": "TMDB",
           "category": "Info",
-          "url": "https://www.themoviedb.org/movie/1191876"
+          "url": "https://www.themoviedb.org/movie/1605511"
         },
         {
           "name": "Zdroj",
@@ -27007,15 +27000,15 @@
         }
       ],
       "behaviorHints": {
-        "defaultVideoId": "tt13499272"
+        "defaultVideoId": "tt37578186"
       },
       "_addon": {
         "key": "movie|z popela: jáma|from the ashes: the pit|2026|cz",
         "dateAdded": "2026-01-22",
         "lang": "CZ",
         "csfdUrl": "https://www.csfd.cz/sk/film/1792825-z-popela-jama/prehlad/",
-        "imdbId": "tt13499272",
-        "tmdbId": 1191876,
+        "imdbId": "tt37578186",
+        "tmdbId": 1605511,
         "sourceType": "movie",
         "titleRaw": "Z popela: Jáma / From the Ashes: The Pit (2026) (CZ)"
       }
@@ -30953,7 +30946,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Finn Wolfhard, Billy Bryk",
+      "director": "Billy Bryk, Finn Wolfhard",
       "cast": [
         "Finn Wolfhard",
         "Billy Bryk",
@@ -35865,7 +35858,7 @@
         "CZ"
       ],
       "imdbRating": "6.3",
-      "director": "Jens Møller, Piet De Rycker, Jesper Møller",
+      "director": "Jesper Møller, Piet De Rycker, Jens Møller",
       "cast": [
         "Dalia Mya Schmidt-Foß",
         "Oliver Kalkofe",
@@ -37964,7 +37957,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "5.4",
+      "imdbRating": "5.3",
       "director": "Grégory Boutboul",
       "cast": [
         "Max Boublil",
@@ -39285,7 +39278,7 @@
       "type": "movie",
       "name": "Steve",
       "poster": "https://image.tmdb.org/t/p/w500/wmLoMyofbseLfxiGgk1Iz5H97c3.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/m5UwDL3nLNQn9UDfteylgFIpxCJ.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/sb8Aq1RohASXyjT0uEOUUZJi5oI.jpg",
       "description": "Náročný den v životě poctivého ředitele školy pro problémové kluky, který se snaží zkrotit svoje studenty. Sám toho ale má nad hlavu.\n\nDabing: CZ\n\nPridané: 2025-10-03\n\nIMDb: tt32985279\n\nTMDB: 1242404",
       "releaseInfo": "2025",
       "year": 2025,
@@ -39675,7 +39668,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Petar Valchanov, Kristina Grozeva",
+      "director": "Kristina Grozeva, Petar Valchanov",
       "cast": [
         "Maria Bakalovová",
         "Margita Gosheva",
@@ -44604,7 +44597,7 @@
         "Rodinný",
         "CZ"
       ],
-      "imdbRating": "6.6",
+      "imdbRating": "6.1",
       "director": "Kenny Beaumont",
       "cast": [
         "Randy Couture",
@@ -46477,7 +46470,7 @@
         "CZ"
       ],
       "imdbRating": "7.3",
-      "director": "Behtash Sanaeeha, مریم مقدم",
+      "director": "مریم مقدم, Behtash Sanaeeha",
       "cast": [
         "لیلی فرهادپور",
         "اسماعیل محرابی",
@@ -50861,7 +50854,7 @@
         "Dokumentární",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "6",
       "director": "John Nicholson",
       "cast": [
         "Rafael Nadal"
@@ -51101,7 +51094,7 @@
         "CZ"
       ],
       "imdbRating": "6.6",
-      "director": "Tal Granit, שרון מימון",
+      "director": "שרון מימון, Tal Granit",
       "cast": [
         "Andie MacDowell",
         "Miriam Margolyes",
@@ -51288,7 +51281,7 @@
         "CZ"
       ],
       "imdbRating": "6.8",
-      "director": "Astrid Rondero, Fernanda Valadez",
+      "director": "Fernanda Valadez, Astrid Rondero",
       "cast": [
         "Juan Jesús Varela",
         "Yadira Pérez",
