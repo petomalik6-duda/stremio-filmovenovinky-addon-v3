@@ -1,5 +1,5 @@
 {
-  "at": 1782221826521,
+  "at": 1782303298477,
   "sourceHash": "79eb2abd4afcc897a501df49a5ac4a55ea8bcf09",
   "items": [
     {
@@ -11874,9 +11874,9 @@
       "id": "tt29198659",
       "type": "movie",
       "name": "Paříž mezi nebem a zemí",
-      "poster": "https://image.tmdb.org/t/p/w500/gnoqVr3lHr1TgTX9njcljRaQqOf.jpg",
+      "poster": "https://image.tmdb.org/t/p/w500/lrjLijgyCEXFO7optlLkBkt16Rm.jpg",
       "background": "https://image.tmdb.org/t/p/w1280/rZMTJ5Biql3vqjVTP0GjkSm5w6V.jpg",
-      "description": "Originálny názov: Paradis Paris\n\nDabing: CZ\n\nPridané: 2026-06-23\n\nČSFD: https://www.csfd.cz/sk/film/1526835-pariz-mezi-nebem-a-zemi/prehlad/\n\nIMDb: tt29198659\n\nTMDB: 1119546",
+      "description": "Co dělá život hodný prožití? V sérii vzájemně propojených příběhů se životům několika pařížských obyvatel obrátí vzhůru nohama, když jim na dveře zaklepe smrt: narcistická italská operní pěvkyně se probudí v márnici a zjistí, že její vlastní smrt zůstala bez povšimnutí; britský kaskadér začne zpochybňovat své povolání, když jeho syn utrpí nehodu; excentrická kolumbijská dáma v pokročilém věku uzavře smlouvu se samotnou smrtí... Zatímco se každá z postav snaží znovu najít to, na čem záleží nejvíc, město světla, lásky a nekonečných možností září jasněji než kdy jindy.\n\nOriginálny názov: Paradis Paris\n\nDabing: CZ\n\nPridané: 2026-06-23\n\nČSFD: https://www.csfd.cz/sk/film/1526835-pariz-mezi-nebem-a-zemi/prehlad/\n\nIMDb: tt29198659\n\nTMDB: 1119546",
       "releaseInfo": "2024",
       "year": 2024,
       "runtime": "109 min",
@@ -12199,7 +12199,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "7.9",
+      "imdbRating": "8",
       "director": "Leah McKendrick",
       "cast": [
         "Zoey Deutch",
@@ -12262,7 +12262,7 @@
         "Akční",
         "CZ"
       ],
-      "imdbRating": "7.3",
+      "imdbRating": "7.6",
       "director": "박규태",
       "cast": [
         "진선규",
@@ -13508,7 +13508,7 @@
         "CZ"
       ],
       "imdbRating": "4.3",
-      "director": "Joe Bland, Andrew Balek",
+      "director": "Andrew Balek, Joe Bland",
       "cast": [
         "Greg Kriek",
         "Sean Kanan",
@@ -14089,7 +14089,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "6",
+      "imdbRating": "4.5",
       "director": "Nick Wilson",
       "cast": [
         "Malin Åkerman",
@@ -15092,7 +15092,7 @@
       "id": "tt8760450",
       "type": "movie",
       "name": "Westhampton",
-      "poster": "https://image.tmdb.org/t/p/w500/eXwgECXxx9D4m2dUahNMua21k6P.jpg",
+      "poster": "https://image.tmdb.org/t/p/w500/3YvIAVjzPr24xqY95gG2ygwI6V4.jpg",
       "background": "https://image.tmdb.org/t/p/w1280/xghWZGohcjcayZay0gwtNhWLIST.jpg",
       "description": "Filmový tvůrce, kterého pronásledují výčitky kvůli nehodě, kterou způsobil na střední škole, je nucen vrátit se na místo tragédie a postavit se tváří v tvář přátelům, kterým zničil život, a městu, které jím pohrdá. Střídání mezi současností a nezávislým filmem, který o nehodě natočil, odhaluje, že skutečné události se odehrály zcela jinak, než jak je zachytil ve svém snímku.\n\nDabing: CZ\n\nPridané: 2026-05-24\n\nČSFD: https://www.csfd.cz/sk/film/1682832-westhampton/galeria/plagaty/\n\nIMDb: tt8760450\n\nTMDB: 1253786",
       "releaseInfo": "2026",
@@ -19113,7 +19113,7 @@
       "imdbRating": "6.1",
       "director": "Tommy Wirkola",
       "cast": [
-        "Phoebe Dynevor",
+        "Phoebe Dynevorová",
         "Whitney Peak",
         "Djimon Hounsou",
         "Alyla Browne",
@@ -22044,7 +22044,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "6.4",
+      "imdbRating": "6.3",
       "director": "Chad Hartigan",
       "cast": [
         "Zoey Deutch",
@@ -22916,7 +22916,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "4.5",
+      "imdbRating": "5",
       "director": "Zuzana Kirchnerová",
       "cast": [
         "Anna Geislerová",
@@ -29340,6 +29340,7 @@
         "Animovaný",
         "Dobrodružný",
         "Komedie",
+        "Rodinný",
         "CZ/SK"
       ],
       "imdbRating": "7.2",
@@ -32375,7 +32376,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Billy Bryk, Finn Wolfhard",
+      "director": "Finn Wolfhard, Billy Bryk",
       "cast": [
         "Finn Wolfhard",
         "Billy Bryk",
@@ -34585,7 +34586,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "3.2",
+      "imdbRating": "3.4",
       "director": "Tomáš Vorel",
       "cast": [
         "Jiří Mádl",
@@ -37161,7 +37162,7 @@
         "CZ"
       ],
       "imdbRating": "7.2",
-      "director": "Mehdi Idir, Grand Corps Malade",
+      "director": "Grand Corps Malade, Mehdi Idir",
       "cast": [
         "Tahar Rahim",
         "Bastien Bouillon",
@@ -37287,7 +37288,7 @@
         "CZ"
       ],
       "imdbRating": "6.3",
-      "director": "Jesper Møller, Piet De Rycker, Jens Møller",
+      "director": "Jens Møller, Piet De Rycker, Jesper Møller",
       "cast": [
         "Dalia Mya Schmidt-Foß",
         "Oliver Kalkofe",
@@ -39820,7 +39821,7 @@
       "description": "Gilda je nevyléčitelně nemocná a přeje si zemřít bez bolesti. Když její komické pokusy o sebevraždu selžou, vyhledá odbornou pomoc.\n\nOriginálny názov: Dreaming of Lions\n\nDabing: CZ\n\nPridané: 2025-10-11\n\nČSFD: https://www.csfd.cz/film/1593952-sen-o-lvech/prehled/\n\nIMDb: tt15063134\n\nTMDB: 1374709",
       "releaseInfo": "2025",
       "year": 2025,
-      "runtime": "85 min",
+      "runtime": "87 min",
       "genres": [
         "Komedie",
         "Fantasy",
@@ -40529,7 +40530,7 @@
         "CZ"
       ],
       "imdbRating": "6",
-      "director": "Samantha Speirs, Bertie Speirs",
+      "director": "Bertie Speirs, Samantha Speirs",
       "cast": [
         "Ladi Emeruwa",
         "Charlotte Price",
@@ -41866,7 +41867,7 @@
       "director": "Christopher Jenkins",
       "cast": [
         "Mo Gilligan",
-        "Simone Ashley",
+        "Simone Ashleyová",
         "Sophie Okonedo",
         "Zayn Malik",
         "Dylan Llewellyn",
@@ -41998,7 +41999,7 @@
         "CZ"
       ],
       "imdbRating": "6.4",
-      "director": "Vincent Paronnaud, Alexis Ducord",
+      "director": "Alexis Ducord, Vincent Paronnaud",
       "cast": [
         "Yolande Moreau",
         "Philippe Katerine",
@@ -43703,7 +43704,7 @@
         "CZ"
       ],
       "imdbRating": "10",
-      "director": "Juan Pablo Di Pace, Andrés Pepe Estrada",
+      "director": "Andrés Pepe Estrada, Juan Pablo Di Pace",
       "cast": [
         "Juan Pablo Di Pace",
         "Santiago Madrussan",
@@ -47960,7 +47961,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "4.6",
+      "imdbRating": "4.5",
       "director": "Delaney Buffett",
       "cast": [
         "Katie Corwin",
@@ -48903,7 +48904,7 @@
         "CZ"
       ],
       "imdbRating": "7",
-      "director": "Adam B. Stein, Zach Lipovsky",
+      "director": "Zach Lipovsky, Adam B. Stein",
       "cast": [
         "Kaitlyn Santa Juana",
         "Teo Briones",
@@ -50333,7 +50334,7 @@
         "Thriller",
         "SK"
       ],
-      "imdbRating": "5.9",
+      "imdbRating": "6",
       "director": "James Clayton",
       "cast": [
         "James Clayton",
@@ -52523,7 +52524,7 @@
         "CZ"
       ],
       "imdbRating": "6.6",
-      "director": "Tal Granit, שרון מימון",
+      "director": "שרון מימון, Tal Granit",
       "cast": [
         "Andie MacDowell",
         "Miriam Margolyes",
@@ -52710,7 +52711,7 @@
         "CZ"
       ],
       "imdbRating": "6.8",
-      "director": "Fernanda Valadez, Astrid Rondero",
+      "director": "Astrid Rondero, Fernanda Valadez",
       "cast": [
         "Juan Jesús Varela",
         "Yadira Pérez",
