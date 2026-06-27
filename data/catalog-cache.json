@@ -1,5 +1,5 @@
 {
-  "at": 1782556714156,
+  "at": 1782589114403,
   "sourceHash": "6fbd996f0d87e76ae5ec90580ef2ea0e127a9bb6",
   "items": [
     {
@@ -12129,15 +12129,39 @@
       "id": "tt34888871",
       "type": "movie",
       "name": "Malý bratr",
-      "poster": "https://placehold.co/500x750?text=Mal%C3%BD%20bratr",
-      "background": "https://placehold.co/500x750?text=Mal%C3%BD%20bratr",
-      "description": "Originálny názov: Little Brother\n\nDabing: CZ\n\nPridané: 2026-06-27\n\nTMDB: 1397385\n\nIMDb: tt34888871",
+      "poster": "https://image.tmdb.org/t/p/w500/agjSD0xJNg8AuLL4lsEhCHT0RAJ.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/bdwv8Hsu4Bnz8aRbH5MQ9clQ0DG.jpg",
+      "description": "Hektický život vytíženého realitního makléře projde zásadní rekonstrukcí, když se zničehonic objeví jeho chaotický „malý bratr“.\n\nOriginálny názov: Little Brother\n\nDabing: CZ\n\nPridané: 2026-06-27\n\nIMDb: tt34888871\n\nTMDB: 1397385",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "101 min",
       "genres": [
+        "Komedie",
         "CZ"
       ],
+      "imdbRating": "6.2",
+      "director": "Matt Spicer",
+      "cast": [
+        "John Cena",
+        "Eric André",
+        "Michelle Monaghan",
+        "Christopher Meloni",
+        "Sherry Cola",
+        "Ego Nwodim",
+        "Caleb Hearon",
+        "Bryce Gheisar"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt34888871/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1397385"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -12147,11 +12171,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt34888871/"
         }
       ],
       "behaviorHints": {
@@ -12172,13 +12191,28 @@
       "id": "tt28334938",
       "type": "movie",
       "name": "Cesta za snem",
-      "poster": "https://placehold.co/500x750?text=Cesta%20za%20snem",
-      "background": "https://placehold.co/500x750?text=Cesta%20za%20snem",
-      "description": "Originálny názov: Clika\n\nDabing: CZ\n\nPridané: 2026-06-27\n\nČSFD: https://www.csfd.cz/sk/film/1650542-cesta-za-snem/prehlad/\n\nTMDB: 1450257\n\nIMDb: tt28334938",
-      "releaseInfo": "2025",
-      "year": 2025,
+      "poster": "https://image.tmdb.org/t/p/w500/82Vh8PSzWtBi0CLWrnJdRhGYxEr.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/juj498fB0FRZHRKrirHL61gMqUs.jpg",
+      "description": "Chitova neúnavná cesta za splněním snu je příběhem ambicí, tradice a sebepoznání.\n\nOriginálny názov: Clika\n\nDabing: CZ\n\nPridané: 2026-06-27\n\nČSFD: https://www.csfd.cz/sk/film/1650542-cesta-za-snem/prehlad/\n\nIMDb: tt28334938\n\nTMDB: 1450257",
+      "releaseInfo": "2026",
+      "year": 2026,
+      "runtime": "79 min",
       "genres": [
+        "Hudební",
+        "Drama",
         "CZ"
+      ],
+      "imdbRating": "7.9",
+      "director": "Michael Greene",
+      "cast": [
+        "Jay Dee",
+        "Cristian E. Gutierrez",
+        "Daniel 'DoKnows' Lopez",
+        "Laura Lopez",
+        "Nana Ponceleon",
+        "OhGeesy",
+        "Eric Roberts",
+        "Uziel Pantoja"
       ],
       "links": [
         {
@@ -12187,14 +12221,19 @@
           "url": "https://www.csfd.cz/sk/film/1650542-cesta-za-snem/prehlad/"
         },
         {
-          "name": "Zdroj",
-          "category": "Info",
-          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
           "name": "IMDb",
           "category": "Info",
           "url": "https://www.imdb.com/title/tt28334938/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1450257"
+        },
+        {
+          "name": "Zdroj",
+          "category": "Info",
+          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
@@ -12215,13 +12254,27 @@
       "id": "tt39334849",
       "type": "movie",
       "name": "Nečekané léto",
-      "poster": "https://placehold.co/500x750?text=Ne%C4%8Dekan%C3%A9%20l%C3%A9to",
-      "background": "https://placehold.co/500x750?text=Ne%C4%8Dekan%C3%A9%20l%C3%A9to",
-      "description": "Dabing: CZ\n\nPridané: 2026-06-27\n\nČSFD: https://www.csfd.cz/sk/film/1786381-necakane-leto/prehlad/\n\nTMDB: 1642848\n\nIMDb: tt39334849",
+      "poster": "https://image.tmdb.org/t/p/w500/gTreXiLJqJJbWOzWP8NA11U1dsv.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/v1sjTTaJ6nzxI7qvil9X7fDVxlR.jpg",
+      "description": "Denisa sice pečlivě plánuje cestu na italské pobřeží, ta ale velmi brzy nečekaně končí v zapadlém českém kempu. Zatímco se urputně snaží vrátit vše do starých kolejí, její děti si okamžitě najdou cestu k Petrovi, který těch pár chatek nedobrovolně spravuje. Spolu s ratolestmi početné a kempováním protřelé rodiny Petráskových tak zažívají nejen nečekaná prázdninová dobrodružství, ale také úspěšně hatí svůj odjezd i Denisiny životní plány.\n\nDabing: CZ\n\nPridané: 2026-06-27\n\nČSFD: https://www.csfd.cz/sk/film/1786381-necakane-leto/prehlad/\n\nIMDb: tt39334849\n\nTMDB: 1642848",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "93 min",
       "genres": [
+        "Komedie",
+        "Rodinný",
         "CZ"
+      ],
+      "director": "Milan Cieslar",
+      "cast": [
+        "Barbora Poláková",
+        "Jordan Haj",
+        "Linda Rybová",
+        "Jiří Vyorálek",
+        "Zuzana Mauréry",
+        "Jaroslav Dušek",
+        "Petr Čtvrtníček",
+        "Leoš Noha"
       ],
       "links": [
         {
@@ -12230,19 +12283,31 @@
           "url": "https://www.csfd.cz/sk/film/1786381-necakane-leto/prehlad/"
         },
         {
-          "name": "Zdroj",
-          "category": "Info",
-          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
           "name": "IMDb",
           "category": "Info",
           "url": "https://www.imdb.com/title/tt39334849/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1642848"
+        },
+        {
+          "name": "Zdroj",
+          "category": "Info",
+          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
         "defaultVideoId": "tt39334849"
       },
+      "videos": [
+        {
+          "id": "yt:yllJynio1QY",
+          "title": "Trailer",
+          "released": "2026-06-27"
+        }
+      ],
       "_addon": {
         "key": "movie|nečekané léto||2026|cz",
         "dateAdded": "2026-06-27",
@@ -12258,13 +12323,28 @@
       "id": "tt36987599",
       "type": "movie",
       "name": "Hvězda bez hitu",
-      "poster": "https://placehold.co/500x750?text=Hv%C4%9Bzda%20bez%20hitu",
-      "background": "https://placehold.co/500x750?text=Hv%C4%9Bzda%20bez%20hitu",
-      "description": "Originálny názov: No Hit Wonder\n\nDabing: CZ\n\nPridané: 2026-06-26\n\nČSFD: https://www.csfd.cz/sk/film/1703324-hvezda-bez-hitu/prehlad/\n\nTMDB: 1427832\n\nIMDb: tt36987599",
+      "poster": "https://image.tmdb.org/t/p/w500/xomHskI2QGIKsPHmsH6uPHLsBO1.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/hDp8Itlhln0aBjlHXVIsUsxiRaa.jpg",
+      "description": "Zpěvák Daniel je na dně. Po pokusu o sebevraždu skončí na psychiatrii a má zpěvem přinést radost skupině osamělých lidí.\n\nOriginálny názov: No Hit Wonder\n\nDabing: CZ\n\nPridané: 2026-06-26\n\nČSFD: https://www.csfd.cz/sk/film/1703324-hvezda-bez-hitu/prehlad/\n\nIMDb: tt36987599\n\nTMDB: 1427832",
       "releaseInfo": "2025",
       "year": 2025,
+      "runtime": "118 min",
       "genres": [
+        "Komedie",
+        "Drama",
         "CZ"
+      ],
+      "imdbRating": "6.8",
+      "director": "Florian Dietrich",
+      "cast": [
+        "Florian David Fitz",
+        "Nora Tschirner",
+        "Jerusha Wahlen",
+        "Corinna Kirchhoff",
+        "Bernd Hölscher",
+        "Jasmin Shakeri",
+        "Lorna Ishema",
+        "Udo Samel"
       ],
       "links": [
         {
@@ -12273,14 +12353,19 @@
           "url": "https://www.csfd.cz/sk/film/1703324-hvezda-bez-hitu/prehlad/"
         },
         {
-          "name": "Zdroj",
-          "category": "Info",
-          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
           "name": "IMDb",
           "category": "Info",
           "url": "https://www.imdb.com/title/tt36987599/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1427832"
+        },
+        {
+          "name": "Zdroj",
+          "category": "Info",
+          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
@@ -12301,13 +12386,29 @@
       "id": "tt23573936",
       "type": "movie",
       "name": "Velitel ponorky",
-      "poster": "https://placehold.co/500x750?text=Velitel%20ponorky",
-      "background": "https://placehold.co/500x750?text=Velitel%20ponorky",
-      "description": "Originálny názov: Comandante\n\nDabing: CZ\n\nPridané: 2026-06-26\n\nČSFD: https://www.csfd.cz/sk/film/1405745-velitel-ponorky/recenzie/\n\nTMDB: 1047016\n\nIMDb: tt23573936",
+      "poster": "https://image.tmdb.org/t/p/w500/miXmz8at1jJo1G0I8wKpBeyN8Nw.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/ixomGplKX40BU5R7QxCdwPOL9CI.jpg",
+      "description": "Na začátku druhé světové války dostává kapitán Salvatore Todaro velení italské ponorky Cappellini, která operuje v nebezpečných vodách Atlantského oceánu. Během jedné z hlídek narazí jeho posádka na obchodní loď plující bez osvětlení. Když se ukáže, že jde o nepřátelské plavidlo, rozpoutá se krátký, ale intenzivní střet, který končí jeho potopením.  Po bitvě však Todaro učiní rozhodnutí, které je v rozporu s válečnou logikou, ale odpovídá jeho vlastnímu morálnímu kodexu. Místo aby přeživší ponechal napospas rozbouřenému oceánu, rozhodne se zachránit belgické námořníky a dopravit je do bezpečí. Tím však vystaví sebe, svou ponorku i celou posádku obrovskému riziku, protože musí několik dní zůstat na hladině, kde se mohou kdykoliv stát snadným cílem nepřátelských sil.  Film je inspirován skutečnými událostmi a vypráví příběh odvahy, lidskosti a cti, která dokázala obstát i uprostřed nelítostné války.\n\nOriginálny názov: Comandante\n\nDabing: CZ\n\nPridané: 2026-06-26\n\nČSFD: https://www.csfd.cz/sk/film/1405745-velitel-ponorky/recenzie/\n\nIMDb: tt23573936\n\nTMDB: 1047016",
       "releaseInfo": "2023",
       "year": 2023,
+      "runtime": "120 min",
       "genres": [
+        "Válečný",
+        "Historický",
+        "Drama",
         "CZ"
+      ],
+      "imdbRating": "6.9",
+      "director": "Edoardo De Angelis",
+      "cast": [
+        "Pierfrancesco Favino",
+        "Massimiliano Rossi",
+        "Johan Heldenbergh",
+        "Silvia D'Amico",
+        "Arturo Muselli",
+        "Giuseppe Brunetti",
+        "Gianluca Di Gennaro",
+        "Johannes Wirix"
       ],
       "links": [
         {
@@ -12316,14 +12417,19 @@
           "url": "https://www.csfd.cz/sk/film/1405745-velitel-ponorky/recenzie/"
         },
         {
-          "name": "Zdroj",
-          "category": "Info",
-          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
           "name": "IMDb",
           "category": "Info",
           "url": "https://www.imdb.com/title/tt23573936/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1047016"
+        },
+        {
+          "name": "Zdroj",
+          "category": "Info",
+          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
@@ -12344,7 +12450,7 @@
       "id": "tt32565993",
       "type": "movie",
       "name": "Béé team na stopě",
-      "poster": "https://image.tmdb.org/t/p/w500/6QtL9rl3Zb4d8qW6EJ4qO5hSSfU.jpg",
+      "poster": "https://image.tmdb.org/t/p/w500/xVp94erqT2xq7KlNDv1LjXjfPvn.jpg",
       "background": "https://image.tmdb.org/t/p/w1280/t6O6XWelu27BD0OmIDCCufZZT6d.jpg",
       "description": "V této vtipné, novátorské detektivce je George pastýř, který každou noc čte svým milovaným ovcím detektivní romány v domnění, že jim stejně nemohou rozumět. Když však záhadná událost naruší život na farmě, ovce si uvědomí, že se samy musí stát detektivy. Při sledování stop a vyšetřování lidských podezřelých dokazují, že i ovce mohou být brilantními řešiteli zločinů.\n\nOriginálny názov: The Sheep Detectives\n\nDabing: CZ/SK\n\nPridané: 2026-06-25\n\nIMDb: tt32565993\n\nTMDB: 1301421",
       "releaseInfo": "2026",
@@ -12352,11 +12458,12 @@
       "runtime": "109 min",
       "genres": [
         "Komedie",
-        "Rodinný",
+        "Krimi",
         "Mysteriózní",
+        "Rodinný",
         "CZ/SK"
       ],
-      "imdbRating": "7.6",
+      "imdbRating": "7.7",
       "director": "Kyle Balda",
       "cast": [
         "Hugh Jackman",
@@ -12408,15 +12515,43 @@
       "id": "tt28650488",
       "type": "movie",
       "name": "Super Mario galaktický film",
-      "poster": "https://placehold.co/500x750?text=Super%20Mario%20galaktick%C3%BD%20film",
-      "background": "https://placehold.co/500x750?text=Super%20Mario%20galaktick%C3%BD%20film",
-      "description": "Originálny názov: Galaxy Movie\n\nDabing: CZ/SK\n\nPridané: 2026-06-25\n\nTMDB: 1226863\n\nIMDb: tt28650488",
+      "poster": "https://image.tmdb.org/t/p/w500/7uDDrCfyplW0J90hgEn6r5WsT3V.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/9Z2uDYXqJrlmePznQQJhL6d92Rq.jpg",
+      "description": "Poté, co Mario a Luigi zmařili Bowserův předchozí plán oženit se s princeznou Peach, čelí nyní nové hrozbě v podobě Bowsera Jr., který je odhodlán osvobodit svého otce ze zajetí a obnovit rodinné dědictví. Spolu se starými i novými společníky putují bratři napříč hvězdami, aby zastavili tažení mladého dědice.\n\nOriginálny názov: Galaxy Movie\n\nDabing: CZ/SK\n\nPridané: 2026-06-25\n\nIMDb: tt28650488\n\nTMDB: 1226863",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "98 min",
       "genres": [
+        "Rodinný",
+        "Komedie",
+        "Dobrodružný",
+        "Fantasy",
+        "Animovaný",
         "CZ/SK"
       ],
+      "imdbRating": "8.2",
+      "director": "Aaron Horvath, Michael Jelenic",
+      "cast": [
+        "Chris Pratt",
+        "Anya Taylor-Joy",
+        "Charlie Day",
+        "Jack Black",
+        "Donald Glover",
+        "Benny Safdie",
+        "Brie Larson",
+        "Keegan-Michael Key"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt28650488/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1226863"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -12426,16 +12561,18 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt28650488/"
         }
       ],
       "behaviorHints": {
         "defaultVideoId": "tt28650488"
       },
+      "videos": [
+        {
+          "id": "yt:LWG9su7iyXc",
+          "title": "Trailer",
+          "released": "2026-06-25"
+        }
+      ],
       "_addon": {
         "key": "movie|super mario galaktický film|galaxy movie|2026|cz/sk",
         "dateAdded": "2026-06-25",
@@ -12514,13 +12651,27 @@
       "id": "tt28102880",
       "type": "movie",
       "name": "Dej si pohov, mladej! 2",
-      "poster": "https://placehold.co/500x750?text=Dej%20si%20pohov%2C%20mladej!%202",
-      "background": "https://placehold.co/500x750?text=Dej%20si%20pohov%2C%20mladej!%202",
-      "description": "Originálny názov: Maison de retraite 2\n\nDabing: CZ\n\nPridané: 2026-06-25\n\nČSFD: https://www.csfd.cz/sk/film/1452598-daj-si-pohov-mlady-2/prehlad/\n\nTMDB: 1083300\n\nIMDb: tt28102880",
-      "releaseInfo": "2023",
-      "year": 2023,
+      "poster": "https://image.tmdb.org/t/p/w500/qlDnG9IOdJssYICrPo7KtySCjgw.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/3nhnRUTge3depmgTN3Fjax6DbO1.jpg",
+      "description": "Díky Milannovi žijí nyní senioři a osiřelé děti pod jednou střechou jako velká rodina. Když se však do toho obují úřady, pohádka končí. Rezidenti se během léta dočasně přestěhují do zdánlivě dokonalého klubu Bel Azur, což se ale vůbec nelíbí domácím důchodcům. Válka penzistů je však Milannův nejmenší problém. V zoufalé snaze zachránit jejich společný domov se chytí do pasti zlomyslné konkurence. S podporou první lásky a důvtipem starých i nových mentorů však ještě dokáže rozehrát pořádnou šachovou partii!\n\nOriginálny názov: Maison de retraite 2\n\nDabing: CZ\n\nPridané: 2026-06-25\n\nČSFD: https://www.csfd.cz/sk/film/1452598-daj-si-pohov-mlady-2/prehlad/\n\nIMDb: tt28102880\n\nTMDB: 1083300",
+      "releaseInfo": "2024",
+      "year": 2024,
+      "runtime": "102 min",
       "genres": [
+        "Komedie",
         "CZ"
+      ],
+      "imdbRating": "5.3",
+      "director": "Claude Zidi Jr.",
+      "cast": [
+        "Kev Adams",
+        "Daniel Prévost",
+        "Liliane Rovère",
+        "Firmine Richard",
+        "Jean Reno",
+        "Chantal Ladesou",
+        "Enrico Macias",
+        "Amanda Lear"
       ],
       "links": [
         {
@@ -12529,14 +12680,19 @@
           "url": "https://www.csfd.cz/sk/film/1452598-daj-si-pohov-mlady-2/prehlad/"
         },
         {
-          "name": "Zdroj",
-          "category": "Info",
-          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
           "name": "IMDb",
           "category": "Info",
           "url": "https://www.imdb.com/title/tt28102880/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1083300"
+        },
+        {
+          "name": "Zdroj",
+          "category": "Info",
+          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
@@ -12748,15 +12904,40 @@
       "id": "tt1333644",
       "type": "movie",
       "name": "Dantův rukopis",
-      "poster": "https://placehold.co/500x750?text=Dant%C5%AFv%20rukopis",
-      "background": "https://placehold.co/500x750?text=Dant%C5%AFv%20rukopis",
-      "description": "Originálny názov: In the Hand of Dante\n\nDabing: CZ\n\nPridané: 2026-06-24\n\nTMDB: 1020047\n\nIMDb: tt1333644",
-      "releaseInfo": "2025",
-      "year": 2025,
+      "poster": "https://image.tmdb.org/t/p/w500/fN7FrDyLDi8ynzDV2Xf6R5CsIWt.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/6pb3DTtHYh6ChqsmX9yFEX9GXVt.jpg",
+      "description": "Spisovatel pomáhá mafiánskému bossovi ukrást originál Danteho „Božské komedie“. Paralelní linka odhaluje, jak tenhle básník ze 14. století svoje mistrovské dílo tvořil.\n\nOriginálny názov: In the Hand of Dante\n\nDabing: CZ\n\nPridané: 2026-06-24\n\nIMDb: tt1333644\n\nTMDB: 1020047",
+      "releaseInfo": "2026",
+      "year": 2026,
+      "runtime": "153 min",
       "genres": [
+        "Drama",
+        "Krimi",
         "CZ"
       ],
+      "imdbRating": "4.8",
+      "director": "Julian Schnabel",
+      "cast": [
+        "Oscar Isaac",
+        "Gal Gadotová",
+        "Gerard Butler",
+        "John Malkovich",
+        "Louis Cancelmi",
+        "Sabrina Impacciatore",
+        "Franco Nero",
+        "Benjamin Clementine"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt1333644/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1020047"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -12766,11 +12947,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt1333644/"
         }
       ],
       "behaviorHints": {
@@ -12788,25 +12964,26 @@
       }
     },
     {
-      "id": "tt19864094",
+      "id": "tt33355331",
       "type": "movie",
       "name": "Bumerang",
-      "poster": "https://image.tmdb.org/t/p/w500/i6JCAOL2OtO9dO5HcZvvaex45Q5.jpg",
-      "background": "https://image.tmdb.org/t/p/w500/i6JCAOL2OtO9dO5HcZvvaex45Q5.jpg",
-      "description": "Poté, co přišla o práci, je jedna tápající mileniálka nucena se nastěhovat zpět do svého dětského pokoje a vypořádat se s životem po boku svých dysfunkčních rodičů. Odhodlaná najít si milence, obnoví kontakt se svou láskou z dob základní školy.\n\nOriginálny názov: Boomerang\n\nDabing: CZ\n\nPridané: 2026-06-24\n\nČSFD: https://www.csfd.cz/sk/film/1563676-bumerang/prehlad/\n\nIMDb: tt19864094\n\nTMDB: 1134701",
+      "poster": "https://image.tmdb.org/t/p/w500/bsUN0weg5hhMcRI5w8fJErvBHzn.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/d5uZzh8HpyFqGWz8MBuYe3e58fO.jpg",
+      "description": "Film nabízí poutavý pohled na staré i nové vztahy a zároveň zachycuje fascinující obraz současného života a společenských zvyklostí v Teheránu.\n\nOriginálny názov: Boomerang\n\nDabing: CZ\n\nPridané: 2026-06-24\n\nČSFD: https://www.csfd.cz/sk/film/1563676-bumerang/prehlad/\n\nIMDb: tt33355331\n\nTMDB: 1317907",
       "releaseInfo": "2024",
       "year": 2024,
-      "runtime": "13 min",
+      "runtime": "83 min",
       "genres": [
-        "Komedie",
+        "Drama",
         "CZ"
       ],
-      "imdbRating": "1",
-      "director": "Rylee Jean Ebsen",
+      "director": "Shahab Fotouhi",
       "cast": [
-        "Phil Abrams",
-        "Sydney Steinberg",
-        "Marin Hinkle"
+        "Arash Naimian",
+        "Leili Rashidi",
+        "Yas Farkhondeh",
+        "Ali Hanafian",
+        "Shaghayeh Djodat"
       ],
       "links": [
         {
@@ -12817,12 +12994,12 @@
         {
           "name": "IMDb",
           "category": "Info",
-          "url": "https://www.imdb.com/title/tt19864094/"
+          "url": "https://www.imdb.com/title/tt33355331/"
         },
         {
           "name": "TMDB",
           "category": "Info",
-          "url": "https://www.themoviedb.org/movie/1134701"
+          "url": "https://www.themoviedb.org/movie/1317907"
         },
         {
           "name": "Zdroj",
@@ -12831,15 +13008,15 @@
         }
       ],
       "behaviorHints": {
-        "defaultVideoId": "tt19864094"
+        "defaultVideoId": "tt33355331"
       },
       "_addon": {
         "key": "movie|bumerang|boomerang|2024|cz",
         "dateAdded": "2026-06-24",
         "lang": "CZ",
         "csfdUrl": "https://www.csfd.cz/sk/film/1563676-bumerang/prehlad/",
-        "imdbId": "tt19864094",
-        "tmdbId": 1134701,
+        "imdbId": "tt33355331",
+        "tmdbId": 1317907,
         "sourceType": "movie",
         "titleRaw": "Bumerang / Boomerang (2024) (CZ)"
       }
@@ -13097,13 +13274,28 @@
       "id": "tt33502160",
       "type": "movie",
       "name": "Ruka na kolébce",
-      "poster": "https://placehold.co/500x750?text=Ruka%20na%20kol%C3%A9bce",
-      "background": "https://placehold.co/500x750?text=Ruka%20na%20kol%C3%A9bce",
-      "description": "Originálny názov: The Hand That Rocks the Cradle\n\nDabing: CZ\n\nPridané: 2026-06-22\n\nČSFD: https://www.csfd.sk/film/1604213-ruka-na-koliske/prehlad/\n\nTMDB: 1362315\n\nIMDb: tt33502160",
+      "poster": "https://image.tmdb.org/t/p/w500/rDRCq7QdVuxDOtE2oCB1vNe0FK4.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/lK1zWi7EpBIFaGJBf0Y7jjemZe2.jpg",
+      "description": "Strhující a svůdný psychologický thriller je novým pojetím klasického filmu, ve kterém vlivná matka z předměstí do své rodiny najme novou chůvu, ale záhy zjistí, že není tím, za koho se vydává.\n\nOriginálny názov: The Hand That Rocks the Cradle\n\nDabing: CZ\n\nPridané: 2026-06-22\n\nČSFD: https://www.csfd.sk/film/1604213-ruka-na-koliske/prehlad/\n\nIMDb: tt33502160\n\nTMDB: 1362315",
       "releaseInfo": "2025",
       "year": 2025,
+      "runtime": "105 min",
       "genres": [
+        "Horor",
+        "Thriller",
         "CZ"
+      ],
+      "imdbRating": "5.8",
+      "director": "Michelle Garza Cervera",
+      "cast": [
+        "Maika Monroe",
+        "Mary Elizabeth Winstead",
+        "Raúl Castillo",
+        "Mileiah Vega",
+        "Nora Contreras",
+        "Lola Contreras",
+        "Martin Starr",
+        "Yvette Lu"
       ],
       "links": [
         {
@@ -13112,14 +13304,19 @@
           "url": "https://www.csfd.sk/film/1604213-ruka-na-koliske/prehlad/"
         },
         {
-          "name": "Zdroj",
-          "category": "Info",
-          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
           "name": "IMDb",
           "category": "Info",
           "url": "https://www.imdb.com/title/tt33502160/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1362315"
+        },
+        {
+          "name": "Zdroj",
+          "category": "Info",
+          "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
@@ -13140,15 +13337,39 @@
       "id": "tt30268321",
       "type": "movie",
       "name": "Eleanor the Great",
-      "poster": "https://placehold.co/500x750?text=Eleanor%20the%20Great",
-      "background": "https://placehold.co/500x750?text=Eleanor%20the%20Great",
-      "description": "Dabing: CZ\n\nPridané: 2026-06-20\n\nTMDB: 1212271\n\nIMDb: tt30268321",
+      "poster": "https://image.tmdb.org/t/p/w500/9XTM42IJST6lwPxtK2iUwNaFvCT.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/Adg0gp8kGKXUSe8emJByRbvweGk.jpg",
+      "description": "Živelná seniorka vypráví příběh, který se změní v nebezpečné dobrodružství.\n\nDabing: CZ\n\nPridané: 2026-06-20\n\nIMDb: tt30268321\n\nTMDB: 1212271",
       "releaseInfo": "2025",
       "year": 2025,
+      "runtime": "98 min",
       "genres": [
+        "Drama",
         "CZ"
       ],
+      "imdbRating": "6.9",
+      "director": "Scarlett Johansson",
+      "cast": [
+        "June Squibb",
+        "Erin Kellyman",
+        "Chiwetel Ejiofor",
+        "Jessica Hecht",
+        "Rita Zohar",
+        "Will Price",
+        "Lia Lando",
+        "Greg Kaston"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt30268321/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1212271"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -13158,11 +13379,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt30268321/"
         }
       ],
       "behaviorHints": {
@@ -13183,15 +13399,40 @@
       "id": "tt10375624",
       "type": "movie",
       "name": "Hlasovky pro Isabelle",
-      "poster": "https://placehold.co/500x750?text=Hlasovky%20pro%20Isabelle",
-      "background": "https://placehold.co/500x750?text=Hlasovky%20pro%20Isabelle",
-      "description": "Originálny názov: Voicemails for Isabelle\n\nDabing: CZ\n\nPridané: 2026-06-20\n\nTMDB: 614945\n\nIMDb: tt10375624",
+      "poster": "https://image.tmdb.org/t/p/w500/td3lG3vZ30J5r7E4A5Fl1Jf1YR0.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/2WU6Y6aonzD6uAaCmNnEFlesxxJ.jpg",
+      "description": "Mladá žena posílá sestře do nebe zábavné hlasovky ze života, ty ale končí u někoho jiného. A ten někdo začíná být do cizího hlasu na dálku zamilovaný.\n\nOriginálny názov: Voicemails for Isabelle\n\nDabing: CZ\n\nPridané: 2026-06-20\n\nIMDb: tt10375624\n\nTMDB: 614945",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "119 min",
       "genres": [
+        "Romantický",
+        "Komedie",
         "CZ"
       ],
+      "imdbRating": "8.2",
+      "director": "Leah McKendrick",
+      "cast": [
+        "Zoey Deutch",
+        "Nick Robinson",
+        "Ciara Bravo",
+        "Nick Offerman",
+        "Leah McKendrick",
+        "Harry Shum Jr.",
+        "Lukas Gage",
+        "Toby Sandeman"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt10375624/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/614945"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -13201,11 +13442,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt10375624/"
         }
       ],
       "behaviorHints": {
@@ -13227,7 +13463,7 @@
       "type": "movie",
       "name": "Manželé v akci",
       "poster": "https://image.tmdb.org/t/p/w500/A01Ca3GfoUZ192ebgHHj6MYOG35.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/zZQQ5dd7jq1PfUnWTT9qH4RMf5a.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/kEiQORCwEXSeoG4SK0e4sezHboJ.jpg",
       "description": "Detektiv nečekaně spojí síly s novým manželem svojí bývalé ženy, aby vypátrali, kdo ji unesl. Jestli ji ale chtějí zachránit, musí hodit vzájemné spory za hlavu.\n\nOriginálny názov: Nampyeondeul\n\nDabing: CZ\n\nPridané: 2026-06-20\n\nČSFD: https://www.csfd.cz/sk/film/1854960-manzele-v-akci/prehlad/\n\nIMDb: tt36876775\n\nTMDB: 1451344",
       "releaseInfo": "2026",
       "year": 2026,
@@ -13237,7 +13473,7 @@
         "Akční",
         "CZ"
       ],
-      "imdbRating": "7.9",
+      "imdbRating": "7.5",
       "director": "박규태",
       "cast": [
         "진선규",
@@ -13289,15 +13525,41 @@
       "id": "tt14850054",
       "type": "movie",
       "name": "Greenland 2: Útěk",
-      "poster": "https://placehold.co/500x750?text=Greenland%202%3A%20%C3%9At%C4%9Bk",
-      "background": "https://placehold.co/500x750?text=Greenland%202%3A%20%C3%9At%C4%9Bk",
-      "description": "Originálny názov: Greenland 2: Migration\n\nDabing: CZ\n\nPridané: 2026-06-18\n\nTMDB: 840464\n\nIMDb: tt14850054",
+      "poster": "https://image.tmdb.org/t/p/w500/iBUde8WJUH1XCy4T2pNlQnlzp4o.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/cLFbDVfhllIMybpo2fkGNzehiQG.jpg",
+      "description": "Rodina Garrityových se ocitá v dalším nebezpečí. Pět let po dopadu komety, která zničila velkou část Země, jsou nuceni opustit svůj bezpečný bunkr v Grónsku a vydat se na dlouhou cestu napříč zpustošenou a zamrzlou Evropou, aby si našli nový obyvatelný domov. Ve snaze přežít a začít nový život na zatím neznámém místě budou muset čelit mnoha výzvám, které si do té doby neuměly ani představit.\n\nOriginálny názov: Greenland 2: Migration\n\nDabing: CZ\n\nPridané: 2026-06-18\n\nIMDb: tt14850054\n\nTMDB: 840464",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "98 min",
       "genres": [
+        "Dobrodružný",
+        "Thriller",
+        "Vědeckofantastický",
         "CZ"
       ],
+      "imdbRating": "6.4",
+      "director": "Ric Roman Waugh",
+      "cast": [
+        "Gerard Butler",
+        "Morena Baccarin",
+        "Roman Griffin Davis",
+        "Tommie Earl Jenkins",
+        "Trond Fausa Aurvåg",
+        "Amber Rose Revah",
+        "Gina Gangar",
+        "Antonio De Lima"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt14850054/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/840464"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -13307,11 +13569,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt14850054/"
         }
       ],
       "behaviorHints": {
@@ -13406,6 +13663,7 @@
         "Komedie",
         "CZ"
       ],
+      "imdbRating": "5",
       "director": "Noëlle Bastin, Baptiste Bogaert",
       "cast": [
         "Pierre Bastin",
@@ -13453,15 +13711,40 @@
       "id": "tt36958376",
       "type": "movie",
       "name": "Tvoje vina: Londýn",
-      "poster": "https://placehold.co/500x750?text=Tvoje%20vina%3A%20Lond%C3%BDn",
-      "background": "https://placehold.co/500x750?text=Tvoje%20vina%3A%20Lond%C3%BDn",
-      "description": "Originálny názov: Your Fault: London\n\nDabing: CZ\n\nPridané: 2026-06-17\n\nTMDB: 1477317\n\nIMDb: tt36958376",
+      "poster": "https://image.tmdb.org/t/p/w500/gTeFG1CIyGg5K0SLRqCwSpExHUj.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/wQOhbCP6H8bO5ddlXDZT207orew.jpg",
+      "description": "Nick i Noah se vydávají na dobrodružství, která jim změní život a hrozí, že je rozdělí – Nick se zapojuje do podnikání se svým otcem a Noah začíná novou kapitolu na Oxfordské univerzitě. Nyní, když žijí oddělené životy a potkávají nové lidi, se ocitají zapleteni do pokušení, rivalit a zrad a jejich pouto je zkoušeno jako nikdy předtím. Jak se odhalují tajemství a sílí pokušení, musí bojovat, aby se navzájem udrželi – nebo riskovat, že ztratí všechno.\n\nOriginálny názov: Your Fault: London\n\nDabing: CZ\n\nPridané: 2026-06-17\n\nIMDb: tt36958376\n\nTMDB: 1477317",
       "releaseInfo": "2026",
       "year": 2026,
+      "runtime": "123 min",
       "genres": [
+        "Romantický",
+        "Drama",
         "CZ"
       ],
+      "imdbRating": "7.5",
+      "director": "Dani Girdwood, Charlotte Fassler",
+      "cast": [
+        "Asha Banks",
+        "Matthew Broome",
+        "Louisa Binder",
+        "Joel Nankervis",
+        "Scarlett Rayner",
+        "Orlando Norman",
+        "Ray Fearon",
+        "Enva Lewis"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt36958376/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1477317"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -13471,11 +13754,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt36958376/"
         }
       ],
       "behaviorHints": {
@@ -13801,15 +14079,40 @@
       "id": "tt12810074",
       "type": "movie",
       "name": "Nočná mrcha",
-      "poster": "https://placehold.co/500x750?text=No%C4%8Dn%C3%A1%20mrcha",
-      "background": "https://placehold.co/500x750?text=No%C4%8Dn%C3%A1%20mrcha",
-      "description": "Originálny názov: Nightbitch\n\nDabing: CZ\n\nPridané: 2026-06-13\n\nTMDB: 728949\n\nIMDb: tt12810074",
+      "poster": "https://image.tmdb.org/t/p/w500/h49Pie8gM2jK0UHGFRjfPB3YTd.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/2ICMZZVcwboF8Z9V7aaJY3CVh9w.jpg",
+      "description": "Žena přeruší kariéru a stane se matkou v domácnosti. Její život ale nabere bizarní směr.\n\nOriginálny názov: Nightbitch\n\nDabing: CZ\n\nPridané: 2026-06-13\n\nIMDb: tt12810074\n\nTMDB: 728949",
       "releaseInfo": "2024",
       "year": 2024,
+      "runtime": "98 min",
       "genres": [
+        "Komedie",
+        "Horor",
         "CZ"
       ],
+      "imdbRating": "5.7",
+      "director": "Marielle Heller",
+      "cast": [
+        "Amy Adams",
+        "Scoot McNairy",
+        "Arleigh Snowden",
+        "Emmett Snowden",
+        "Jessica Harper",
+        "Zoë Chao",
+        "Mary Holland",
+        "Archana Rajan"
+      ],
       "links": [
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt12810074/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/728949"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -13819,11 +14122,6 @@
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
-        },
-        {
-          "name": "IMDb",
-          "category": "Info",
-          "url": "https://www.imdb.com/title/tt12810074/"
         }
       ],
       "behaviorHints": {
@@ -14231,7 +14529,7 @@
         "Krimi",
         "CZ"
       ],
-      "imdbRating": "7.1",
+      "imdbRating": "7",
       "director": "Adrian Panek",
       "cast": [
         "Jakub Gierszał",
@@ -14688,7 +14986,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.3",
+      "imdbRating": "7.2",
       "director": "James Sweeney",
       "cast": [
         "Dylan O'Brien",
@@ -15252,7 +15550,7 @@
         "Hudební",
         "CZ"
       ],
-      "imdbRating": "6.2",
+      "imdbRating": "6.3",
       "director": "Anderson .Paak",
       "cast": [
         "Anderson .Paak",
@@ -18453,7 +18751,7 @@
         "Romantický",
         "CZ"
       ],
-      "imdbRating": "6.8",
+      "imdbRating": "6.7",
       "director": "Johanna Runevad",
       "cast": [
         "Eva Melander",
@@ -19899,7 +20197,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "6.5",
+      "imdbRating": "6.4",
       "director": "Kate Woods",
       "cast": [
         "Lily Whiteley",
@@ -33295,7 +33593,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Finn Wolfhard, Billy Bryk",
+      "director": "Billy Bryk, Finn Wolfhard",
       "cast": [
         "Finn Wolfhard",
         "Billy Bryk",
@@ -36019,7 +36317,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.1",
+      "imdbRating": "7.2",
       "director": "管虎",
       "cast": [
         "彭于晏",
@@ -40621,7 +40919,7 @@
         "CZ"
       ],
       "imdbRating": "7",
-      "director": "Logan Giese, John Burd",
+      "director": "John Burd, Logan Giese",
       "cast": [
         "Christa Rose",
         "Eva Igo",
@@ -41449,7 +41747,7 @@
         "CZ"
       ],
       "imdbRating": "6",
-      "director": "Samantha Speirs, Bertie Speirs",
+      "director": "Bertie Speirs, Samantha Speirs",
       "cast": [
         "Ladi Emeruwa",
         "Charlotte Price",
@@ -42017,7 +42315,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Petar Valchanov, Kristina Grozeva",
+      "director": "Kristina Grozeva, Petar Valchanov",
       "cast": [
         "Maria Bakalovová",
         "Margita Gosheva",
@@ -44126,7 +44424,7 @@
         "CZ"
       ],
       "imdbRating": "6",
-      "director": "Nicola Lemay, Christine Dallaire-Dupont",
+      "director": "Christine Dallaire-Dupont, Nicola Lemay",
       "cast": [
         "Alexandre Bacon",
         "Nancy Bernier",
@@ -44853,7 +45151,7 @@
         "CZ/SK"
       ],
       "imdbRating": "6.9",
-      "director": "Madeline Sharafian, Domee Shi, Adrian Molina",
+      "director": "Domee Shi, Madeline Sharafian, Adrian Molina",
       "cast": [
         "Yonas Kibreab",
         "Remy Edgerly",
@@ -48437,7 +48735,7 @@
         "CZ"
       ],
       "imdbRating": "7.3",
-      "director": "Barbara Miller, Philip Delaquis",
+      "director": "Philip Delaquis, Barbara Miller",
       "cast": [
         "Tändzin Gjamccho"
       ],
@@ -49823,7 +50121,7 @@
         "CZ"
       ],
       "imdbRating": "7",
-      "director": "Zach Lipovsky, Adam B. Stein",
+      "director": "Adam B. Stein, Zach Lipovsky",
       "cast": [
         "Kaitlyn Santa Juana",
         "Teo Briones",
@@ -50140,7 +50438,7 @@
         "CZ"
       ],
       "imdbRating": "8",
-      "director": "Maggie Kang, Chris Appelhans",
+      "director": "Chris Appelhans, Maggie Kang",
       "cast": [
         "Arden Cho",
         "May Hong",
@@ -53630,7 +53928,7 @@
         "CZ"
       ],
       "imdbRating": "6.8",
-      "director": "Astrid Rondero, Fernanda Valadez",
+      "director": "Fernanda Valadez, Astrid Rondero",
       "cast": [
         "Juan Jesús Varela",
         "Yadira Pérez",
