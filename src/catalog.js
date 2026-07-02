@@ -41,6 +41,7 @@ function toMeta(item, csfd = {}, tmdb = null) {
     item.csfdUrl ? { name: 'ČSFD', category: 'Info', url: item.csfdUrl } : null,
     imdbId ? { name: 'IMDb', category: 'Info', url: `https://www.imdb.com/title/${imdbId}/` } : null,
     tmdb?.tmdbId ? { name: 'TMDB', category: 'Info', url: tmdbUrl(type, tmdb.tmdbId) } : null,
+    tmdb?.trailer ? { name: 'Trailer', category: 'Video', url: `https://www.youtube.com/watch?v=${tmdb.trailer}` } : null,
     item.detailUrl ? { name: 'FilmovéNovinky', category: 'Info', url: item.detailUrl } : null,
     item.sourceUrl ? { name: 'Zdroj', category: 'Info', url: item.sourceUrl } : null
   ].filter(Boolean);
@@ -71,7 +72,9 @@ function toMeta(item, csfd = {}, tmdb = null) {
     cast: tmdb?.cast,
     links,
     behaviorHints: { defaultVideoId: id },
-    videos: tmdb?.trailer ? [{ id: `yt:${tmdb.trailer}`, title: 'Trailer', released: item.dateAdded }] : undefined,
+    // DÔLEŽITÉ: pri filme neposielame `videos` s trailerom. Nuvio/Android TV
+    // môže každé samostatné video vyhodnotiť ako epizódu a film zobraziť ako seriál.
+    // Trailer zostáva dostupný ako bežný odkaz vyššie.
     _addon: { key: item.key || itemKey(item), dateAdded: item.dateAdded, lang: item.lang, csfdUrl: item.csfdUrl || null, imdbId, tmdbId: tmdb?.tmdbId || null, sourceType: type, titleRaw: item.titleRaw }
   };
 }

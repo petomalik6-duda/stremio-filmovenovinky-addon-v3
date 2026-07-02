@@ -1,3 +1,12 @@
+# FilmovéNovinky v3.5.1 – Nuvio Android TV movie fix
+
+Táto verzia opravuje prípad, keď Nuvio zobrazilo film **Ďábel nosí Pradu 2** ako seriál.
+Oprava je všeobecná pre všetky filmy: filmové meta odpovede už neposielajú `videos` s trailerom ani seriálové polia. Trailer zostáva dostupný ako odkaz.
+
+Podrobný postup je v `UPGRADE-3.5.1-NUVIO.md`.
+
+---
+
 # FilmovéNovinky refresh-cache repair balík
 
 Tento balík pridá opravy priamo do `refresh-cache` procesu.

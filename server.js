@@ -30,8 +30,8 @@ const catalogs = [
 ];
 
 const manifest = {
-  id: 'sk.filmovenovinky.filmy.only.v370',
-  version: '3.5.0',
+  id: 'sk.filmovenovinky.filmy.only.v371',
+  version: '3.5.1',
   name: 'FilmovéNovinky CZ/SK filmy',
   description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',
   logo: `${PUBLIC_URL}/logo.png`,
@@ -54,6 +54,22 @@ app.use('/logo.png', express.static('logo.png'));
 function cleanMeta(meta) {
   if (!meta) return null;
   const { _addon, ...safeMeta } = meta;
+
+  // Ochrana pre Nuvio/Android TV: filmy sú single-video položky.
+  // Staršie cache mohli obsahovať `videos` s YouTube trailerom, čo Nuvio
+  // niekedy interpretovalo ako zoznam epizód a zobrazilo film ako seriál.
+  if (safeMeta.type === 'movie') {
+    delete safeMeta.videos;
+    delete safeMeta.seriesInfo;
+    delete safeMeta.season;
+    delete safeMeta.episode;
+
+    safeMeta.behaviorHints = {
+      ...(safeMeta.behaviorHints || {}),
+      defaultVideoId: safeMeta.id
+    };
+  }
+
   return safeMeta;
 }
 
