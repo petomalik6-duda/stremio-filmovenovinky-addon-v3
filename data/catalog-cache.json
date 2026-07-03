@@ -1,5 +1,5 @@
 {
-  "at": 1782975516074,
+  "at": 1783061419844,
   "sourceHash": "f67100d8e51580ad78337171f526b0e01c30cffb",
   "items": [
     {
@@ -12197,7 +12197,7 @@
       "id": "tt32278481",
       "type": "movie",
       "name": "Enola Holmesová 3",
-      "poster": "https://image.tmdb.org/t/p/w500/mE2wuBHPSAvQ2tCukajkWgB2diN.jpg",
+      "poster": "https://image.tmdb.org/t/p/w500/iLQE0fzQJb8BAvNXaL3rjFKXT4o.jpg",
       "background": "https://image.tmdb.org/t/p/w1280/jLuGZc84MvPYCQomQg9DI72mstt.jpg",
       "description": "Enola Holmesová vyráží na Maltu, kde se má vdávat. Sherlock ale zničehonic zmizí a Enola musí místo svatby řešit nebezpečný případ.\n\nOriginálny názov: Enola Holmes 3\n\nDabing: CZ\n\nPridané: 2026-07-01\n\nIMDb: tt32278481\n\nTMDB: 1202033",
       "releaseInfo": "2026",
@@ -12207,9 +12207,10 @@
         "Dobrodružný",
         "Krimi",
         "Mysteriózní",
+        "Akční",
         "CZ"
       ],
-      "imdbRating": "7.7",
+      "imdbRating": "7.2",
       "director": "Philip Barantini",
       "cast": [
         "Millie Bobby Brown",
@@ -12272,7 +12273,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "6.8",
+      "imdbRating": "6.9",
       "director": "David Frankel",
       "cast": [
         "Meryl Streep",
@@ -12294,6 +12295,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1314481"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=kFi_9bR5zdw"
         },
         {
           "name": "FilmovéNovinky",
@@ -12461,7 +12467,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "6.2",
+      "imdbRating": "6.3",
       "director": "Matt Spicer",
       "cast": [
         "John Cena",
@@ -12613,6 +12619,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1642848"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=yllJynio1QY"
         },
         {
           "name": "Zdroj",
@@ -12845,7 +12856,7 @@
         "CZ/SK"
       ],
       "imdbRating": "8.2",
-      "director": "Aaron Horvath, Michael Jelenic",
+      "director": "Michael Jelenic, Aaron Horvath",
       "cast": [
         "Chris Pratt",
         "Anya Taylor-Joy",
@@ -12866,6 +12877,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1226863"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=LWG9su7iyXc"
         },
         {
           "name": "FilmovéNovinky",
@@ -13097,7 +13113,7 @@
         "Fantasy",
         "CZ"
       ],
-      "imdbRating": "8.4",
+      "imdbRating": "8.5",
       "director": "Tacuja Jošihara",
       "cast": [
         "Kikunosuke Toja",
@@ -14030,7 +14046,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.6",
+      "imdbRating": "7.5",
       "director": "Dani Girdwood, Charlotte Fassler",
       "cast": [
         "Asha Banks",
@@ -14585,7 +14601,7 @@
         "Horor",
         "CZ"
       ],
-      "imdbRating": "7.3",
+      "imdbRating": "7.4",
       "director": "Michael Philippou, Danny Philippou",
       "cast": [
         "Billy Barratt",
@@ -14649,7 +14665,7 @@
         "Thriller",
         "CZ"
       ],
-      "imdbRating": "6.3",
+      "imdbRating": "6.2",
       "director": "Juan Francisco Olea",
       "cast": [
         "Katalina Sánchez",
@@ -14837,7 +14853,7 @@
         "Krimi",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "6.9",
       "director": "Adrian Panek",
       "cast": [
         "Jakub Gierszał",
@@ -15114,6 +15130,11 @@
           "url": "https://www.themoviedb.org/movie/687163"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=26708YSDK-4"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/sci-fi/project-hail-mary-2026-ryan-gosling-liz-kingsman-lionel-boyce-milana-vayntrub"
@@ -15176,6 +15197,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1290821"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=Qk_tqZkxmII"
         },
         {
           "name": "FilmovéNovinky",
@@ -15280,7 +15306,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.2",
+      "imdbRating": "7.3",
       "director": "James Sweeney",
       "cast": [
         "Dylan O'Brien",
@@ -16244,6 +16270,11 @@
           "url": "https://www.themoviedb.org/movie/677558"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=JFhohUwnE5k"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/animovane/velrybia-piesen-the-last-whale-singer-2026-vincent-tong-jen-viens"
@@ -16686,6 +16717,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1368881"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=yeQsCOkDFws"
         },
         {
           "name": "FilmovéNovinky",
@@ -17459,6 +17495,11 @@
           "url": "https://www.themoviedb.org/movie/1330021"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=yxCUwgUf994"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/dramy/pozoruhodne-bystre-stvorenia-remarkably-bright-creatures-2026-netflix"
@@ -17777,6 +17818,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1297842"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=XGOEYIRu3ow"
         },
         {
           "name": "FilmovéNovinky",
@@ -18252,7 +18298,7 @@
         "Fantasy",
         "CZ"
       ],
-      "imdbRating": "9",
+      "imdbRating": "8.9",
       "director": "Nathan Greno",
       "cast": [
         "Michael B. Jordan",
@@ -18274,6 +18320,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1007757"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=AHzXLI9Xzhs"
         },
         {
           "name": "FilmovéNovinky",
@@ -19393,7 +19444,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "5.6",
+      "imdbRating": "5.7",
       "director": "MJ Bassett",
       "cast": [
         "Matilda Lutz",
@@ -19456,7 +19507,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.2",
+      "imdbRating": "6.8",
       "director": "Brwa Vahabpour",
       "cast": [
         "Peiman Azizpour",
@@ -19604,6 +19655,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1318447"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=KvRhEkqZuHs"
         },
         {
           "name": "FilmovéNovinky",
@@ -20387,7 +20443,7 @@
         "Akční",
         "CZ"
       ],
-      "imdbRating": "7.8",
+      "imdbRating": "7.7",
       "director": "Jesse V. Johnson",
       "cast": [
         "Aaron Eckhart",
@@ -21485,6 +21541,11 @@
           "url": "https://www.themoviedb.org/movie/1272837"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=B6rZPO4Yb40"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/horory/28-rokov-potom-chram-z-kosti-28-years-later-the-bone-temple-2026"
@@ -21991,6 +22052,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1171145"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=OsLpUACucj8"
         },
         {
           "name": "FilmovéNovinky",
@@ -22943,6 +23009,11 @@
           "url": "https://www.themoviedb.org/movie/1556011"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=X1bez7Nk8MY"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -23067,6 +23138,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1573810"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=khxajhmQbQY"
         },
         {
           "name": "Zdroj",
@@ -24381,6 +24457,11 @@
           "url": "https://www.themoviedb.org/movie/1461539"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=jlEaJZ6nWO0"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -24699,6 +24780,11 @@
           "url": "https://www.themoviedb.org/movie/1468114"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=Rd_V1ayxBM8"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -24921,7 +25007,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "7.5",
+      "imdbRating": "8.1",
       "director": "Snævar Sölvason",
       "cast": [
         "Björn Jörundur Friðbjörnsson",
@@ -25046,7 +25132,7 @@
         "Thriller",
         "CZ"
       ],
-      "imdbRating": "7",
+      "imdbRating": "8.5",
       "director": "Daniel Emeke Oriahi",
       "cast": [
         "Uzoamaka Power",
@@ -25236,7 +25322,7 @@
         "Fantasy",
         "CZ"
       ],
-      "imdbRating": "6.3",
+      "imdbRating": "6.4",
       "director": "รัชฏ์ภูมิ บุญบัญชาโชค",
       "cast": [
         "ดาวิกา โฮร์เน่",
@@ -25945,6 +26031,11 @@
           "url": "https://www.themoviedb.org/movie/1355213"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=3YFPs7A1aOg"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -26286,7 +26377,7 @@
         "CZ"
       ],
       "imdbRating": "7.4",
-      "director": "Thérèse Ahlbeck, Marcus Olsson",
+      "director": "Marcus Olsson, Thérèse Ahlbeck",
       "cast": [
         "Henrik Dorsin",
         "Sissela Benn",
@@ -26476,7 +26567,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "6.2",
+      "imdbRating": "6.3",
       "director": "J.J. Perry",
       "cast": [
         "Dave Bautista",
@@ -26995,6 +27086,11 @@
           "url": "https://www.themoviedb.org/movie/1552028"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=XwN3BBCEaJk"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -27245,6 +27341,11 @@
           "url": "https://www.themoviedb.org/movie/1246049"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=SlsbT5lWUUU"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/horory/dracula-a-love-tale-2025-caleb-landry-jones-christoph-waltz"
@@ -27492,6 +27593,11 @@
           "url": "https://www.themoviedb.org/movie/1084242"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=PHNltp6UW_s"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/animovane/zootropolis-mesto-zvierat-2-zootopia-2-2025-jason-bateman-ginnifer-goodwin"
@@ -27550,6 +27656,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1629706"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=UrOkdy9u4hQ"
         },
         {
           "name": "FilmovéNovinky",
@@ -28231,6 +28342,11 @@
           "url": "https://www.themoviedb.org/movie/1563043"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=DtB4UZ-xtUI"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -28891,7 +29007,7 @@
         "Komedie",
         "CZ"
       ],
-      "imdbRating": "6.5",
+      "imdbRating": "6.4",
       "director": "Jon Holmberg",
       "cast": [
         "Orlando Wahlsteen",
@@ -29108,6 +29224,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1157322"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=f78r0tpG5fg"
         },
         {
           "name": "Zdroj",
@@ -29475,6 +29596,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1226578"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=47l3z1v9NB0"
         },
         {
           "name": "FilmovéNovinky",
@@ -30476,6 +30602,11 @@
           "url": "https://www.themoviedb.org/movie/1618108"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=feW3V45QYqI"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -30659,6 +30790,11 @@
           "url": "https://www.themoviedb.org/movie/945961"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=0YqFbhVHbm0"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/horory/votrelec-alien-romulus-2024-isabela-merced-cailee-spaeny"
@@ -30722,6 +30858,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1316147"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=5sIXn4Bg3G8"
         },
         {
           "name": "FilmovéNovinky",
@@ -31347,6 +31488,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1034716"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=wu6R28bmdUU"
         },
         {
           "name": "FilmovéNovinky",
@@ -33359,6 +33505,11 @@
           "url": "https://www.themoviedb.org/movie/1526333"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=MGbiBYxNm6w"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -34362,6 +34513,11 @@
           "url": "https://www.themoviedb.org/movie/1124619"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=ySL5QF4-8Hg"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/akcne/bride-hard-2025-rebel-wilson-justin-hartley-anna-chlumsky"
@@ -34986,6 +35142,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/533533"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=Zu8paHGelQ0"
         },
         {
           "name": "FilmovéNovinky",
@@ -35616,6 +35777,11 @@
           "url": "https://www.themoviedb.org/movie/1232546"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=BsPceq773GQ"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/horory/until-dawn-2025-peter-stormare-odessa-a-zion-michael-cimino"
@@ -35901,7 +36067,7 @@
         "Drama",
         "CZ"
       ],
-      "imdbRating": "3.4",
+      "imdbRating": "3.7",
       "director": "Tomáš Vorel",
       "cast": [
         "Jiří Mádl",
@@ -35928,6 +36094,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1256518"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=ApufbcG_-ZU"
         },
         {
           "name": "Zdroj",
@@ -36117,6 +36288,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/959604"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=cYPTXMS-PD4"
         },
         {
           "name": "Zdroj",
@@ -36719,7 +36895,7 @@
         "Thriller",
         "CZ"
       ],
-      "imdbRating": "6.5",
+      "imdbRating": "6.6",
       "director": "Sébastien Vaniček",
       "cast": [
         "Théo Christine",
@@ -37592,6 +37768,11 @@
           "url": "https://www.themoviedb.org/movie/1007734"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=6vm3PS-7Mo0"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/akcne/nikto-2-nobody-2-2025-bob-odenkirk-connie-nielsen-christopher-lloyd"
@@ -37908,6 +38089,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1117857"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=FCtDiKY-ftc"
         },
         {
           "name": "FilmovéNovinky",
@@ -38576,7 +38762,7 @@
         "CZ"
       ],
       "imdbRating": "6.3",
-      "director": "Jens Møller, Piet De Rycker, Jesper Møller",
+      "director": "Jesper Møller, Piet De Rycker, Jens Møller",
       "cast": [
         "Dalia Mya Schmidt-Foß",
         "Oliver Kalkofe",
@@ -38665,6 +38851,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1481097"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=8ftPgcjDSwg"
         },
         {
           "name": "Zdroj",
@@ -38781,6 +38972,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1360111"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=Swn4KhqhwWs"
         },
         {
           "name": "Zdroj",
@@ -38906,6 +39102,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1175942"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=q69VPfhis-U"
         },
         {
           "name": "FilmovéNovinky",
@@ -40969,7 +41170,7 @@
         "CZ"
       ],
       "imdbRating": "7",
-      "director": "John Burd, Logan Giese",
+      "director": "Logan Giese, John Burd",
       "cast": [
         "Christa Rose",
         "Eva Igo",
@@ -41249,6 +41450,11 @@
           "url": "https://www.themoviedb.org/movie/1290879"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=r_gWz6nqnxE"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/thrillery/zena-z-kajuty-c-10-the-woman-in-cabin-10-2025-netflix-keira-knightley"
@@ -41365,6 +41571,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1483477"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=DVevdG7tjlg"
         },
         {
           "name": "Zdroj",
@@ -41679,6 +41890,11 @@
           "url": "https://www.themoviedb.org/movie/1405305"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=BrR2PBgF45Q"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -41839,7 +42055,7 @@
         "Thriller",
         "CZ"
       ],
-      "imdbRating": "6.6",
+      "imdbRating": "6.5",
       "director": "Daniel Calparsoro",
       "cast": [
         "Luis Tosar",
@@ -42344,7 +42560,7 @@
         "CZ"
       ],
       "imdbRating": "5.5",
-      "director": "Kristina Grozeva, Petar Valchanov",
+      "director": "Petar Valchanov, Kristina Grozeva",
       "cast": [
         "Maria Bakalovová",
         "Margita Gosheva",
@@ -43197,6 +43413,11 @@
           "url": "https://www.themoviedb.org/movie/1071585"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=znB9Sc9ws9Q"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/horory/m3gan-2-0-2025-jemaine-clement-allison-williams-violet-mcgraw"
@@ -43325,6 +43546,11 @@
           "url": "https://www.themoviedb.org/movie/1234821"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=dn25tqefrac"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/akcne/jursky-svet-znovuzrodenie-jurassic-world-rebirth-2025"
@@ -43418,7 +43644,7 @@
       "type": "movie",
       "name": "Bláznivá střela",
       "poster": "https://image.tmdb.org/t/p/w500/kNeSg2svzOM31LhAVtzJpYYaCzl.jpg",
-      "background": "https://image.tmdb.org/t/p/w1280/kzeBfhXMRWiykBsqoL3UbfaM0S.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/1wi1hcbl6KYqARjdQ4qrBWZdiau.jpg",
       "description": "Když chceš být dobrý polda, musíš pít spoustu kafe, jíst mraky kalorických jídel, mluvit na podezřelé co nejdrsnějším hlasem a moc se nepárat s tím, co si myslí tvoji nadřízení. Přesně tím se řídí poručík Frank Drebin, který dostal tu největší průpravu od svého táty, absolutní legendy policejního sboru. Frank junior, jenž se při vyšetřování řídí pravidlem „Pro policajty žádná pravidla neplatí,“ právě dostal k rozlousknutí banální případ. Sebevraždu, která smrdí. A protože Beth, krásná sestra oběti, tvrdí, že se její bratr rozhodně nezasebevraždil, vyrazí Drebin po troše nezávazného flirtování po stopách záludného zločince.\n\nOriginálny názov: The Naked Gun\n\nDabing: CZ\n\nPridané: 2025-09-17\n\nIMDb: tt3402138\n\nTMDB: 1035259",
       "releaseInfo": "2025",
       "year": 2025,
@@ -43752,6 +43978,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/936108"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=Qe1m7zWG4d8"
         },
         {
           "name": "FilmovéNovinky",
@@ -44262,6 +44493,11 @@
           "url": "https://www.themoviedb.org/movie/1483665"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=Gb8w5CkQ6cE"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -44425,7 +44661,7 @@
         "CZ"
       ],
       "imdbRating": "6",
-      "director": "Nicola Lemay, Christine Dallaire-Dupont",
+      "director": "Christine Dallaire-Dupont, Nicola Lemay",
       "cast": [
         "Alexandre Bacon",
         "Nancy Bernier",
@@ -45174,6 +45410,11 @@
           "url": "https://www.themoviedb.org/movie/1022787"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=axx2gaPqcKs"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/animovane/elio-2024-teaser-trailer-yonas-kibreab-america-ferrera"
@@ -45427,6 +45668,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1464786"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=g4u2vqlFvYs"
         },
         {
           "name": "Zdroj",
@@ -45863,6 +46109,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/575265"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=zHnWDITP4IQ"
         },
         {
           "name": "FilmovéNovinky",
@@ -46501,6 +46752,11 @@
           "url": "https://www.themoviedb.org/movie/1390401"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=cu_D4E_IiuY"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -46557,6 +46813,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1128655"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=-r03aWc1s_A"
         },
         {
           "name": "FilmovéNovinky",
@@ -47168,6 +47429,11 @@
           "url": "https://www.themoviedb.org/movie/1465963"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=lTbke5ZTvfA"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
@@ -47338,6 +47604,11 @@
           "url": "https://www.themoviedb.org/movie/1137350"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=JexQJHXq8-I"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/komedie/fenicke-sprisahanie-the-phoenician-scheme-2025-benicio-del-toro-michael-cera"
@@ -47400,6 +47671,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/552524"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=HoVCgMn842A"
         },
         {
           "name": "FilmovéNovinky",
@@ -48679,7 +48955,7 @@
         "CZ"
       ],
       "imdbRating": "7.3",
-      "director": "Philip Delaquis, Barbara Miller",
+      "director": "Barbara Miller, Philip Delaquis",
       "cast": [
         "Tändzin Gjamccho"
       ],
@@ -48952,6 +49228,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1443594"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=9xzOi35_lF8"
         },
         {
           "name": "Zdroj",
@@ -49329,6 +49610,11 @@
           "url": "https://www.themoviedb.org/movie/986056"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=oQmJyHTuamY"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/akcne/thunderbolts-2025-florence-pugh-olga-kurylenko-sebastian-stan"
@@ -49395,6 +49681,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1294729"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=dSQlIu307ak"
         },
         {
           "name": "Zdroj",
@@ -49755,6 +50046,11 @@
           "url": "https://www.themoviedb.org/movie/324544"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=vigHZpFLAJE"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/akcne/carodejnica-a-lovec-in-the-lost-lands-2025-milla-jovovich-dave-bautista"
@@ -50037,7 +50333,7 @@
         "CZ"
       ],
       "imdbRating": "7",
-      "director": "Adam B. Stein, Zach Lipovsky",
+      "director": "Adam Stein, Zach Lipovsky",
       "cast": [
         "Kaitlyn Santa Juana",
         "Teo Briones",
@@ -50354,7 +50650,7 @@
         "CZ"
       ],
       "imdbRating": "8",
-      "director": "Maggie Kang, Chris Appelhans",
+      "director": "Chris Appelhans, Maggie Kang",
       "cast": [
         "Arden Cho",
         "May Hong",
@@ -50375,6 +50671,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/803796"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=9p6Di_zlGuk"
         },
         {
           "name": "FilmovéNovinky",
@@ -51350,6 +51651,11 @@
           "url": "https://www.themoviedb.org/movie/1233413"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=F93_Jtv1X14"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/horory/hriesnici-sinners-2025-michael-b-jordan-jack-o-connell"
@@ -52290,6 +52596,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1233575"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=0qREKtJsugk"
         },
         {
           "name": "FilmovéNovinky",
@@ -53909,6 +54220,11 @@
           "url": "https://www.themoviedb.org/movie/447273"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=-EjSYFMjq3o"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/muzikaly/snehulienka-snow-white-2025-rachel-zegler-gal-gadot"
@@ -53972,6 +54288,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/950387"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=SAnliL9ElkY"
         },
         {
           "name": "FilmovéNovinky",
@@ -54040,6 +54361,11 @@
           "name": "TMDB",
           "category": "Info",
           "url": "https://www.themoviedb.org/movie/1030009"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=N1IsOf3NbGU"
         },
         {
           "name": "Zdroj",
@@ -55884,6 +56210,11 @@
           "url": "https://www.themoviedb.org/movie/822119"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=TGhIeXEwVDU"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/akcne/captain-america-novy-svet-2025-anthony-mackie-harrison-ford"
@@ -56965,6 +57296,11 @@
           "url": "https://www.themoviedb.org/movie/1038263"
         },
         {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=jT9XFifqSLM"
+        },
+        {
           "name": "FilmovéNovinky",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/zivotopisne/maria-2024-angelina-jolie-alba-rohrwacher-valeria-golino"
@@ -56990,6 +57326,5 @@
       }
     }
   ],
-  "lastError": null,
-  "migration": "v3.5.1-nuvio-movie-videos-removed"
+  "lastError": null
 }
