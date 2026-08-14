@@ -10,6 +10,7 @@ import {
   searchCatalog,
   isRefreshRunning
 } from './src/catalog.js';
+import { cleanPublicMeta } from './src/public-meta.js';
 
 const PORT = Number(process.env.PORT || 10000);
 const PUBLIC_URL = (process.env.PUBLIC_URL || `http://127.0.0.1:${PORT}`).replace(/\/$/, '');
@@ -30,8 +31,8 @@ const catalogs = [
 ];
 
 const manifest = {
-  id: 'sk.filmovenovinky.filmy.only.v371',
-  version: '3.6.2',
+  id: 'sk.filmovenovinky.filmy.only.v372',
+  version: '3.6.3',
   name: 'FilmovéNovinky CZ/SK filmy',
   description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',
   logo: `${PUBLIC_URL}/logo.png`,
@@ -55,25 +56,7 @@ app.use(express.json());
 app.use('/logo.png', express.static('logo.png'));
 
 function cleanMeta(meta) {
-  if (!meta) return null;
-  const { _addon, ...safeMeta } = meta;
-
-  // Ochrana pre Nuvio/Android TV: filmy sú single-video položky.
-  // Staršie cache mohli obsahovať `videos` s YouTube trailerom, čo Nuvio
-  // niekedy interpretovalo ako zoznam epizód a zobrazilo film ako seriál.
-  if (safeMeta.type === 'movie') {
-    delete safeMeta.videos;
-    delete safeMeta.seriesInfo;
-    delete safeMeta.season;
-    delete safeMeta.episode;
-
-    safeMeta.behaviorHints = {
-      ...(safeMeta.behaviorHints || {}),
-      defaultVideoId: safeMeta.id
-    };
-  }
-
-  return safeMeta;
+  return cleanPublicMeta(meta);
 }
 
 function parseExtra(extraRaw = '') {
