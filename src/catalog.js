@@ -4,6 +4,7 @@ import { tmdbByImdb, tmdbSearch, tmdbMovie, tmdbSeries, getTmdbStatus } from './
 import { readStore, writeStore, storePath } from './store.js';
 import { buildMetaIndex, localStremioId } from './ids.js';
 import { preferRicherMeta, metaNeedsDetailRepair, metaDetailIssues } from './meta-quality.js';
+import { getVerifiedSourceOverride, sourceOverrideNeedsMigration } from './source-overrides.js';
 
 const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
@@ -131,6 +132,32 @@ function titleCandidates(item, csfd = {}) {
 }
 
 async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}) {
+  const verifiedOverride = getVerifiedSourceOverride(item);
+
+  // Posledné overené edge cases viažeme na stabilné ČSFD ID. Tým sa vyhneme
+  // agresívnejšiemu fuzzy matchingu pre celý katalóg.
+  if (verifiedOverride?.excludedReason) {
+    return toMeta(item, {}, null, {
+      excludedReason: verifiedOverride.excludedReason,
+      sourceOverrideVersion: verifiedOverride.version || 1
+    });
+  }
+
+  if (verifiedOverride?.tmdbId) {
+    try {
+      const directTmdb = item.type === 'series'
+        ? await tmdbSeries(verifiedOverride.tmdbId)
+        : await tmdbMovie(verifiedOverride.tmdbId);
+      if (directTmdb) {
+        return toMeta(item, { imdbId: verifiedOverride.imdbId || directTmdb.imdbId || null }, directTmdb, {
+          lookupPath: 'verified_csfd_tmdb_override',
+          sourceOverrideVersion: verifiedOverride.version || 1
+        });
+      }
+    } catch (error) {
+      console.warn('[verified-override] TMDB lookup failed, using normal fallbacks:', item.name, error.message);
+    }
+  }
   // Fast incremental path: ak cache už pozná externé ID, najprv sa pokúsime
   // obnoviť detail priamo z TMDB. Tým sa pri bežnom dennom refreshe vyhneme
   // pomalému ČSFD/Jina requestu pre položky, ktoré už boli spoľahlivo spárované.
@@ -166,7 +193,15 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
   }
 
   const normalizedItem = { ...item, csfdUrl };
-  const csfd = item.type === 'series' ? {} : await fetchCsfdMeta(csfdUrl);
+  let csfd = item.type === 'series' ? {} : await fetchCsfdMeta(csfdUrl);
+  if (verifiedOverride) {
+    csfd = {
+      ...csfd,
+      imdbId: csfd.imdbId || verifiedOverride.imdbId || null,
+      description: csfd.description || verifiedOverride.description || '',
+      genres: (Array.isArray(csfd.genres) && csfd.genres.length) ? csfd.genres : (verifiedOverride.genres || []),
+    };
+  }
 
   // Dôkladná fallback cesta. Pri full refreshe sa sem ide priamo, aby sa zachovalo
   // pôvodné overenie cez ČSFD/Jina + TMDB matcher.
@@ -207,11 +242,18 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
     }
   }
 
-  return toMeta(normalizedItem, csfd, tmdb);
+  return toMeta(normalizedItem, csfd, tmdb, verifiedOverride ? {
+    sourceOverrideVersion: verifiedOverride.version || 1,
+    lookupPath: tmdb ? 'verified_or_standard_match' : 'verified_csfd_fallback'
+  } : {});
 }
 
 function metaNeedsRematch(item, meta) {
   if (!meta) return true;
+  // Overené source corrections sa migráciou týkajú iba konkrétnych ČSFD ID.
+  // Kontrola musí byť pred excludedReason, aby sa vedela aktualizovať aj staršia
+  // vylúčená položka, ak sa override verzia zmení.
+  if (sourceOverrideNeedsMigration(item, meta)) return true;
   if (meta?._addon?.excludedReason) return false;
 
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
