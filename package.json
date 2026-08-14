@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.6.4",
-  "description": "FilmoveNovinky movie-only addon with strict Stremio/Nuvio/Fusion metadata schema normalization.",
+  "version": "3.6.5",
+  "description": "FilmoveNovinky movie-only addon with metadata downgrade protection and strict Stremio/Nuvio/Fusion metadata normalization.",
   "type": "module",
   "main": "server.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "refresh-now": "node scraper.js",
     "refresh": "node scripts/refresh.js",
     "refresh-cache-with-safe-repair": "npm run refresh && node scripts/postprocess-cache.js",
-    "test": "node scripts/verify-nuvio-movie-fix.js && node scripts/verify-safe-matching.js && node scripts/verify-meta-alias.js && node scripts/verify-manifest-meta-routing.js && node scripts/verify-custom-meta-id.js && node scripts/verify-meta-schema.js"
+    "test": "node scripts/verify-nuvio-movie-fix.js && node scripts/verify-safe-matching.js && node scripts/verify-meta-alias.js && node scripts/verify-manifest-meta-routing.js && node scripts/verify-custom-meta-id.js && node scripts/verify-meta-schema.js && node scripts/verify-no-metadata-downgrade.js"
   },
   "dependencies": {
     "axios": "^1.7.9",

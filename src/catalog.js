@@ -3,6 +3,7 @@ import { fetchCsfdMeta, searchCsfd } from './csfd.js';
 import { tmdbByImdb, tmdbSearch } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 import { buildMetaIndex, localStremioId } from './ids.js';
+import { preferRicherMeta } from './meta-quality.js';
 
 const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
@@ -276,11 +277,14 @@ export async function refreshCache({ forceFull = false } = {}) {
         }
 
         try {
-          metas.push(await enrichItem(item));
+          const candidate = await enrichItem(item);
+          metas.push(preferRicherMeta(existing, candidate));
           enriched += 1;
         } catch (e) {
           console.error('Enrich failed:', item.name, e.message);
-          metas.push(localMeta(item));
+          // Critical: even forceFull refresh must not destroy a previously
+          // enriched record when an external provider fails temporarily.
+          metas.push(existing || localMeta(item));
         }
       }
 
