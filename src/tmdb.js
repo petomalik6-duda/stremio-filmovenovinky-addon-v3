@@ -134,7 +134,7 @@ export async function tmdbMovie(id) {
     ...common(data, 'movie'),
     type: 'movie',
     runtime: data.runtime ? `${data.runtime} min` : undefined,
-    director: (data.credits?.crew || []).filter(c => c.job === 'Director').map(c => c.name).join(', ')
+    director: (data.credits?.crew || []).filter(c => c.job === 'Director').map(c => c.name)
   };
 }
 
@@ -145,7 +145,7 @@ export async function tmdbSeries(id) {
     ...common(data, 'series'),
     type: 'series',
     runtime: data.episode_run_time?.[0] ? `${data.episode_run_time[0]} min/ep` : undefined,
-    director: (data.created_by || []).map(c => c.name).join(', ')
+    director: (data.created_by || []).map(c => c.name)
   };
 }
 
