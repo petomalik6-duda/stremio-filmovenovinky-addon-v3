@@ -439,6 +439,8 @@ export async function getCatalogStats() {
     tmdbConfigured: getTmdbStatus().configured,
     tmdbLanguage: getTmdbStatus().language,
     tmdbFallbackLanguage: getTmdbStatus().fallbackLanguage,
+    tmdbTranslationFallback: getTmdbStatus().translationFallback,
+    tmdbFactualSummaryFallback: getTmdbStatus().factualSummaryFallback,
     enrichLimit: ENRICH_LIMIT,
     detailRepairLimit: DETAIL_REPAIR_LIMIT,
     pendingRematch: pendingRematchCount(cache),

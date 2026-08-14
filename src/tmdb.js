@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { titleMatchScore, yearMatches } from './matching.js';
-import { mergeTmdbLanguageFallback } from './tmdb-language-fallback.js';
+import { mergeTmdbLanguageFallback, chooseTranslationOverview, buildFactualMetadataSummary } from './tmdb-language-fallback.js';
 
 const TMDB = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP = 'https://image.tmdb.org/t/p/w1280';
 const LANG = process.env.TMDB_LANGUAGE || 'cs-CZ';
 const FALLBACK_LANG = process.env.TMDB_FALLBACK_LANGUAGE || 'en-US';
+const TRANSLATION_FALLBACK = String(process.env.TMDB_TRANSLATION_FALLBACK || 'true').toLowerCase() !== 'false';
+const FACTUAL_SUMMARY_FALLBACK = String(process.env.TMDB_FACTUAL_SUMMARY_FALLBACK || 'true').toLowerCase() !== 'false';
 
 const TMDB_YEAR_TOLERANCE = Number(process.env.TMDB_YEAR_TOLERANCE || 2);
 const TMDB_SEARCH_LIMIT = Number(process.env.TMDB_SEARCH_LIMIT || 8);
@@ -20,14 +22,16 @@ export function getTmdbStatus() {
     enabled: tmdbEnabled(),
     configured: Boolean(String(process.env.TMDB_API_KEY || '').trim()),
     language: LANG,
-    fallbackLanguage: FALLBACK_LANG
+    fallbackLanguage: FALLBACK_LANG,
+    translationFallback: TRANSLATION_FALLBACK,
+    factualSummaryFallback: FACTUAL_SUMMARY_FALLBACK
   };
 }
 
 async function tmdbGet(path, params = {}, language = LANG) {
   if (!key()) return null;
   const { data } = await axios.get(`${TMDB}${path}`, {
-    params: { api_key: key(), language, ...params },
+    params: { api_key: key(), ...(language ? { language } : {}), ...params },
     timeout: 15000
   });
   return data;
@@ -37,7 +41,7 @@ async function detailWithLanguageFallback(path, params, type) {
   let data = await tmdbGet(path, params, LANG);
   if (!data) return null;
 
-  const overview = String(data.overview || '').trim();
+  let overview = String(data.overview || '').trim();
   if (overview.length < 20 && FALLBACK_LANG && FALLBACK_LANG !== LANG) {
     try {
       const fallback = await tmdbGet(path, params, FALLBACK_LANG);
@@ -45,6 +49,23 @@ async function detailWithLanguageFallback(path, params, type) {
     } catch (error) {
       console.warn(`[tmdb] ${FALLBACK_LANG} detail fallback failed for ${path}:`, error.message);
     }
+  }
+
+  overview = String(data.overview || '').trim();
+  if (overview.length < 20 && TRANSLATION_FALLBACK) {
+    try {
+      const translations = await tmdbGet(`${path}/translations`, {}, null);
+      const translatedOverview = chooseTranslationOverview(translations, data.original_language);
+      if (translatedOverview) data = { ...data, overview: translatedOverview };
+    } catch (error) {
+      console.warn(`[tmdb] translations fallback failed for ${path}:`, error.message);
+    }
+  }
+
+  overview = String(data.overview || '').trim();
+  if (overview.length < 20 && FACTUAL_SUMMARY_FALLBACK) {
+    const summary = buildFactualMetadataSummary(data, type);
+    if (summary.length >= 20) data = { ...data, overview: summary };
   }
 
   return data;
