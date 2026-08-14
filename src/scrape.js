@@ -23,7 +23,8 @@ export function itemKey(item) { return `${item.type}|${item.name}|${item.origina
 
 function readerUrl(url) {
   // Jina Reader vie vrátiť HTML stránku ako jednoduchý markdown/text.
-  return `https://r.jina.ai/http://r.jina.ai/http://${url}`;
+  // Pre https://example.com je správny tvar https://r.jina.ai/https://example.com.
+  return `https://r.jina.ai/${url}`;
 }
 
 function parseTitleParts(raw, fallbackType='movie') {

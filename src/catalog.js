@@ -2,6 +2,7 @@ import { scrapeFilmovenovinky, itemKey } from './scrape.js';
 import { fetchCsfdMeta, searchCsfd } from './csfd.js';
 import { tmdbByImdb, tmdbSearch } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
+import { buildMetaIndex, localStremioId } from './ids.js';
 
 const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
@@ -24,8 +25,7 @@ function setStage(value) {
   console.log('[refresh-stage]', value);
 }
 
-function buildIndex(metas) { return new Map((metas || []).map(m => [m.id, m])); }
-function stremioId(item, csfd, tmdb) { return tmdb?.imdbId || csfd?.imdbId || `filmovenovinky:${Buffer.from(`${item.type}-${item.name}-${item.year}-${item.lang}`).toString('base64url')}`; }
+function stremioId(item, csfd, tmdb) { return tmdb?.imdbId || csfd?.imdbId || localStremioId(item); }
 function score(meta) { const n = Number(meta.imdbRating || 0); return Number.isFinite(n) ? n : 0; }
 function tmdbUrl(type, id) { return `https://www.themoviedb.org/${type === 'series' ? 'tv' : 'movie'}/${id}`; }
 function placeholderPoster(name) { return `https://placehold.co/500x750?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`; }
@@ -79,7 +79,20 @@ function toMeta(item, csfd = {}, tmdb = null) {
     // DÔLEŽITÉ: pri filme neposielame `videos` s trailerom. Nuvio/Android TV
     // môže každé samostatné video vyhodnotiť ako epizódu a film zobraziť ako seriál.
     // Trailer zostáva dostupný ako bežný odkaz vyššie.
-    _addon: { key: item.key || itemKey(item), dateAdded: item.dateAdded, lang: item.lang, csfdUrl: item.csfdUrl || null, imdbId, tmdbId: tmdb?.tmdbId || null, tmdbYear: tmdb?.releaseInfo || null, matchVersion: MATCH_VERSION, sourceType: type, titleRaw: item.titleRaw }
+    _addon: {
+      key: item.key || itemKey(item),
+      dateAdded: item.dateAdded,
+      lang: item.lang,
+      csfdUrl: item.csfdUrl || null,
+      imdbId,
+      tmdbId: tmdb?.tmdbId || null,
+      tmdbYear: tmdb?.releaseInfo || null,
+      matchVersion: MATCH_VERSION,
+      sourceType: type,
+      titleRaw: item.titleRaw,
+      // Stabilný alias, aby detail fungoval aj po prechode local ID -> IMDb ID.
+      localId: localStremioId(item)
+    }
   };
 }
 
@@ -142,6 +155,15 @@ function metaNeedsRematch(item, meta) {
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
   if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
 
+  // Lokálne placeholder metadata sa nesmú považovať za definitívne spárované.
+  // Ak raz TMDB/ČSFD request zlyhal, ďalší refresh musí mať šancu film opraviť.
+  const hasExternalMatch = Boolean(
+    meta?._addon?.imdbId ||
+    meta?._addon?.tmdbId ||
+    (typeof meta?.id === 'string' && meta.id.startsWith('tt'))
+  );
+  if (!hasExternalMatch) return true;
+
   const sourceYear = Number(item?.year || 0);
   const matchedYear = Number(meta?._addon?.tmdbYear || meta?.releaseInfo || meta?.year || 0);
   if (sourceYear && matchedYear && Math.abs(sourceYear - matchedYear) > CACHE_MATCH_YEAR_TOLERANCE) return true;
@@ -169,7 +191,7 @@ function pendingRematchCount(current) {
 
 async function loadFromDisk() {
   const store = await readStore();
-  cache = { ...store, byId: buildIndex(store.metas), lastError: cache.lastError || store.lastError || null };
+  cache = { ...store, byId: buildMetaIndex(store.metas, store.items), lastError: cache.lastError || store.lastError || null };
   return cache;
 }
 
@@ -225,7 +247,7 @@ export async function refreshCache({ forceFull = false } = {}) {
 
       if (!forceFull && current.sourceHash === scraped.sourceHash && current.metas.length && !cacheNeedsMatchMigration(current)) {
         setStage('source-unchanged');
-        cache = { ...current, at: Date.now(), byId: buildIndex(current.metas), lastError: null };
+        cache = { ...current, at: Date.now(), byId: buildMetaIndex(current.metas, current.items), lastError: null };
         await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas, lastError: null });
         return cache.metas;
       }
@@ -263,7 +285,7 @@ export async function refreshCache({ forceFull = false } = {}) {
       }
 
       setStage('write-cache');
-      cache = { at: Date.now(), sourceHash: scraped.sourceHash, items: scraped.items, metas, byId: buildIndex(metas), lastError: null };
+      cache = { at: Date.now(), sourceHash: scraped.sourceHash, items: scraped.items, metas, byId: buildMetaIndex(metas, scraped.items), lastError: null };
       await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas, lastError: null });
 
       setStage('done');
