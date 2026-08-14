@@ -81,3 +81,13 @@ Pri každom automatickom refresh-cache sa nové filmy hneď pokúsia opraviť, a
 ```
 
 alebo bez TMDB detailu.
+
+## v3.6.0 – Safe movie matching
+
+Oprava nesprávne načítaných filmov/remakov:
+- IMDb z ČSFD sa číta iba z explicitného IMDb odkazu,
+- TMDB musí sedieť názvom aj rokom (tolerancia je nastaviteľná),
+- stará cache sa automaticky označí na rematch,
+- `/stats` ukazuje `matchVersion` a `pendingRematch`.
+
+Po prvom nasadení v3.6.0 odporúčame spustiť GitHub Actions refresh s `force_full=true`.

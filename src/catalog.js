@@ -11,6 +11,8 @@ const ENRICH_LIMIT = Number(process.env.ENRICH_LIMIT || 0);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
+const MATCH_VERSION = 2;
+const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
@@ -63,8 +65,10 @@ function toMeta(item, csfd = {}, tmdb = null) {
     poster: tmdb?.poster || csfd.poster || placeholderPoster(displayName),
     background: tmdb?.background || tmdb?.poster || csfd.poster || placeholderPoster(displayName),
     description: descriptionParts.join('\n\n'),
-    releaseInfo: tmdb?.releaseInfo || item.year || undefined,
-    year: Number(tmdb?.releaseInfo || item.year) || undefined,
+    // Rok zo zdroja FilmovéNovinky je pre katalóg autoritatívny. TMDB rok si
+    // uchovávame iba diagnosticky, aby sa zmena distribučného roku neplietla s názvom.
+    releaseInfo: item.year || tmdb?.releaseInfo || undefined,
+    year: Number(item.year || tmdb?.releaseInfo) || undefined,
     runtime: tmdb?.runtime,
     genres: [...new Set([...(tmdb?.genres || []), ...(csfd.genres || []), item.lang].filter(Boolean))],
     imdbRating: tmdb?.imdbRating,
@@ -75,7 +79,7 @@ function toMeta(item, csfd = {}, tmdb = null) {
     // DÔLEŽITÉ: pri filme neposielame `videos` s trailerom. Nuvio/Android TV
     // môže každé samostatné video vyhodnotiť ako epizódu a film zobraziť ako seriál.
     // Trailer zostáva dostupný ako bežný odkaz vyššie.
-    _addon: { key: item.key || itemKey(item), dateAdded: item.dateAdded, lang: item.lang, csfdUrl: item.csfdUrl || null, imdbId, tmdbId: tmdb?.tmdbId || null, sourceType: type, titleRaw: item.titleRaw }
+    _addon: { key: item.key || itemKey(item), dateAdded: item.dateAdded, lang: item.lang, csfdUrl: item.csfdUrl || null, imdbId, tmdbId: tmdb?.tmdbId || null, tmdbYear: tmdb?.releaseInfo || null, matchVersion: MATCH_VERSION, sourceType: type, titleRaw: item.titleRaw }
   };
 }
 
@@ -129,6 +133,38 @@ async function enrichItem(item) {
   }
 
   return toMeta(normalizedItem, csfd, tmdb);
+}
+
+
+function metaNeedsRematch(item, meta) {
+  if (!meta) return true;
+
+  // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
+  if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
+
+  const sourceYear = Number(item?.year || 0);
+  const matchedYear = Number(meta?._addon?.tmdbYear || meta?.releaseInfo || meta?.year || 0);
+  if (sourceYear && matchedYear && Math.abs(sourceYear - matchedYear) > CACHE_MATCH_YEAR_TOLERANCE) return true;
+
+  return false;
+}
+
+function cacheNeedsMatchMigration(current) {
+  const itemsByKey = new Map((current.items || []).map(item => [item.key || itemKey(item), item]));
+  return (current.metas || []).some(meta => {
+    const key = meta?._addon?.key;
+    const item = key ? itemsByKey.get(key) : null;
+    return item ? metaNeedsRematch(item, meta) : Number(meta?._addon?.matchVersion || 0) < MATCH_VERSION;
+  });
+}
+
+function pendingRematchCount(current) {
+  const itemsByKey = new Map((current.items || []).map(item => [item.key || itemKey(item), item]));
+  return (current.metas || []).filter(meta => {
+    const key = meta?._addon?.key;
+    const item = key ? itemsByKey.get(key) : null;
+    return item ? metaNeedsRematch(item, meta) : Number(meta?._addon?.matchVersion || 0) < MATCH_VERSION;
+  }).length;
 }
 
 async function loadFromDisk() {
@@ -187,7 +223,7 @@ export async function refreshCache({ forceFull = false } = {}) {
         return current.metas || [];
       }
 
-      if (!forceFull && current.sourceHash === scraped.sourceHash && current.metas.length) {
+      if (!forceFull && current.sourceHash === scraped.sourceHash && current.metas.length && !cacheNeedsMatchMigration(current)) {
         setStage('source-unchanged');
         cache = { ...current, at: Date.now(), byId: buildIndex(current.metas), lastError: null };
         await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas, lastError: null });
@@ -201,16 +237,19 @@ export async function refreshCache({ forceFull = false } = {}) {
 
       for (const item of scraped.items) {
         const key = item.key || itemKey(item);
-        const reusable = !forceFull && REFRESH_NEW_ONLY && oldByKey.get(key);
+        const existing = oldByKey.get(key);
+        const reusable = !forceFull && REFRESH_NEW_ONLY && existing && !metaNeedsRematch(item, existing);
 
         if (reusable) {
-          metas.push(reusable);
+          metas.push(existing);
           continue;
         }
 
         // ENRICH_LIMIT=0 znamená: žiadne CSFD/TMDB HTTP volania, iba rýchle lokálne metadata.
         if (ENRICH_LIMIT <= 0 || (!forceFull && enriched >= ENRICH_LIMIT)) {
-          metas.push(localMeta(item));
+          // Ak sme dosiahli limit, neničíme staré metadata. Neoverené staršie záznamy
+          // sa prepočítajú v ďalšom refreshe; nové položky dostanú bezpečné lokálne meta.
+          metas.push(existing || localMeta(item));
           continue;
         }
 
@@ -248,7 +287,7 @@ export async function refreshCache({ forceFull = false } = {}) {
 export async function getCatalog() {
   if (!cache.at) await loadFromDisk();
 
-  if (isStale() && !isRefreshRunning()) {
+  if ((isStale() || cacheNeedsMatchMigration(cache)) && !isRefreshRunning()) {
     refreshCacheBackground().catch(() => {});
   }
 
@@ -278,6 +317,8 @@ export async function getCatalogStats() {
       ? metas.filter(m => Boolean(m._addon?.tmdbId) || Boolean(m._addon?.imdbId) || Boolean(m._addon?.csfdUrl) || (typeof m.id === 'string' && m.id.startsWith('tt'))).length
       : metas.length,
     hideUnmatchedItems: HIDE_UNMATCHED_ITEMS,
+    matchVersion: MATCH_VERSION,
+    pendingRematch: pendingRematchCount(cache),
     cacheFile: storePath(),
     movies: metas.filter(m => m.type === 'movie').length,
     series: metas.filter(m => m.type === 'series').length,

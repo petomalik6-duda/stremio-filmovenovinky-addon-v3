@@ -1,5 +1,6 @@
 import { getWithRetry } from './http.js';
 import * as cheerio from 'cheerio';
+import { extractExplicitImdbIdFromHtml } from './matching.js';
 
 const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/2.0)';
 
@@ -9,6 +10,7 @@ function absAttr(url) {
 }
 
 function clean(text = '') { return text.replace(/\s+/g, ' ').trim(); }
+
 
 export async function searchCsfd(title, year) {
   if (!title) return null;
@@ -32,15 +34,16 @@ export async function fetchCsfdMeta(csfdUrl) {
   try {
     const { data } = await getWithRetry(csfdUrl, { headers: { 'User-Agent': UA }, timeout: 25000 });
     const $ = cheerio.load(data);
-    const html = $.html();
-    const imdbId = html.match(/tt\d{7,9}/)?.[0] || null;
+    const imdbId = extractExplicitImdbIdFromHtml(data);
     const rating = clean($('.film-rating-average, .rating-average, .film-rating .average').first().text()) || null;
     const poster = absAttr($('meta[property="og:image"]').attr('content')) || null;
     const description = clean($('meta[property="og:description"]').attr('content') || $('.plot-full, .plot').first().text()) || '';
     const title = clean($('meta[property="og:title"]').attr('content') || $('h1').first().text()) || '';
+    const yearText = clean($('main').first().text() || $('body').text());
+    const csfdYear = yearText.match(/\b(19\d{2}|20\d{2})\b/)?.[1] || null;
     const genres = [];
     $('.genres a, .genre a, a[href*="/zanr/"]').each((_i, a) => genres.push(clean($(a).text())));
-    return { imdbId, csfdRating: rating, poster, description, csfdTitle: title, genres: [...new Set(genres.filter(Boolean))] };
+    return { imdbId, csfdRating: rating, poster, description, csfdTitle: title, csfdYear, genres: [...new Set(genres.filter(Boolean))] };
   } catch (e) {
     return { csfdError: e.message };
   }

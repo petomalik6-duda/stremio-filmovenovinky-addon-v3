@@ -1,10 +1,13 @@
 import fs from 'fs/promises';
+import { extractExplicitImdbIdFromHtml, titleMatchScore, yearMatches } from '../src/matching.js';
 
 const CACHE_FILE = process.env.CACHE_FILE || 'data/catalog-cache.json';
 const TMDB_API_KEY = process.env.TMDB_API_KEY || '';
 const TMDB_LANGUAGE = process.env.TMDB_LANGUAGE || 'cs-CZ';
 const DELAY_MS = Number(process.env.POSTPROCESS_DELAY_MS || 200);
 const LIMIT = Number(process.env.POSTPROCESS_LIMIT || 1000);
+const YEAR_TOLERANCE = Number(process.env.TMDB_YEAR_TOLERANCE || 2);
+const MIN_TITLE_SCORE = Number(process.env.TMDB_MIN_TITLE_SCORE || 80);
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -47,9 +50,7 @@ async function imdbFromCsfd(csfdUrl) {
   if (!csfdUrl) return null;
   try {
     const html = await fetchText(csfdUrl);
-    return html.match(/imdb\.com\/title\/(tt\d{7,10})/i)?.[1]
-      || html.match(/\btt\d{7,10}\b/i)?.[0]
-      || null;
+    return extractExplicitImdbIdFromHtml(html);
   } catch {
     return null;
   }
@@ -81,20 +82,22 @@ async function imdbFromTmdbId(tmdbId) {
 }
 
 function scoreMovie(meta, movie) {
-  const wanted = [meta.name, getOriginalName(meta)].filter(Boolean).map(norm);
-  const found = [movie.title, movie.original_title].filter(Boolean).map(norm);
   const year = getYear(meta);
   const movieYear = String(movie.release_date || '').slice(0, 4);
 
-  let score = 0;
-  if (year && movieYear === year) score += 40;
-  for (const w of wanted) {
-    for (const f of found) {
-      if (w === f) score += 60;
-      else if (w.includes(f) || f.includes(w)) score += 25;
-    }
-  }
-  return score;
+  if (!yearMatches(year, movieYear, YEAR_TOLERANCE)) return -1;
+
+  const score = Math.max(
+    titleMatchScore(meta.name, movie.title, movie.original_title),
+    titleMatchScore(getOriginalName(meta), movie.title, movie.original_title)
+  );
+
+  if (score < MIN_TITLE_SCORE) return -1;
+
+  let total = score;
+  if (year && movieYear === year) total += 30;
+  else if (year && movieYear) total += 12;
+  return total;
 }
 
 async function tmdbSearch(meta) {
@@ -125,7 +128,7 @@ async function tmdbSearch(meta) {
     }
   }
 
-  return bestScore >= 60 ? best : null;
+  return bestScore >= MIN_TITLE_SCORE ? best : null;
 }
 
 function setImdb(meta, imdbId) {

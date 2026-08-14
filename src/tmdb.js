@@ -1,12 +1,14 @@
 import axios from 'axios';
+import { titleMatchScore, yearMatches } from './matching.js';
 
 const TMDB = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP = 'https://image.tmdb.org/t/p/w1280';
 const LANG = process.env.TMDB_LANGUAGE || 'cs-CZ';
 
-const TMDB_YEAR_TOLERANCE = Number(process.env.TMDB_YEAR_TOLERANCE || 1);
+const TMDB_YEAR_TOLERANCE = Number(process.env.TMDB_YEAR_TOLERANCE || 2);
 const TMDB_SEARCH_LIMIT = Number(process.env.TMDB_SEARCH_LIMIT || 8);
+const TMDB_MIN_TITLE_SCORE = Number(process.env.TMDB_MIN_TITLE_SCORE || 80);
 
 function tmdbEnabled() { return String(process.env.ENABLE_TMDB || 'false').toLowerCase() === 'true'; }
 function key() { return tmdbEnabled() ? (process.env.TMDB_API_KEY || '') : ''; }
@@ -47,11 +49,12 @@ export async function tmdbSearch(title, year, type='movie') {
   for (const attempt of attempts) {
     const found = await searchOne(attempt.query, attempt.year, type, year);
     if (found && (!best || found._score > best._score)) best = found;
-    if (best && best._score >= 90) break;
+    if (best && best._score >= 120) break;
   }
 
   if (!best) return null;
   delete best._score;
+  delete best._titleScore;
   return best;
 }
 
@@ -71,7 +74,14 @@ async function searchOne(title, requestYear, type, expectedYear) {
     try {
       const full = type === 'series' ? await tmdbSeries(result.id) : await tmdbMovie(result.id);
       if (!full) continue;
-      full._score = scoreCandidate(title, expectedYear, full);
+
+      const titleScore = titleMatchScore(title, full.name, full.originalName);
+      if (titleScore < TMDB_MIN_TITLE_SCORE) continue;
+
+      if (!yearMatches(expectedYear, full.releaseInfo, TMDB_YEAR_TOLERANCE)) continue;
+
+      full._titleScore = titleScore;
+      full._score = scoreCandidate(titleScore, expectedYear, full);
       candidates.push(full);
     } catch (e) {
       console.error('[tmdb] candidate failed:', title, result.id, e.message);
@@ -79,41 +89,23 @@ async function searchOne(title, requestYear, type, expectedYear) {
   }
 
   candidates.sort((a, b) => b._score - a._score);
-  const best = candidates[0];
-
-  if (!best) return null;
-
-  // Pri nových budúcich filmoch býva rok na webe iný než TMDB release year.
-  // Ak názov sedí dobre, povoľ aj rozdiel roka.
-  const hasStrongTitle = best._score >= 50;
-  const yearOk = !expectedYear || !best.releaseInfo || Math.abs(Number(best.releaseInfo) - Number(expectedYear)) <= TMDB_YEAR_TOLERANCE;
-
-  if (yearOk || hasStrongTitle) return best;
-  return null;
+  return candidates[0] || null;
 }
 
-function scoreCandidate(query, expectedYear, meta) {
-  let score = 0;
-  const q = normalize(query);
-  const name = normalize(meta.name);
-  const original = normalize(meta.originalName);
-
-  if (name === q) score += 70;
-  else if (original === q) score += 70;
-  else if (name.includes(q) || q.includes(name)) score += 35;
-  else if (original.includes(q) || q.includes(original)) score += 35;
+function scoreCandidate(titleScore, expectedYear, meta) {
+  let score = titleScore;
 
   if (expectedYear && meta.releaseInfo) {
     const diff = Math.abs(Number(meta.releaseInfo) - Number(expectedYear));
-    if (diff === 0) score += 25;
-    else if (diff <= TMDB_YEAR_TOLERANCE) score += 10;
-    else score -= 10;
+    if (diff === 0) score += 30;
+    else if (diff <= TMDB_YEAR_TOLERANCE) score += 12;
   }
 
-  if (meta.imdbId) score += 10;
-  if (meta.poster) score += 3;
+  if (meta.imdbId) score += 8;
+  if (meta.poster) score += 2;
   return score;
 }
+
 
 function common(data, type) {
   const title = type === 'series' ? (data.name || data.original_name) : (data.title || data.original_title);
@@ -166,14 +158,4 @@ function cleanQuery(value) {
 
 function stripSubtitle(value) {
   return String(value || '').split(':')[0].trim();
-}
-
-function normalize(value) {
-  return String(value || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
 }
