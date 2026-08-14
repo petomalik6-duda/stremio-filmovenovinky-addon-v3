@@ -113,18 +113,22 @@ export function cleanPublicMeta(meta) {
   const safeMeta = cleanKnownMetaFields(meta);
 
   if (safeMeta.type === 'movie') {
-    // Movie metadata must not contain episode/video arrays: several clients
-    // interpret them as a series. A movie has one logical video instead.
+    // Cross-client compatibility: stream-only addons are normally registered
+    // for IMDb `tt` ids. Therefore every matched FilmovéNovinky movie must use
+    // its IMDb id as the PUBLIC meta/video id. Our addon still serves the rich
+    // `/meta/movie/tt....json` response, while buildMetaIndex keeps the old
+    // filmovenovinky: id as an alias for clients with stale detail links.
+    const imdbId = addon.imdbId ||
+      (typeof originalId === 'string' && /^tt\d+$/.test(originalId) ? originalId : null);
+    const publicId = imdbId || localId;
+
+    safeMeta.id = publicId;
+    safeMeta.behaviorHints = { defaultVideoId: String(publicId) };
+
+    // Movies do not need a videos array when the meta id itself is the IMDb
+    // video id. Omitting it also avoids clients interpreting a movie as a
+    // series/episode collection.
     delete safeMeta.videos;
-
-    // Use an addon-owned metadata id so clients cannot silently redirect the
-    // detail lookup to an incomplete Cinemeta entry. Keep IMDb as the stream
-    // video id so existing tt-prefixed stream addons remain compatible.
-    const videoId = addon.imdbId ||
-      (typeof originalId === 'string' && originalId.startsWith('tt') ? originalId : localId);
-
-    safeMeta.id = localId;
-    safeMeta.behaviorHints = { defaultVideoId: String(videoId) };
   }
 
   return safeMeta;

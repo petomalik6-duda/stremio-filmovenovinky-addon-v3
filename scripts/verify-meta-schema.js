@@ -60,7 +60,14 @@ for (const raw of cache.metas || []) {
   if (meta.type === 'movie') {
     if (!meta.id.startsWith('filmovenovinky:')) fail(meta, `movie public id must use filmovenovinky:, got ${meta.id}`);
     customIds++;
-    if (meta.videos != null) fail(meta, 'movie must not expose videos');
+    if (meta.videos != null) {
+      if (!Array.isArray(meta.videos) || meta.videos.length !== 1) fail(meta, 'movie videos must contain exactly one stream bridge video');
+      const video = meta.videos[0];
+      if (!video || typeof video !== 'object') fail(meta, 'invalid movie video object');
+      if (typeof video.id !== 'string' || !/^tt\d+$/.test(video.id)) fail(meta, 'movie video id must be IMDb tt id');
+      if (typeof video.title !== 'string' || !video.title.trim()) fail(meta, 'movie video title is required');
+      if ('season' in video || 'episode' in video) fail(meta, 'movie video must not expose season/episode');
+    }
     if (!meta.behaviorHints || typeof meta.behaviorHints !== 'object' || Array.isArray(meta.behaviorHints)) {
       fail(meta, 'behaviorHints must be an object');
     }

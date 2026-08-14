@@ -9,6 +9,6 @@ assert(catalog.includes("lookupPath: 'imdb_to_tmdb_fast'"),'imdb fast path missi
 assert(catalog.includes('enrichItem(item, existing, { fastKnownLookup: !forceFull })'),'incremental/full routing missing');
 assert(catalog.includes('fastIncrementalKnownIdFirst: true'),'stats flag missing');
 assert(workflow.includes("FORCE_FULL_REFRESH: ${{ github.event.inputs.force_full || 'false' }}"),'scheduled incremental default missing');
-assert(server.includes("version: '3.7.3'"),'version mismatch');
-assert(server.includes("id: 'sk.filmovenovinky.filmy.only.v382'"),'manifest id mismatch');
+assert(server.includes("version: '3.7.5'"),'version mismatch');
+assert(server.includes("id: 'sk.filmovenovinky.filmy.only.v384'"),'manifest id mismatch');
 console.log(JSON.stringify({ok:true,fastIncrementalKnownIdFirst:true,fullRefreshFallbackPreserved:true},null,2));

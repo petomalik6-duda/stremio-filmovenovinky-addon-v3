@@ -22,6 +22,12 @@ const VERIFIED_SOURCE_OVERRIDES = new Map([
     imdbId: 'tt37039145',
     description: 'Časozberný dokument z roku 2023 sleduje ochranu outloňov v Indonézii, boj proti nelegálnemu obchodu so zvieratami a činnosť Záchranného programu Kukang. Réžia: Ondřej Smékal.',
     genres: ['Dokumentárny']
+  }],
+  ['1690274', {
+    version: 1,
+    tmdbId: 1470334,
+    imdbId: 'tt6930962',
+    aliases: ['Spiked', 'Bodlinka: Pichlavé dobrodružství', 'Pichľavé dobrodružstvo']
   }]
 ]);
 
