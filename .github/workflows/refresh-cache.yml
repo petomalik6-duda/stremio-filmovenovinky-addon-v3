@@ -47,6 +47,8 @@ jobs:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
           TMDB_LANGUAGE: cs-CZ
           TMDB_FALLBACK_LANGUAGE: en-US
+          TMDB_TRANSLATION_FALLBACK: "true"
+          TMDB_FACTUAL_SUMMARY_FALLBACK: "true"
           ENRICH_LIMIT: 1000
           DETAIL_REPAIR_LIMIT: 200
           TMDB_YEAR_TOLERANCE: 2
