@@ -130,7 +130,35 @@ function titleCandidates(item, csfd = {}) {
   return [...new Set(out.filter(x => x.length >= 2))];
 }
 
-async function enrichItem(item, existing = null) {
+async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}) {
+  // Fast incremental path: ak cache už pozná externé ID, najprv sa pokúsime
+  // obnoviť detail priamo z TMDB. Tým sa pri bežnom dennom refreshe vyhneme
+  // pomalému ČSFD/Jina requestu pre položky, ktoré už boli spoľahlivo spárované.
+  // Ak rýchla cesta zlyhá, pokračujeme pôvodnými fallbackmi nižšie.
+  if (fastKnownLookup) {
+    const existingTmdbId = existing?._addon?.tmdbId;
+    if (existingTmdbId) {
+      try {
+        const directTmdb = item.type === 'series'
+          ? await tmdbSeries(existingTmdbId)
+          : await tmdbMovie(existingTmdbId);
+        if (directTmdb) return toMeta({ ...item, csfdUrl: item.csfdUrl }, {}, directTmdb, { lookupPath: 'tmdb_id_fast' });
+      } catch (error) {
+        console.warn('[incremental-fast] TMDB ID lookup failed, using fallbacks:', item.name, error.message);
+      }
+    }
+
+    const existingImdbId = existing?._addon?.imdbId || (typeof existing?.id === 'string' && existing.id.startsWith('tt') ? existing.id : null);
+    if (existingImdbId) {
+      try {
+        const directTmdb = await tmdbByImdb(existingImdbId, item.type);
+        if (directTmdb) return toMeta({ ...item, csfdUrl: item.csfdUrl }, {}, directTmdb, { lookupPath: 'imdb_to_tmdb_fast' });
+      } catch (error) {
+        console.warn('[incremental-fast] IMDb -> TMDB lookup failed, using fallbacks:', item.name, error.message);
+      }
+    }
+  }
+
   let csfdUrl = item.csfdUrl;
 
   if (item.type !== 'series' && !csfdUrl && CSFD_SEARCH_FALLBACK) {
@@ -140,8 +168,8 @@ async function enrichItem(item, existing = null) {
   const normalizedItem = { ...item, csfdUrl };
   const csfd = item.type === 'series' ? {} : await fetchCsfdMeta(csfdUrl);
 
-  // Ak už cache pozná TMDB ID, je to najspoľahlivejšia cesta k detailu.
-  // Nehľadaj titul znovu iba preto, že predchádzajúci request na ČSFD zlyhal.
+  // Dôkladná fallback cesta. Pri full refreshe sa sem ide priamo, aby sa zachovalo
+  // pôvodné overenie cez ČSFD/Jina + TMDB matcher.
   let tmdb = null;
   const existingTmdbId = existing?._addon?.tmdbId;
   if (existingTmdbId) {
@@ -314,7 +342,7 @@ export async function refreshCache({ forceFull = false } = {}) {
         }
 
         try {
-          const candidate = await enrichItem(item, existing);
+          const candidate = await enrichItem(item, existing, { fastKnownLookup: !forceFull });
           metas.push(preferRicherMeta(existing, candidate));
           enriched += 1;
         } catch (e) {
@@ -463,6 +491,7 @@ export async function getCatalogStats() {
     tmdbFactualSummaryFallback: getTmdbStatus().factualSummaryFallback,
     enrichLimit: ENRICH_LIMIT,
     detailRepairLimit: DETAIL_REPAIR_LIMIT,
+    fastIncrementalKnownIdFirst: true,
     pendingRematch: pendingRematchCount(cache),
     cacheFile: storePath(),
     movies: metas.filter(m => m.type === 'movie').length,
