@@ -1,0 +1,8 @@
+FilmovéNovinky 3.6.7
+
+DÔLEŽITÉ:
+- Tento balík zámerne NEOBSAHUJE data/catalog-cache.json, aby neprepísal novšiu cache z tvojho GitHub repozitára staršou lokálnou kópiou.
+- Pri nahratí súborov do existujúceho repozitára ponechaj aktuálny data/catalog-cache.json bez zmeny.
+- GitHub Actions workflow má ENABLE_TMDB=true, ENRICH_LIMIT=1000 a DETAIL_REPAIR_LIMIT=200.
+- V GitHub repository musí existovať Actions secret TMDB_API_KEY. /stats po deployi ukáže iba tmdbEnabled/tmdbConfigured true/false, nikdy samotný kľúč.
+- Po deployi spusti workflow Refresh FilmovéNovinky cache.

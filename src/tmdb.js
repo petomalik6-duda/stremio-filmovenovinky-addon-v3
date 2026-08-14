@@ -13,6 +13,13 @@ const TMDB_MIN_TITLE_SCORE = Number(process.env.TMDB_MIN_TITLE_SCORE || 80);
 function tmdbEnabled() { return String(process.env.ENABLE_TMDB || 'false').toLowerCase() === 'true'; }
 function key() { return tmdbEnabled() ? (process.env.TMDB_API_KEY || '') : ''; }
 
+export function getTmdbStatus() {
+  return {
+    enabled: tmdbEnabled(),
+    configured: Boolean(String(process.env.TMDB_API_KEY || '').trim())
+  };
+}
+
 async function tmdbGet(path, params = {}) {
   if (!key()) return null;
   const { data } = await axios.get(`${TMDB}${path}`, {

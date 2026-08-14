@@ -1,0 +1,11 @@
+import fs from 'fs';
+const catalog = fs.readFileSync('src/catalog.js', 'utf8');
+const wrapper = fs.readFileSync('scripts/repair-details-after-postprocess.js', 'utf8');
+const server = fs.readFileSync('server.js', 'utf8');
+if (!catalog.includes('repairIncompleteMetadata')) throw new Error('repairIncompleteMetadata missing');
+if (!catalog.includes('detailRepairLimit: DETAIL_REPAIR_LIMIT')) throw new Error('detailRepairLimit diagnostics missing');
+if (!catalog.includes('tmdbConfigured: getTmdbStatus().configured')) throw new Error('TMDB diagnostics missing');
+if (!wrapper.includes('repairIncompleteMetadata')) throw new Error('dedicated repair wrapper missing');
+if (wrapper.includes('refreshCache({ forceFull: false })')) throw new Error('repair still depends on refreshCache/ENRICH_LIMIT');
+if (!server.includes("version: '3.6.7'")) throw new Error('version mismatch');
+console.log(JSON.stringify({ok:true, dedicatedRepair:true, independentFromEnrichLimit:true}, null, 2));

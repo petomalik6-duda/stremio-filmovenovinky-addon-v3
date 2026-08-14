@@ -1,6 +1,6 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.6.6",
+  "version": "3.6.7",
   "description": "FilmoveNovinky movie-only addon with metadata downgrade protection and strict Stremio/Nuvio/Fusion metadata normalization.",
   "type": "module",
   "main": "server.js",
@@ -11,7 +11,7 @@
     "refresh-now": "node scraper.js",
     "refresh": "node scripts/refresh.js",
     "refresh-cache-with-safe-repair": "npm run refresh && node scripts/postprocess-cache.js && node scripts/repair-details-after-postprocess.js",
-    "test": "node scripts/verify-nuvio-movie-fix.js && node scripts/verify-safe-matching.js && node scripts/verify-meta-alias.js && node scripts/verify-manifest-meta-routing.js && node scripts/verify-custom-meta-id.js && node scripts/verify-meta-schema.js && node scripts/verify-no-metadata-downgrade.js && node scripts/verify-detail-repair.js && node scripts/verify-refresh-detail-pass.js"
+    "test": "node scripts/verify-nuvio-movie-fix.js && node scripts/verify-safe-matching.js && node scripts/verify-meta-alias.js && node scripts/verify-manifest-meta-routing.js && node scripts/verify-custom-meta-id.js && node scripts/verify-meta-schema.js && node scripts/verify-no-metadata-downgrade.js && node scripts/verify-detail-repair.js && node scripts/verify-refresh-detail-pass.js && node scripts/verify-dedicated-detail-repair.js"
   },
   "dependencies": {
     "axios": "^1.7.9",

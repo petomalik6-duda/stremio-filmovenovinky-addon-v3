@@ -1,6 +1,6 @@
 import { scrapeFilmovenovinky, itemKey } from './scrape.js';
 import { fetchCsfdMeta, searchCsfd } from './csfd.js';
-import { tmdbByImdb, tmdbSearch, tmdbMovie, tmdbSeries } from './tmdb.js';
+import { tmdbByImdb, tmdbSearch, tmdbMovie, tmdbSeries, getTmdbStatus } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 import { buildMetaIndex, localStremioId } from './ids.js';
 import { preferRicherMeta, metaNeedsDetailRepair } from './meta-quality.js';
@@ -10,6 +10,7 @@ const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
 const REFRESH_NEW_ONLY = String(process.env.REFRESH_NEW_ONLY || 'true').toLowerCase() !== 'false';
 const CSFD_SEARCH_FALLBACK = String(process.env.CSFD_SEARCH_FALLBACK || 'false').toLowerCase() === 'true';
 const ENRICH_LIMIT = Number(process.env.ENRICH_LIMIT || 0);
+const DETAIL_REPAIR_LIMIT = Number(process.env.DETAIL_REPAIR_LIMIT || 100);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
@@ -326,6 +327,80 @@ export async function refreshCache({ forceFull = false } = {}) {
   }
 }
 
+
+export async function repairIncompleteMetadata({ limit = DETAIL_REPAIR_LIMIT } = {}) {
+  if (!cache.at) await loadFromDisk();
+
+  const tmdbStatus = getTmdbStatus();
+  const itemsByKey = new Map((cache.items || []).map(item => [item.key || itemKey(item), item]));
+  const metas = [...(cache.metas || [])];
+  const targets = metas
+    .map((meta, index) => ({ meta, index }))
+    .filter(({ meta }) => metaNeedsDetailRepair(meta))
+    .slice(0, Math.max(0, Number(limit) || 0));
+
+  const result = {
+    ok: true,
+    limit: Math.max(0, Number(limit) || 0),
+    scanned: metas.length,
+    targets: targets.length,
+    repaired: 0,
+    unresolved: 0,
+    failed: 0,
+    tmdbEnabled: tmdbStatus.enabled,
+    tmdbConfigured: tmdbStatus.configured,
+    unresolvedExamples: []
+  };
+
+  for (const { meta, index } of targets) {
+    const key = meta?._addon?.key;
+    const item = key ? itemsByKey.get(key) : null;
+
+    if (!item) {
+      result.unresolved += 1;
+      if (result.unresolvedExamples.length < 20) {
+        result.unresolvedExamples.push({ name: meta?.name || null, reason: 'source_item_missing' });
+      }
+      continue;
+    }
+
+    try {
+      const candidate = await enrichItem(item, meta);
+      const selected = preferRicherMeta(meta, candidate);
+      metas[index] = selected;
+
+      if (!metaNeedsDetailRepair(selected)) {
+        result.repaired += 1;
+      } else {
+        result.unresolved += 1;
+        if (result.unresolvedExamples.length < 20) {
+          result.unresolvedExamples.push({
+            name: meta?.name || item?.name || null,
+            imdbId: meta?._addon?.imdbId || null,
+            tmdbId: meta?._addon?.tmdbId || null,
+            reason: (!tmdbStatus.enabled || !tmdbStatus.configured) ? 'tmdb_not_configured' : 'provider_returned_incomplete_metadata'
+          });
+        }
+      }
+    } catch (error) {
+      metas[index] = meta;
+      result.failed += 1;
+      if (result.unresolvedExamples.length < 20) {
+        result.unresolvedExamples.push({
+          name: meta?.name || item?.name || null,
+          imdbId: meta?._addon?.imdbId || null,
+          tmdbId: meta?._addon?.tmdbId || null,
+          reason: error.message
+        });
+      }
+    }
+  }
+
+  cache = { ...cache, at: Date.now(), metas, byId: buildMetaIndex(metas, cache.items), lastError: null };
+  await writeStore({ at: cache.at, sourceHash: cache.sourceHash, items: cache.items, metas: cache.metas, lastError: null });
+  return result;
+}
+
 export async function getCatalog() {
   if (!cache.at) await loadFromDisk();
 
@@ -360,6 +435,10 @@ export async function getCatalogStats() {
       : metas.length,
     hideUnmatchedItems: HIDE_UNMATCHED_ITEMS,
     matchVersion: MATCH_VERSION,
+    tmdbEnabled: getTmdbStatus().enabled,
+    tmdbConfigured: getTmdbStatus().configured,
+    enrichLimit: ENRICH_LIMIT,
+    detailRepairLimit: DETAIL_REPAIR_LIMIT,
     pendingRematch: pendingRematchCount(cache),
     cacheFile: storePath(),
     movies: metas.filter(m => m.type === 'movie').length,
