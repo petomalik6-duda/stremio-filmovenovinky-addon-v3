@@ -1,6 +1,6 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "FilmoveNovinky movie-only addon with metadata downgrade protection and strict Stremio/Nuvio/Fusion metadata normalization.",
   "type": "module",
   "main": "server.js",
