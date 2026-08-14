@@ -1,9 +1,9 @@
 import { scrapeFilmovenovinky, itemKey } from './scrape.js';
 import { fetchCsfdMeta, searchCsfd } from './csfd.js';
-import { tmdbByImdb, tmdbSearch } from './tmdb.js';
+import { tmdbByImdb, tmdbSearch, tmdbMovie, tmdbSeries } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 import { buildMetaIndex, localStremioId } from './ids.js';
-import { preferRicherMeta } from './meta-quality.js';
+import { preferRicherMeta, metaNeedsDetailRepair } from './meta-quality.js';
 
 const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
@@ -127,7 +127,7 @@ function titleCandidates(item) {
   return [...new Set(out.filter(x => x.length >= 2))];
 }
 
-async function enrichItem(item) {
+async function enrichItem(item, existing = null) {
   let csfdUrl = item.csfdUrl;
 
   if (item.type !== 'series' && !csfdUrl && CSFD_SEARCH_FALLBACK) {
@@ -137,7 +137,20 @@ async function enrichItem(item) {
   const normalizedItem = { ...item, csfdUrl };
   const csfd = item.type === 'series' ? {} : await fetchCsfdMeta(csfdUrl);
 
-  let tmdb = await tmdbByImdb(csfd.imdbId, item.type);
+  // Ak už cache pozná TMDB ID, je to najspoľahlivejšia cesta k detailu.
+  // Nehľadaj titul znovu iba preto, že predchádzajúci request na ČSFD zlyhal.
+  let tmdb = null;
+  const existingTmdbId = existing?._addon?.tmdbId;
+  if (existingTmdbId) {
+    tmdb = item.type === 'series'
+      ? await tmdbSeries(existingTmdbId)
+      : await tmdbMovie(existingTmdbId);
+  }
+
+  const knownImdbId = existing?._addon?.imdbId || csfd.imdbId || null;
+  if (!tmdb && knownImdbId) {
+    tmdb = await tmdbByImdb(knownImdbId, item.type);
+  }
 
   if (!tmdb) {
     for (const title of titleCandidates(item)) {
@@ -149,12 +162,15 @@ async function enrichItem(item) {
   return toMeta(normalizedItem, csfd, tmdb);
 }
 
-
 function metaNeedsRematch(item, meta) {
   if (!meta) return true;
 
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
   if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
+
+  // Film môže mať správne IMDb/TMDB ID a napriek tomu iba placeholder detail.
+  // Taký záznam sa musí skúsiť obohatiť znova aj pri nezmenenom zdroji.
+  if (metaNeedsDetailRepair(meta)) return true;
 
   // Lokálne placeholder metadata sa nesmú považovať za definitívne spárované.
   // Ak raz TMDB/ČSFD request zlyhal, ďalší refresh musí mať šancu film opraviť.
@@ -277,7 +293,7 @@ export async function refreshCache({ forceFull = false } = {}) {
         }
 
         try {
-          const candidate = await enrichItem(item);
+          const candidate = await enrichItem(item, existing);
           metas.push(preferRicherMeta(existing, candidate));
           enriched += 1;
         } catch (e) {
@@ -354,7 +370,9 @@ export async function getCatalogStats() {
     withCsfd: metas.filter(m => m._addon?.csfdUrl).length,
     withImdb: metas.filter(m => m._addon?.imdbId).length,
     withTmdb: metas.filter(m => m._addon?.tmdbId).length,
-    localIds: metas.filter(m => typeof m.id === 'string' && m.id.startsWith('filmovenovinky:')).length
+    localIds: metas.filter(m => typeof m.id === 'string' && m.id.startsWith('filmovenovinky:')).length,
+    poorMetadata: metas.filter(metaNeedsDetailRepair).length,
+    richMetadata: metas.filter(m => !metaNeedsDetailRepair(m)).length
   };
 }
 

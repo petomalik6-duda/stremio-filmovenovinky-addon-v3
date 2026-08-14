@@ -124,8 +124,8 @@ function writeCache(cache, cacheFile = CACHE_FILE) {
 function getMovieArray(cache) {
   if (Array.isArray(cache)) return cache;
   if (Array.isArray(cache.movies)) return cache.movies;
-  if (Array.isArray(cache.items)) return cache.items.filter(x => !x.type || x.type === 'movie');
   if (Array.isArray(cache.metas)) return cache.metas.filter(x => !x.type || x.type === 'movie');
+  if (Array.isArray(cache.items)) return cache.items.filter(x => !x.type || x.type === 'movie');
   return [];
 }
 

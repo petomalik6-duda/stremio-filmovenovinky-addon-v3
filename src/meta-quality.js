@@ -2,6 +2,24 @@ function isPlaceholderUrl(value) {
   return /(?:^|\.)placehold\.co\//i.test(String(value || ''));
 }
 
+
+function hasNarrativeDescription(meta) {
+  const lines = String(meta?.description || '')
+    .split(/\n+/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .filter(line => !/^(Origin[aá]lny n[aá]zov|Dabing|Pridan[eé]|ČSFD|IMDb|TMDB):/i.test(line));
+  return lines.join(' ').length >= 20;
+}
+
+export function metaNeedsDetailRepair(meta) {
+  if (!meta) return true;
+  if (!meta.poster || isPlaceholderUrl(meta.poster)) return true;
+  if (!meta.background || isPlaceholderUrl(meta.background)) return true;
+  if (!hasNarrativeDescription(meta)) return true;
+  return false;
+}
+
 export function metaQuality(meta) {
   if (!meta) return -1;
 
