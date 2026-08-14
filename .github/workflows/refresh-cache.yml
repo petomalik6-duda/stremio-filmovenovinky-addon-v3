@@ -6,7 +6,7 @@ on:
       force_full:
         description: "Run full refresh? true/false"
         required: false
-        default: "true"
+        default: "false"
 
   schedule:
     - cron: "20 3 * * *"
@@ -64,7 +64,7 @@ jobs:
           CSFD_SEARCH_FALLBACK: "true"
           MOVIES_SOURCE_URL: https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes
           SERIES_SOURCE_URL: ""
-          FORCE_FULL_REFRESH: ${{ github.event.inputs.force_full || 'true' }}
+          FORCE_FULL_REFRESH: ${{ github.event.inputs.force_full || 'false' }}
           POSTPROCESS_LIMIT: 1000
           POSTPROCESS_DELAY_MS: 200
 
