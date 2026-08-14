@@ -1,5 +1,5 @@
 {
-  "at": 1786722240634,
+  "at": 1786723125942,
   "sourceHash": "6479aac51513d89f3d1016754528d2b4333c3231",
   "items": [
     {
@@ -37326,16 +37326,31 @@
       }
     },
     {
-      "id": "filmovenovinky:bW92aWUtQWxlaiB2ZWxpa8OhbsWvLTIwMjMtQ1o",
+      "id": "tt27803347",
       "type": "movie",
       "name": "Alej velikánů",
-      "poster": "https://image.pmgstatic.com/files/svg/flags/162/751/162751395/162751395_38cf6e.svg",
-      "background": "https://image.pmgstatic.com/files/svg/flags/162/751/162751395/162751395_38cf6e.svg",
-      "description": "Originálny názov: Avenue of the Giants\n\nDabing: CZ\n\nPridané: 2026-01-29\n\nČSFD: https://www.csfd.cz/sk/film/1389729-alej-velikanu/prehlad/",
+      "poster": "https://image.tmdb.org/t/p/w500/kQvgYd8GaYkoovQZmE8IkbAMg2d.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/d162vjYEHGEGw2XqxH487bnEkfG.jpg",
+      "description": "Herbert Heller si z dětství ve východní Evropě nese traumatické tajemství: nynější majitel hračkářství v kalifornském Marin County přežil v dospívání holocaust. Nacisté ho ve dvanácti letech zavlekli do koncentračního tábora Osvětim-Březinka, z něhož se mu ale o tři roky později podařilo uprchnout a dalších šedesát let pak toto tajemství přede všemi - včetně vlastních dětí – tajil. Když je stárnoucímu Herbertovi diagnostikována smrtelná nemoc, spřátelí se s Abbey, izolovanou teenagerkou, jejíž vlastní setkání s bolestí a smrtí ho inspiruje k otevřenosti. Abbey a Herbert si navzájem odhalují své životní příběhy, díky čemuž navážou nepravděpodobné mezigenerační přátelství a společně najdou cestu k uzdravení.\n\nOriginálny názov: Avenue of the Giants\n\nDabing: CZ\n\nPridané: 2026-01-29\n\nČSFD: https://www.csfd.cz/sk/film/1389729-alej-velikanu/prehlad/\n\nIMDb: tt27803347\n\nTMDB: 1129188",
       "releaseInfo": "2023",
       "year": 2023,
+      "runtime": "102 min",
       "genres": [
+        "Drama",
         "CZ"
+      ],
+      "imdbRating": "9",
+      "director": [
+        "Finn Taylor"
+      ],
+      "cast": [
+        "Stephen Lang",
+        "Elsie Fisher",
+        "Robin Weigert",
+        "Luke David Blumm",
+        "Stephanie Heiner",
+        "Josh Schell",
+        "Jake Lucas"
       ],
       "links": [
         {
@@ -37344,26 +37359,38 @@
           "url": "https://www.csfd.cz/sk/film/1389729-alej-velikanu/prehlad/"
         },
         {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt27803347/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1129188"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
-        "defaultVideoId": "filmovenovinky:bW92aWUtQWxlaiB2ZWxpa8OhbsWvLTIwMjMtQ1o"
+        "defaultVideoId": "tt27803347"
       },
       "_addon": {
         "key": "movie|alej velikánů|avenue of the giants|2023|cz",
         "dateAdded": "2026-01-29",
         "lang": "CZ",
         "csfdUrl": "https://www.csfd.cz/sk/film/1389729-alej-velikanu/prehlad/",
-        "imdbId": null,
-        "tmdbId": null,
-        "tmdbYear": null,
+        "imdbId": "tt27803347",
+        "tmdbId": 1129188,
+        "tmdbYear": "2026",
         "matchVersion": 3,
         "sourceType": "movie",
         "titleRaw": "Alej velikánů / Avenue of the Giants (2023) (CZ)",
-        "localId": "filmovenovinky:bW92aWUtQWxlaiB2ZWxpa8OhbsWvLTIwMjMtQ1o"
+        "localId": "filmovenovinky:bW92aWUtQWxlaiB2ZWxpa8OhbsWvLTIwMjMtQ1o",
+        "lookupPath": "verified_csfd_tmdb_override",
+        "sourceOverrideVersion": 1
       }
     },
     {
@@ -41207,7 +41234,9 @@
         "matchVersion": 3,
         "sourceType": "movie",
         "titleRaw": "Jánošík (2025) (SK)",
-        "localId": "filmovenovinky:bW92aWUtSsOhbm_FocOtay0yMDI1LVNL"
+        "localId": "filmovenovinky:bW92aWUtSsOhbm_FocOtay0yMDI1LVNL",
+        "excludedReason": "csfd_theatre_recording",
+        "sourceOverrideVersion": 1
       }
     },
     {
@@ -62514,15 +62543,16 @@
       }
     },
     {
-      "id": "filmovenovinky:bW92aWUtS3VrYW5nIE1vdmllOiBQxZnDrWLEm2ggbyBvdXRsb27DrWNoIGEgbGlkZWNoLTIwMjMtQ1o",
+      "id": "tt37039145",
       "type": "movie",
       "name": "Kukang Movie: Příběh o outloních a lidech",
       "poster": "https://image.pmgstatic.com/files/svg/flags/162/751/162751395/162751395_38cf6e.svg",
       "background": "https://image.pmgstatic.com/files/svg/flags/162/751/162751395/162751395_38cf6e.svg",
-      "description": "Dabing: CZ\n\nPridané: 2025-06-11\n\nČSFD: https://www.csfd.cz/film/1633561-kukang-movie-pribeh-o-outlonich-a-lidech/videa/",
+      "description": "Časozberný dokument z roku 2023 sleduje ochranu outloňov v Indonézii, boj proti nelegálnemu obchodu so zvieratami a činnosť Záchranného programu Kukang. Réžia: Ondřej Smékal.\n\nDabing: CZ\n\nPridané: 2025-06-11\n\nČSFD: https://www.csfd.cz/film/1633561-kukang-movie-pribeh-o-outlonich-a-lidech/videa/\n\nIMDb: tt37039145",
       "releaseInfo": "2023",
       "year": 2023,
       "genres": [
+        "Dokumentárny",
         "CZ"
       ],
       "links": [
@@ -62532,26 +62562,33 @@
           "url": "https://www.csfd.cz/film/1633561-kukang-movie-pribeh-o-outlonich-a-lidech/videa/"
         },
         {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt37039145/"
+        },
+        {
           "name": "Zdroj",
           "category": "Info",
           "url": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes"
         }
       ],
       "behaviorHints": {
-        "defaultVideoId": "filmovenovinky:bW92aWUtS3VrYW5nIE1vdmllOiBQxZnDrWLEm2ggbyBvdXRsb27DrWNoIGEgbGlkZWNoLTIwMjMtQ1o"
+        "defaultVideoId": "tt37039145"
       },
       "_addon": {
         "key": "movie|kukang movie: příběh o outloních a lidech||2023|cz",
         "dateAdded": "2025-06-11",
         "lang": "CZ",
         "csfdUrl": "https://www.csfd.cz/film/1633561-kukang-movie-pribeh-o-outlonich-a-lidech/videa/",
-        "imdbId": null,
+        "imdbId": "tt37039145",
         "tmdbId": null,
         "tmdbYear": null,
         "matchVersion": 3,
         "sourceType": "movie",
         "titleRaw": "Kukang Movie: Příběh o outloních a lidech (2023) (CZ)",
-        "localId": "filmovenovinky:bW92aWUtS3VrYW5nIE1vdmllOiBQxZnDrWLEm2ggbyBvdXRsb27DrWNoIGEgbGlkZWNoLTIwMjMtQ1o"
+        "localId": "filmovenovinky:bW92aWUtS3VrYW5nIE1vdmllOiBQxZnDrWLEm2ggbyBvdXRsb27DrWNoIGEgbGlkZWNoLTIwMjMtQ1o",
+        "sourceOverrideVersion": 1,
+        "lookupPath": "verified_csfd_fallback"
       }
     },
     {
