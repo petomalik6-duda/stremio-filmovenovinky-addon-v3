@@ -1,6 +1,7 @@
 import { getWithRetry } from './http.js';
 import * as cheerio from 'cheerio';
 import { extractExplicitImdbIdFromHtml } from './matching.js';
+import { parseCsfdReaderText } from './csfd-reader.js';
 
 const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/2.0)';
 
@@ -10,6 +11,23 @@ function absAttr(url) {
 }
 
 function clean(text = '') { return text.replace(/\s+/g, ' ').trim(); }
+
+
+async function fetchCsfdReaderMeta(csfdUrl) {
+  if (!csfdUrl) return {};
+  try {
+    const readerUrl = `https://r.jina.ai/${csfdUrl}`;
+    const { data } = await getWithRetry(readerUrl, {
+      headers: { 'User-Agent': UA, Accept: 'text/plain' },
+      timeout: 30000,
+      responseType: 'text'
+    });
+    return parseCsfdReaderText(data);
+  } catch (e) {
+    return { csfdReaderError: e.message };
+  }
+}
+
 
 
 export async function searchCsfd(title, year) {
@@ -43,8 +61,36 @@ export async function fetchCsfdMeta(csfdUrl) {
     const csfdYear = yearText.match(/\b(19\d{2}|20\d{2})\b/)?.[1] || null;
     const genres = [];
     $('.genres a, .genre a, a[href*="/zanr/"]').each((_i, a) => genres.push(clean($(a).text())));
-    return { imdbId, csfdRating: rating, poster, description, csfdTitle: title, csfdYear, genres: [...new Set(genres.filter(Boolean))] };
+    const direct = { imdbId, csfdRating: rating, poster, description, csfdTitle: title, csfdYear, genres: [...new Set(genres.filter(Boolean))] };
+
+    // ČSFD používa anti-bot ochranu; HTTP 200 môže byť iba blokovacia stránka bez dát.
+    // Vtedy doplň chýbajúce polia cez Jina Reader, nie cez náhodný title search.
+    if (!direct.imdbId && !direct.poster && direct.description.length < 20) {
+      const reader = await fetchCsfdReaderMeta(csfdUrl);
+      return {
+        ...direct,
+        imdbId: direct.imdbId || reader.imdbId || null,
+        poster: direct.poster || reader.poster || null,
+        description: direct.description || reader.description || '',
+        csfdTitle: direct.csfdTitle || reader.title || '',
+        csfdYear: direct.csfdYear || reader.csfdYear || null,
+        genres: direct.genres.length ? direct.genres : (reader.genres || []),
+        csfdReaderError: reader.csfdReaderError
+      };
+    }
+    return direct;
   } catch (e) {
-    return { csfdError: e.message };
+    const reader = await fetchCsfdReaderMeta(csfdUrl);
+    return {
+      imdbId: reader.imdbId || null,
+      csfdRating: null,
+      poster: reader.poster || null,
+      description: reader.description || '',
+      csfdTitle: reader.title || '',
+      csfdYear: reader.csfdYear || null,
+      genres: reader.genres || [],
+      csfdError: e.message,
+      csfdReaderError: reader.csfdReaderError
+    };
   }
 }

@@ -124,7 +124,7 @@ async function searchOne(title, requestYear, type, expectedYear) {
       const full = type === 'series' ? await tmdbSeries(result.id) : await tmdbMovie(result.id);
       if (!full) continue;
 
-      const titleScore = titleMatchScore(title, full.name, full.originalName);
+      const titleScore = titleMatchScore(title, full.name, full.originalName, full.aliases || []);
       if (titleScore < TMDB_MIN_TITLE_SCORE) continue;
 
       if (!yearMatches(expectedYear, full.releaseInfo, TMDB_YEAR_TOLERANCE)) continue;
@@ -172,12 +172,15 @@ function common(data, type) {
     genres: (data.genres || []).map(g => g.name),
     imdbRating: data.vote_average ? String(Math.round(data.vote_average * 10) / 10) : undefined,
     cast: (data.credits?.cast || []).slice(0, 8).map(c => c.name),
-    trailer: (data.videos?.results || []).find(v => v.site === 'YouTube' && v.type === 'Trailer')?.key || null
+    trailer: (data.videos?.results || []).find(v => v.site === 'YouTube' && v.type === 'Trailer')?.key || null,
+    aliases: type === 'series'
+      ? (data.alternative_titles?.results || []).map(x => x.title).filter(Boolean)
+      : (data.alternative_titles?.titles || []).map(x => x.title).filter(Boolean)
   };
 }
 
 export async function tmdbMovie(id) {
-  const data = await detailWithLanguageFallback(`/movie/${id}`, { append_to_response: 'external_ids,credits,videos' }, 'movie');
+  const data = await detailWithLanguageFallback(`/movie/${id}`, { append_to_response: 'external_ids,credits,videos,alternative_titles' }, 'movie');
   if (!data) return null;
   return {
     ...common(data, 'movie'),
@@ -188,7 +191,7 @@ export async function tmdbMovie(id) {
 }
 
 export async function tmdbSeries(id) {
-  const data = await detailWithLanguageFallback(`/tv/${id}`, { append_to_response: 'external_ids,credits,videos' }, 'series');
+  const data = await detailWithLanguageFallback(`/tv/${id}`, { append_to_response: 'external_ids,credits,videos,alternative_titles' }, 'series');
   if (!data) return null;
   return {
     ...common(data, 'series'),

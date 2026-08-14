@@ -14,7 +14,7 @@ const DETAIL_REPAIR_LIMIT = Number(process.env.DETAIL_REPAIR_LIMIT || 100);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
-const MATCH_VERSION = 2;
+const MATCH_VERSION = 3;
 const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
@@ -36,7 +36,7 @@ function localMeta(item) {
   return toMeta(item, {}, null);
 }
 
-function toMeta(item, csfd = {}, tmdb = null) {
+function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
   const type = item.type === 'series' ? 'series' : 'movie';
   const id = stremioId(item, csfd, tmdb);
   const imdbId = tmdb?.imdbId || csfd?.imdbId || null;
@@ -93,15 +93,17 @@ function toMeta(item, csfd = {}, tmdb = null) {
       sourceType: type,
       titleRaw: item.titleRaw,
       // Stabilný alias, aby detail fungoval aj po prechode local ID -> IMDb ID.
-      localId: localStremioId(item)
+      localId: localStremioId(item),
+      ...extraAddon
     }
   };
 }
 
-function titleCandidates(item) {
+function titleCandidates(item, csfd = {}) {
   const values = [
     item.originalName,
     item.name,
+    csfd.csfdTitle,
     item.titleRaw,
   ];
 
@@ -154,9 +156,26 @@ async function enrichItem(item, existing = null) {
   }
 
   if (!tmdb) {
-    for (const title of titleCandidates(item)) {
+    for (const title of titleCandidates(item, csfd)) {
       tmdb = await tmdbSearch(title, item.year, item.type);
       if (tmdb) break;
+    }
+  }
+
+  // Movie-only addon: ak filmové vyhľadávanie zlyhá, over presnú zhodu v TV.
+  // Takto sa napr. dokumentárny seriál Tajemství včel nebude tváriť ako film.
+  if (!tmdb && item.type === 'movie') {
+    let detectedSeries = null;
+    for (const title of titleCandidates(item, csfd)) {
+      detectedSeries = await tmdbSearch(title, item.year, 'series');
+      if (detectedSeries) break;
+    }
+    if (detectedSeries) {
+      return toMeta(normalizedItem, csfd, null, {
+        excludedReason: 'tmdb_detected_series',
+        detectedType: 'series',
+        detectedTmdbId: detectedSeries.tmdbId || null
+      });
     }
   }
 
@@ -165,6 +184,7 @@ async function enrichItem(item, existing = null) {
 
 function metaNeedsRematch(item, meta) {
   if (!meta) return true;
+  if (meta?._addon?.excludedReason) return false;
 
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
   if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
@@ -336,7 +356,7 @@ export async function repairIncompleteMetadata({ limit = DETAIL_REPAIR_LIMIT } =
   const metas = [...(cache.metas || [])];
   const targets = metas
     .map((meta, index) => ({ meta, index }))
-    .filter(({ meta }) => metaNeedsDetailRepair(meta))
+    .filter(({ meta }) => !meta?._addon?.excludedReason && metaNeedsDetailRepair(meta))
     .slice(0, Math.max(0, Number(limit) || 0));
 
   const result = {
@@ -431,8 +451,8 @@ export async function getCatalogStats() {
     lastError: cache.lastError,
     items: metas.length,
     visibleItems: HIDE_UNMATCHED_ITEMS
-      ? metas.filter(m => Boolean(m._addon?.tmdbId) || Boolean(m._addon?.imdbId) || Boolean(m._addon?.csfdUrl) || (typeof m.id === 'string' && m.id.startsWith('tt'))).length
-      : metas.length,
+      ? metas.filter(looksLikeRealMovieMeta).filter(m => Boolean(m._addon?.tmdbId) || Boolean(m._addon?.imdbId) || Boolean(m._addon?.csfdUrl) || (typeof m.id === 'string' && m.id.startsWith('tt'))).length
+      : metas.filter(looksLikeRealMovieMeta).length,
     hideUnmatchedItems: HIDE_UNMATCHED_ITEMS,
     matchVersion: MATCH_VERSION,
     tmdbEnabled: getTmdbStatus().enabled,
@@ -454,11 +474,26 @@ export async function getCatalogStats() {
     withImdb: metas.filter(m => m._addon?.imdbId).length,
     withTmdb: metas.filter(m => m._addon?.tmdbId).length,
     localIds: metas.filter(m => typeof m.id === 'string' && m.id.startsWith('filmovenovinky:')).length,
-    poorMetadata: metas.filter(metaNeedsDetailRepair).length,
-    poorMissingPoster: metas.filter(m => metaDetailIssues(m).includes('poster')).length,
-    poorMissingBackground: metas.filter(m => metaDetailIssues(m).includes('background')).length,
-    poorMissingDescription: metas.filter(m => metaDetailIssues(m).includes('description')).length,
-    richMetadata: metas.filter(m => !metaNeedsDetailRepair(m)).length
+    excludedNonMovies: metas.filter(m => Boolean(m?._addon?.excludedReason)).length,
+    poorMetadata: metas.filter(m => !m?._addon?.excludedReason && metaNeedsDetailRepair(m)).length,
+    poorMissingPoster: metas.filter(m => !m?._addon?.excludedReason && metaDetailIssues(m).includes('poster')).length,
+    poorMissingBackground: metas.filter(m => !m?._addon?.excludedReason && metaDetailIssues(m).includes('background')).length,
+    poorMissingDescription: metas.filter(m => !m?._addon?.excludedReason && metaDetailIssues(m).includes('description')).length,
+    richMetadata: metas.filter(m => !m?._addon?.excludedReason && !metaNeedsDetailRepair(m)).length,
+    poorMetadataExamples: metas
+      .filter(m => !m?._addon?.excludedReason && metaNeedsDetailRepair(m))
+      .slice(0, 20)
+      .map(m => ({
+        name: m.name,
+        year: m.releaseInfo || null,
+        imdbId: m?._addon?.imdbId || null,
+        tmdbId: m?._addon?.tmdbId || null,
+        issues: metaDetailIssues(m)
+      })),
+    excludedExamples: metas
+      .filter(m => Boolean(m?._addon?.excludedReason))
+      .slice(0, 20)
+      .map(m => ({ name: m.name, year: m.releaseInfo || null, reason: m._addon.excludedReason, detectedTmdbId: m._addon.detectedTmdbId || null }))
   };
 }
 
@@ -470,6 +505,7 @@ export function searchCatalog(metas, query) {
 
 
 function looksLikeRealMovieMeta(meta) {
+  if (meta?._addon?.excludedReason) return false;
   if (!STRICT_MOVIE_FILTER) return true;
 
   const name = String(meta.name || '').trim();
