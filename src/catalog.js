@@ -3,7 +3,7 @@ import { fetchCsfdMeta, searchCsfd } from './csfd.js';
 import { tmdbByImdb, tmdbSearch, tmdbMovie, tmdbSeries, getTmdbStatus } from './tmdb.js';
 import { readStore, writeStore, storePath } from './store.js';
 import { buildMetaIndex, localStremioId } from './ids.js';
-import { preferRicherMeta, metaNeedsDetailRepair } from './meta-quality.js';
+import { preferRicherMeta, metaNeedsDetailRepair, metaDetailIssues } from './meta-quality.js';
 
 const MAX_ITEMS = Number(process.env.MAX_ITEMS || 1000);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_HOURS || 24) * 60 * 60 * 1000;
@@ -437,6 +437,8 @@ export async function getCatalogStats() {
     matchVersion: MATCH_VERSION,
     tmdbEnabled: getTmdbStatus().enabled,
     tmdbConfigured: getTmdbStatus().configured,
+    tmdbLanguage: getTmdbStatus().language,
+    tmdbFallbackLanguage: getTmdbStatus().fallbackLanguage,
     enrichLimit: ENRICH_LIMIT,
     detailRepairLimit: DETAIL_REPAIR_LIMIT,
     pendingRematch: pendingRematchCount(cache),
@@ -451,6 +453,9 @@ export async function getCatalogStats() {
     withTmdb: metas.filter(m => m._addon?.tmdbId).length,
     localIds: metas.filter(m => typeof m.id === 'string' && m.id.startsWith('filmovenovinky:')).length,
     poorMetadata: metas.filter(metaNeedsDetailRepair).length,
+    poorMissingPoster: metas.filter(m => metaDetailIssues(m).includes('poster')).length,
+    poorMissingBackground: metas.filter(m => metaDetailIssues(m).includes('background')).length,
+    poorMissingDescription: metas.filter(m => metaDetailIssues(m).includes('description')).length,
     richMetadata: metas.filter(m => !metaNeedsDetailRepair(m)).length
   };
 }

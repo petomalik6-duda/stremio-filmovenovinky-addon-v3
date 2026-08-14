@@ -12,12 +12,17 @@ function hasNarrativeDescription(meta) {
   return lines.join(' ').length >= 20;
 }
 
+export function metaDetailIssues(meta) {
+  if (!meta) return ['meta'];
+  const issues = [];
+  if (!meta.poster || isPlaceholderUrl(meta.poster)) issues.push('poster');
+  if (!meta.background || isPlaceholderUrl(meta.background)) issues.push('background');
+  if (!hasNarrativeDescription(meta)) issues.push('description');
+  return issues;
+}
+
 export function metaNeedsDetailRepair(meta) {
-  if (!meta) return true;
-  if (!meta.poster || isPlaceholderUrl(meta.poster)) return true;
-  if (!meta.background || isPlaceholderUrl(meta.background)) return true;
-  if (!hasNarrativeDescription(meta)) return true;
-  return false;
+  return metaDetailIssues(meta).length > 0;
 }
 
 export function metaQuality(meta) {

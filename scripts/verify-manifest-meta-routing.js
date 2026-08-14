@@ -8,8 +8,8 @@ if (!src.includes(expected)) {
   process.exit(1);
 }
 
-if (!src.includes("version: '3.6.7'")) {
-  console.error('FAIL: server manifest version is not 3.6.7');
+if (!src.includes("version: '3.6.8'")) {
+  console.error('FAIL: server manifest version is not 3.6.8');
   process.exit(1);
 }
 

@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { titleMatchScore, yearMatches } from './matching.js';
+import { mergeTmdbLanguageFallback } from './tmdb-language-fallback.js';
 
 const TMDB = 'https://api.themoviedb.org/3';
 const IMG = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP = 'https://image.tmdb.org/t/p/w1280';
 const LANG = process.env.TMDB_LANGUAGE || 'cs-CZ';
+const FALLBACK_LANG = process.env.TMDB_FALLBACK_LANGUAGE || 'en-US';
 
 const TMDB_YEAR_TOLERANCE = Number(process.env.TMDB_YEAR_TOLERANCE || 2);
 const TMDB_SEARCH_LIMIT = Number(process.env.TMDB_SEARCH_LIMIT || 8);
@@ -16,16 +18,35 @@ function key() { return tmdbEnabled() ? (process.env.TMDB_API_KEY || '') : ''; }
 export function getTmdbStatus() {
   return {
     enabled: tmdbEnabled(),
-    configured: Boolean(String(process.env.TMDB_API_KEY || '').trim())
+    configured: Boolean(String(process.env.TMDB_API_KEY || '').trim()),
+    language: LANG,
+    fallbackLanguage: FALLBACK_LANG
   };
 }
 
-async function tmdbGet(path, params = {}) {
+async function tmdbGet(path, params = {}, language = LANG) {
   if (!key()) return null;
   const { data } = await axios.get(`${TMDB}${path}`, {
-    params: { api_key: key(), language: LANG, ...params },
+    params: { api_key: key(), language, ...params },
     timeout: 15000
   });
+  return data;
+}
+
+async function detailWithLanguageFallback(path, params, type) {
+  let data = await tmdbGet(path, params, LANG);
+  if (!data) return null;
+
+  const overview = String(data.overview || '').trim();
+  if (overview.length < 20 && FALLBACK_LANG && FALLBACK_LANG !== LANG) {
+    try {
+      const fallback = await tmdbGet(path, params, FALLBACK_LANG);
+      data = mergeTmdbLanguageFallback(data, fallback, type);
+    } catch (error) {
+      console.warn(`[tmdb] ${FALLBACK_LANG} detail fallback failed for ${path}:`, error.message);
+    }
+  }
+
   return data;
 }
 
@@ -135,7 +156,7 @@ function common(data, type) {
 }
 
 export async function tmdbMovie(id) {
-  const data = await tmdbGet(`/movie/${id}`, { append_to_response: 'external_ids,credits,videos' });
+  const data = await detailWithLanguageFallback(`/movie/${id}`, { append_to_response: 'external_ids,credits,videos' }, 'movie');
   if (!data) return null;
   return {
     ...common(data, 'movie'),
@@ -146,7 +167,7 @@ export async function tmdbMovie(id) {
 }
 
 export async function tmdbSeries(id) {
-  const data = await tmdbGet(`/tv/${id}`, { append_to_response: 'external_ids,credits,videos' });
+  const data = await detailWithLanguageFallback(`/tv/${id}`, { append_to_response: 'external_ids,credits,videos' }, 'series');
   if (!data) return null;
   return {
     ...common(data, 'series'),

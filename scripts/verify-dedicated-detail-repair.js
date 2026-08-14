@@ -7,5 +7,5 @@ if (!catalog.includes('detailRepairLimit: DETAIL_REPAIR_LIMIT')) throw new Error
 if (!catalog.includes('tmdbConfigured: getTmdbStatus().configured')) throw new Error('TMDB diagnostics missing');
 if (!wrapper.includes('repairIncompleteMetadata')) throw new Error('dedicated repair wrapper missing');
 if (wrapper.includes('refreshCache({ forceFull: false })')) throw new Error('repair still depends on refreshCache/ENRICH_LIMIT');
-if (!server.includes("version: '3.6.7'")) throw new Error('version mismatch');
+if (!server.includes("version: '3.6.8'")) throw new Error('version mismatch');
 console.log(JSON.stringify({ok:true, dedicatedRepair:true, independentFromEnrichLimit:true}, null, 2));
