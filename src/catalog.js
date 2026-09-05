@@ -103,6 +103,7 @@ function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
       matchVersion: MATCH_VERSION,
       sourceType: type,
       titleRaw: item.titleRaw,
+      sourceOrder: Number.isFinite(Number(item.order)) ? Number(item.order) : null,
       // Stabilný alias, aby detail fungoval aj po prechode local ID -> IMDb ID.
       localId: localStremioId(item),
       ...extraAddon
@@ -280,6 +281,9 @@ function metaNeedsRematch(item, meta) {
   if (itemCatalogIds.join('|') !== metaCatalogIds.join('|')) return true;
   if ((item?.tipImdbRating ?? null) !== (meta?._addon?.tipImdbRating ?? null)) return true;
   if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;
+  const itemOrder = Number.isFinite(Number(item?.order)) ? Number(item.order) : null;
+  const metaOrder = Number.isFinite(Number(meta?._addon?.sourceOrder)) ? Number(meta._addon.sourceOrder) : null;
+  if (itemOrder !== metaOrder) return true;
 
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
   if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
@@ -681,10 +685,27 @@ function isBestRatedTip(meta) {
   return imdb >= BEST_IMDB_MIN || csfd >= BEST_CSFD_MIN;
 }
 
-function sortTipsByDate(a, b) {
-  const byDate = String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
+function sourceOrder(meta) {
+  const n = Number(meta?._addon?.sourceOrder);
+  return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
+}
+
+function compareDatesDesc(a, b) {
+  return String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
+}
+
+function sortByDateThenOrder(a, b) {
+  const byDate = compareDatesDesc(a, b);
   if (byDate) return byDate;
+  const byOrder = sourceOrder(a) - sourceOrder(b);
+  if (Number.isFinite(byOrder) && byOrder) return byOrder;
   return String(a.name || '').localeCompare(String(b.name || ''), 'sk');
+}
+
+function sortTipsByPageOrder(a, b) {
+  const byOrder = sourceOrder(a) - sourceOrder(b);
+  if (Number.isFinite(byOrder) && byOrder) return byOrder;
+  return sortByDateThenOrder(a, b);
 }
 
 function sortBestTipsByRating(a, b) {
@@ -697,7 +718,7 @@ function sortBestTipsByRating(a, b) {
   const byImdb = tipImdb(b) - tipImdb(a);
   if (byImdb) return byImdb;
 
-  return sortTipsByDate(a, b);
+  return sortTipsByPageOrder(a, b);
 }
 
 export function filterCatalog(metas, id, type) {
@@ -724,6 +745,6 @@ export function filterCatalog(metas, id, type) {
     );
   }
 
-  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;
+  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : (id === 'filmovenovinky-tipy' ? sortTipsByPageOrder : sortByDateThenOrder);
   return arr.sort(sortFn);
 }
