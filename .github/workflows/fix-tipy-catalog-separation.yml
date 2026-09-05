@@ -1,0 +1,147 @@
+name: Fix Tipy catalog separation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fix-tipy-catalog-separation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Reset to latest main
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+      - name: Patch catalog split and poster fallback
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          catalog = Path('src/catalog.js')
+          src = catalog.read_text()
+
+          src = src.replace("const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.0);", "const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.2);")
+          src = src.replace("const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 75);", "const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 78);")
+
+          block_re = re.compile(r"function isBestRatedTip\(meta\) \{[\s\S]*?\n\}\n\nfunction sortByDateThenRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog")
+          new_block = r"""function tipImdb(meta) {
+  return numeric(meta?._addon?.tipImdbRating);
+}
+
+function tipCsfd(meta) {
+  return numeric(meta?._addon?.tipCsfdPercent);
+}
+
+function tipScore(meta) {
+  const csfd = tipCsfd(meta) ? tipCsfd(meta) / 10 : 0;
+  const imdb = tipImdb(meta);
+  return Math.max(csfd, imdb);
+}
+
+function isBestRatedTip(meta) {
+  const imdb = tipImdb(meta);
+  const csfd = tipCsfd(meta);
+
+  // Najlepšie hodnotené má byť menší a odlišný výber zo sekcie Tipy.
+  // Preto používame iba ratingy načítané zo stránky FilmovéNovinky, nie TMDB fallback.
+  return imdb >= BEST_IMDB_MIN || csfd >= BEST_CSFD_MIN;
+}
+
+function sortTipsByDate(a, b) {
+  const byDate = String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
+  if (byDate) return byDate;
+  return String(a.name || '').localeCompare(String(b.name || ''), 'sk');
+}
+
+function sortBestTipsByRating(a, b) {
+  const byScore = tipScore(b) - tipScore(a);
+  if (byScore) return byScore;
+
+  const byCsfd = tipCsfd(b) - tipCsfd(a);
+  if (byCsfd) return byCsfd;
+
+  const byImdb = tipImdb(b) - tipImdb(a);
+  if (byImdb) return byImdb;
+
+  return sortTipsByDate(a, b);
+}
+
+export function filterCatalog"""
+          src2, n = block_re.subn(new_block, src)
+          if n != 1:
+            raise SystemExit(f'catalog rating block replacement count={n}')
+          src = src2
+
+          old = """  return arr.sort(sortByDateThenRating);
+}"""
+          new = """  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;
+  return arr.sort(sortFn);
+}"""
+          if old not in src:
+            raise SystemExit('catalog final sort marker not found')
+          src = src.replace(old, new)
+          catalog.write_text(src)
+
+          public = Path('src/public-meta.js')
+          pub = public.read_text()
+          if 'function placeholderPoster(name)' not in pub:
+            pub = pub.replace(
+              "function asString(value) {\n",
+              "function placeholderPoster(name) {\n  return `https://placehold.co/500x750/png?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`;\n}\n\nfunction asString(value) {\n"
+            )
+          marker = "  // First strip internal/non-standard cache fields and normalize strict types.\n  const safeMeta = cleanKnownMetaFields(meta);\n"
+          insert = """  // First strip internal/non-standard cache fields and normalize strict types.
+  const safeMeta = cleanKnownMetaFields(meta);
+
+  // Serve-time fallback so older cache entries and newly added tip items never
+  // render as blank cards in Stremio/Nuvio/Fusion.
+  const displayName = safeMeta.name || meta.name || 'CZ/SK';
+  if (!safeMeta.poster) safeMeta.poster = placeholderPoster(displayName);
+  if (!safeMeta.posterShape) safeMeta.posterShape = 'poster';
+  if (!safeMeta.background) safeMeta.background = safeMeta.poster;
+"""
+          if marker not in pub and 'Serve-time fallback so older cache entries' not in pub:
+            raise SystemExit('public-meta marker not found')
+          if 'Serve-time fallback so older cache entries' not in pub:
+            pub = pub.replace(marker, insert)
+          public.write_text(pub)
+
+          package = Path('package.json')
+          pkg = package.read_text()
+          pkg = re.sub(r'"version":\s*"[^"]+"', '"version": "3.7.14"', pkg, count=1)
+          package.write_text(pkg)
+          PY
+
+      - name: Verify syntax
+        run: |
+          node --check src/catalog.js
+          node --check src/public-meta.js
+
+      - name: Commit catalog separation fix
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add src/catalog.js src/public-meta.js package.json
+          if git diff --cached --quiet; then
+            echo "No source changes"
+            exit 0
+          fi
+          git commit -m "Separate tip catalogs and add poster fallback"
+          git pull --rebase --autostash origin main
+          git push origin main
