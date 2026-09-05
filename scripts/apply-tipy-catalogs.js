@@ -3,15 +3,12 @@ import fs from 'fs';
 function read(file) { return fs.readFileSync(file, 'utf8'); }
 function write(file, content) { fs.writeFileSync(file, content); }
 function mustReplace(content, file, search, replacement) {
-  if (!content.includes(search)) throw new Error(`${file}: marker not found: ${search.slice(0, 80)}`);
+  if (!content.includes(search)) throw new Error(file + ': marker not found: ' + search.slice(0, 80));
   return content.replace(search, replacement);
 }
 function mustReplaceRegex(content, file, regex, replacement) {
-  if (!regex.test(content)) throw new Error(`${file}: regex marker not found: ${regex}`);
+  if (!regex.test(content)) throw new Error(file + ': regex marker not found: ' + regex);
   return content.replace(regex, replacement);
-}
-function uniqueStrings(values) {
-  return [...new Set((values || []).filter(Boolean))];
 }
 
 function patchPackage() {
@@ -56,12 +53,16 @@ function patchServer() {
   }
 ];`;
 
-  src = mustReplaceRegex(src, file, /const catalogs = \[[\s\S]*?\n\];\n\nconst manifest =/, `${catalogs}\n\nconst manifest =`);
+  src = mustReplaceRegex(src, file, /const catalogs = \[[\s\S]*?\n\];\n\nconst manifest =/, catalogs + '\n\nconst manifest =');
   src = src.replace("const ADDON_VERSION = process.env.npm_package_version || '3.7.7';", "const ADDON_VERSION = process.env.npm_package_version || '3.7.8';");
-  src = src.replace(
-    "        <p>Debug find: <a href=\"/debug/find?q=carodejnik\">/debug/find?q=carodejnik</a></p>",
-    "        <p>Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené</p>\n        <p>Debug find: <a href=\"/debug/find?q=carodejnik\">/debug/find?q=carodejnik</a></p>"
-  );
+
+  if (!src.includes('Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené')) {
+    src = src.replace(
+      '        <p>Debug find: <a href="/debug/find?q=carodejnik">/debug/find?q=carodejnik</a></p>',
+      '        <p>Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené</p>\n        <p>Debug find: <a href="/debug/find?q=carodejnik">/debug/find?q=carodejnik</a></p>'
+    );
+  }
+
   write(file, src);
 }
 
@@ -69,12 +70,15 @@ function patchScrape() {
   const file = 'src/scrape.js';
   let src = read(file);
 
-  src = src.replace(
-    "export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';\nconst DISABLE_SERIES",
-    "export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';\nexport const TIPS_SOURCE_URL = process.env.TIPS_SOURCE_URL || 'https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami';\nconst ENABLE_TIPS_CATALOG = String(process.env.ENABLE_TIPS_CATALOG || 'true').toLowerCase() !== 'false';\nconst TIPS_MAX_ITEMS = Number(process.env.TIPS_MAX_ITEMS || 250);\nconst DISABLE_SERIES"
-  );
+  if (!src.includes('TIPS_SOURCE_URL')) {
+    src = mustReplace(
+      src,
+      file,
+      "export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';\nconst DISABLE_SERIES",
+      "export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';\nexport const TIPS_SOURCE_URL = process.env.TIPS_SOURCE_URL || 'https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami';\nconst ENABLE_TIPS_CATALOG = String(process.env.ENABLE_TIPS_CATALOG || 'true').toLowerCase() !== 'false';\nconst TIPS_MAX_ITEMS = Number(process.env.TIPS_MAX_ITEMS || 250);\nconst DISABLE_SERIES"
+    );
+  }
 
-  const helperMarker = 'function isProbablyNotMovieLine(text) {';
   if (!src.includes('function parseTipRatings(text)')) {
     const helpers = `
 function parseNumber(value) {
@@ -140,10 +144,10 @@ function createTipItem(title, ratingText, currentDate, { links = [], detailUrl =
   // Tipy môžu byť aj iba s titulkami. Shape parser potrebuje CZ/SK značku,
   // ale pôvodnú dostupnosť zachováme v item.lang a tipAvailability.
   const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');
-  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, 'movie');
+  const item = makeMovieItemFromText(cleanTitleText + ' (' + parseLang + ')', currentDate, TIPS_SOURCE_URL, 'movie');
   if (!item) return null;
 
-  item.titleRaw = clean(`${cleanTitleText} ${ratingText || ''}`);
+  item.titleRaw = clean(cleanTitleText + ' ' + (ratingText || ''));
   item.lang = ratings.lang || item.lang;
   item.dateAdded = currentDate || parseDate(cleanTitleText) || today();
   item.sourceUrl = TIPS_SOURCE_URL;
@@ -195,7 +199,7 @@ function parseTipsTextList(rawText) {
 }
 
 `;
-    src = mustReplace(src, file, helperMarker, helpers + helperMarker);
+    src = mustReplace(src, file, 'function isProbablyNotMovieLine(text) {', helpers + 'function isProbablyNotMovieLine(text) {');
   }
 
   if (!src.includes('export async function scrapeTips')) {
@@ -256,12 +260,13 @@ function mergeCatalogItems(items) {
 
   for (const item of items || []) {
     if (!item) continue;
-    const key = `${item.type}|${item.name}|${item.originalName || ''}|${item.year}`.toLowerCase();
-    const existing = byKey.get(key);
+    const key = String(item.type || '') + '|' + String(item.name || '') + '|' + String(item.originalName || '') + '|' + String(item.year || '');
+    const normalizedKey = key.toLowerCase();
+    const existing = byKey.get(normalizedKey);
 
     if (!existing) {
       const catalogIds = item.catalogIds || ['filmovenovinky-filmy'];
-      byKey.set(key, { ...item, catalogIds: uniqueStrings(catalogIds) });
+      byKey.set(normalizedKey, { ...item, catalogIds: uniqueStrings(catalogIds) });
       continue;
     }
 
@@ -314,7 +319,7 @@ function mergeCatalogItems(items) {
     console.log('[scrape] series disabled');
   }
 
-  const sourceHash = crypto.createHash('sha1').update(`${moviesResult.sourceHash}|${tipsResult.sourceHash}|${seriesResult.sourceHash}`).digest('hex');
+  const sourceHash = crypto.createHash('sha1').update(moviesResult.sourceHash + '|' + tipsResult.sourceHash + '|' + seriesResult.sourceHash).digest('hex');
   const items = mergeCatalogItems([...moviesResult.items, ...tipsResult.items, ...seriesResult.items]);
   return { sourceUrl: MOVIES_SOURCE_URL, sourceHash, items };
 }
@@ -331,7 +336,7 @@ function patchCatalog() {
   if (!src.includes('const BEST_IMDB_MIN')) {
     src = src.replace(
       'const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);',
-      `const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);\nconst BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 6.5);\nconst BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 65);`
+      'const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);\nconst BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 6.5);\nconst BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 65);'
     );
   }
 
@@ -344,26 +349,25 @@ function patchCatalog() {
   if (!src.includes('catalogIds: Array.isArray(item.catalogIds)')) {
     src = src.replace(
       '      lang: item.lang,\n      csfdUrl: item.csfdUrl || null,',
-      `      lang: item.lang,\n      catalogIds: Array.isArray(item.catalogIds) && item.catalogIds.length ? item.catalogIds : ['filmovenovinky-filmy'],\n      sourcePage: item.sourcePage || null,\n      tipGenre: item.tipGenre || null,\n      tipImdbRating: item.tipImdbRating ?? null,\n      tipCsfdPercent: item.tipCsfdPercent ?? null,\n      tipAvailability: item.tipAvailability || null,\n      csfdUrl: item.csfdUrl || null,`
+      "      lang: item.lang,\n      catalogIds: Array.isArray(item.catalogIds) && item.catalogIds.length ? item.catalogIds : ['filmovenovinky-filmy'],\n      sourcePage: item.sourcePage || null,\n      tipGenre: item.tipGenre || null,\n      tipImdbRating: item.tipImdbRating ?? null,\n      tipCsfdPercent: item.tipCsfdPercent ?? null,\n      tipAvailability: item.tipAvailability || null,\n      csfdUrl: item.csfdUrl || null,"
     );
   }
 
   if (!src.includes('function sortedCatalogIds(value)')) {
     src = src.replace(
       'function metaNeedsRematch(item, meta) {',
-      `function sortedCatalogIds(value) {\n  const ids = Array.isArray(value) && value.length ? value : ['filmovenovinky-filmy'];\n  return [...new Set(ids.filter(Boolean))].sort();\n}\n\nfunction metaNeedsRematch(item, meta) {`
+      "function sortedCatalogIds(value) {\n  const ids = Array.isArray(value) && value.length ? value : ['filmovenovinky-filmy'];\n  return [...new Set(ids.filter(Boolean))].sort();\n}\n\nfunction metaNeedsRematch(item, meta) {"
     );
   }
 
   if (!src.includes('const itemCatalogIds = sortedCatalogIds(item?.catalogIds);')) {
     src = src.replace(
       '  if (item?.tmdbId && Number(meta?._addon?.tmdbId || 0) !== Number(item.tmdbId)) return true;\n',
-      `  if (item?.tmdbId && Number(meta?._addon?.tmdbId || 0) !== Number(item.tmdbId)) return true;\n\n  const itemCatalogIds = sortedCatalogIds(item?.catalogIds);\n  const metaCatalogIds = sortedCatalogIds(meta?._addon?.catalogIds);\n  if (itemCatalogIds.join('|') !== metaCatalogIds.join('|')) return true;\n  if ((item?.tipImdbRating ?? null) !== (meta?._addon?.tipImdbRating ?? null)) return true;\n  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;\n`
+      "  if (item?.tmdbId && Number(meta?._addon?.tmdbId || 0) !== Number(item.tmdbId)) return true;\n\n  const itemCatalogIds = sortedCatalogIds(item?.catalogIds);\n  const metaCatalogIds = sortedCatalogIds(meta?._addon?.catalogIds);\n  if (itemCatalogIds.join('|') !== metaCatalogIds.join('|')) return true;\n  if ((item?.tipImdbRating ?? null) !== (meta?._addon?.tipImdbRating ?? null)) return true;\n  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;\n"
     );
   }
 
-  const newFilter = `
-function catalogIdsForMeta(meta) {
+  const newFilter = `function catalogIdsForMeta(meta) {
   return Array.isArray(meta?._addon?.catalogIds) && meta._addon.catalogIds.length
     ? meta._addon.catalogIds
     : ['filmovenovinky-filmy'];
@@ -420,7 +424,9 @@ export function filterCatalog(metas, id, type) {
 }
 `;
 
-  src = mustReplaceRegex(src, file, /export function filterCatalog\(metas, id, type\) \{[\s\S]*?\n\}/, newFilter.trimEnd());
+  const start = src.indexOf('export function filterCatalog(metas, id, type) {');
+  if (start === -1) throw new Error('src/catalog.js: filterCatalog start not found');
+  src = src.slice(0, start) + newFilter;
   write(file, src);
 }
 
@@ -430,7 +436,7 @@ function patchWorkflow() {
   if (!src.includes('TIPS_SOURCE_URL:')) {
     src = src.replace(
       '          MOVIES_SOURCE_URL: https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes\n',
-      `          MOVIES_SOURCE_URL: https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes\n          ENABLE_TIPS_CATALOG: "true"\n          TIPS_SOURCE_URL: https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami\n          TIPS_MAX_ITEMS: 250\n          BEST_IMDB_MIN: 6.5\n          BEST_CSFD_MIN: 65\n`
+      '          MOVIES_SOURCE_URL: https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes\n          ENABLE_TIPS_CATALOG: "true"\n          TIPS_SOURCE_URL: https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami\n          TIPS_MAX_ITEMS: 250\n          BEST_IMDB_MIN: 6.5\n          BEST_CSFD_MIN: 65\n'
     );
   }
   write(file, src);
