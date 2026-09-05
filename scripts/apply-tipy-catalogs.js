@@ -15,13 +15,16 @@ function patchScrape() {
 
   // Tipy musia zostať samostatné položky aj keď rovnaký film existuje v hlavnom
   // katalógu noviniek. Inak sa zlúčia a zdedia dátum/poradie z hlavnej stránky.
-  src = src.replace(
-    /(function createTipItem\([\s\S]*?)(\n\s*item\.key = itemKey\(item\);\n\s*return item;\n\}\n\nfunction parseTextList)/,
-    (_m, before, after) => `${before}\n  item.key = ` + '`tips|${itemKey(item)}`' + `;${after.replace(/\n\s*item\.key = itemKey\(item\);/, '')}`
-  );
-
-  if (!src.includes('tips|${itemKey(item)}')) {
-    throw new Error('createTipItem key prefix was not applied');
+  if (!src.includes('item.key = `tips|${itemKey(item)}`;')) {
+    const re = /function createTipItem\([\s\S]*?\n\}\n\nfunction parseTextList/;
+    const block = src.match(re)?.[0];
+    if (!block) throw new Error('createTipItem block not found');
+    const patched = block.replace(
+      '  item.key = itemKey(item);\n  return item;\n}\n\nfunction parseTextList',
+      '  item.key = `tips|${itemKey(item)}`;\n  return item;\n}\n\nfunction parseTextList'
+    );
+    if (patched === block) throw new Error('createTipItem key marker not found');
+    src = src.replace(block, patched);
   }
 
   const mergeFn = `function mergeCatalogItems(items) {
@@ -65,12 +68,14 @@ function patchScrape() {
 
 export async function scrapeFilmovenovinky`;
 
-  src = replaceRegex(
-    src,
-    /function mergeCatalogItems\(items\) \{[\s\S]*?\n\}\n\nexport async function scrapeFilmovenovinky/,
-    mergeFn,
-    'mergeCatalogItems exact-key split'
-  );
+  if (!src.includes('Používame presný item.key')) {
+    src = replaceRegex(
+      src,
+      /function mergeCatalogItems\(items\) \{[\s\S]*?\n\}\n\nexport async function scrapeFilmovenovinky/,
+      mergeFn,
+      'mergeCatalogItems exact-key split'
+    );
+  }
 
   write(file, src);
 }
@@ -139,12 +144,14 @@ function sortBestTipsByRating(a, b) {
 
 export function filterCatalog`;
 
-  src = replaceRegex(
-    src,
-    /function sortTipsByDate\(a, b\) \{[\s\S]*?\n\}\n\nfunction sortBestTipsByRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog/,
-    sortBlock,
-    'catalog sort block with sourceOrder'
-  );
+  if (!src.includes('function sortTipsByPageOrder')) {
+    src = replaceRegex(
+      src,
+      /function sortTipsByDate\(a, b\) \{[\s\S]*?\n\}\n\nfunction sortBestTipsByRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog/,
+      sortBlock,
+      'catalog sort block with sourceOrder'
+    );
+  }
 
   src = src.replace(
     "const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;",
