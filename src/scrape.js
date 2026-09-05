@@ -444,7 +444,7 @@ export async function scrapeMovies(maxItems = 1000) {
     if (items.length === 0) items = parseTextList($.text(), MOVIES_SOURCE_URL, 'movie');
   }
 
-  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));
+  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));
   await enrichItemsFromDetailPages(items);
   const sourceHash = crypto.createHash('sha1').update(items.map(i => i.key).join('|') || raw).digest('hex');
   console.log('[scrape] movies items=', items.length, 'mode=', mode);
@@ -490,7 +490,7 @@ export async function scrapeTips(maxItems = TIPS_MAX_ITEMS) {
     if (!items.length) items = parseTipsTextList($.text()).slice(0, maxItems);
   }
 
-  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));
+  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));
   await enrichItemsFromDetailPages(items, { limit: Math.min(20, DETAIL_LINK_ENRICH_LIMIT) });
   const sourceHash = crypto.createHash('sha1').update(items.map(i => i.key).join('|') || raw).digest('hex');
   console.log('[scrape] tips items=', items.length, 'mode=', mode);
