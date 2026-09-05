@@ -722,15 +722,21 @@ function sortBestTipsByRating(a, b) {
 }
 
 export function filterCatalog(metas, id, type) {
-  if (type !== 'movie') return [];
+  if (!['movie', 'series'].includes(type)) return [];
 
-  let arr = [...metas].filter(m => m.type === 'movie').filter(looksLikeRealMovieMeta);
+  let arr = [...metas].filter(m => m.type === type).filter(looksLikeRealMovieMeta);
 
   if (id === 'filmovenovinky-filmy') {
+    if (type !== 'movie') return [];
     arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-filmy'));
   } else if (id === 'filmovenovinky-tipy') {
+    if (type !== 'movie') return [];
     arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy'));
+  } else if (id === 'filmovenovinky-tipy-serialy') {
+    if (type !== 'series') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy-serialy'));
   } else if (id === 'filmovenovinky-najlepsie') {
+    if (type !== 'movie') return [];
     arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(isBestRatedTip);
   } else {
     return [];
@@ -745,6 +751,8 @@ export function filterCatalog(metas, id, type) {
     );
   }
 
-  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : (id === 'filmovenovinky-tipy' ? sortTipsByPageOrder : sortByDateThenOrder);
+  const sortFn = id === 'filmovenovinky-najlepsie'
+    ? sortBestTipsByRating
+    : ((id === 'filmovenovinky-tipy' || id === 'filmovenovinky-tipy-serialy') ? sortTipsByPageOrder : sortByDateThenOrder);
   return arr.sort(sortFn);
 }

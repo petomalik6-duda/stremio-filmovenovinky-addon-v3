@@ -18,7 +18,7 @@ const AUTO_REFRESH = String(process.env.AUTO_REFRESH || 'false').toLowerCase() =
 const REFRESH_ON_START = String(process.env.REFRESH_ON_START || 'false').toLowerCase() === 'true';
 const AUTO_REFRESH_MINUTES = Math.max(15, Number(process.env.AUTO_REFRESH_MINUTES || 360));
 const ADDON_ID = process.env.ADDON_ID || 'sk.filmovenovinky.filmy.only';
-const ADDON_VERSION = process.env.npm_package_version || '3.7.12';
+const ADDON_VERSION = process.env.npm_package_version || '3.7.16';
 
 const catalogs = [
   {
@@ -40,6 +40,15 @@ const catalogs = [
     ]
   },
   {
+    type: 'series',
+    id: 'filmovenovinky-tipy-serialy',
+    name: 'FilmovéNovinky – Tipy na seriál',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
     type: 'movie',
     id: 'filmovenovinky-najlepsie',
     name: 'FilmovéNovinky – Najlepšie hodnotené',
@@ -53,14 +62,14 @@ const catalogs = [
 const manifest = {
   id: ADDON_ID,
   version: ADDON_VERSION,
-  name: 'FilmovéNovinky CZ/SK filmy',
-  description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',
+  name: 'FilmovéNovinky CZ/SK filmy a seriály',
+  description: 'CZ/SK filmy a tipy na filmy aj seriály z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',
   logo: `${PUBLIC_URL}/logo.png`,
   resources: [
     'catalog',
-    { name: 'meta', types: ['movie'], idPrefixes: ['tt', 'filmovenovinky:'] }
+    { name: 'meta', types: ['movie', 'series'], idPrefixes: ['tt', 'filmovenovinky:'] }
   ],
-  types: ['movie'],
+  types: ['movie', 'series'],
   catalogs,
   idPrefixes: ['tt', 'filmovenovinky:'],
   behaviorHints: { configurable: false }
@@ -92,7 +101,7 @@ function parseExtra(extraRaw = '') {
 }
 
 function typeOk(type) {
-  return type === 'movie';
+  return type === 'movie' || type === 'series';
 }
 
 function catalogOk(type, id) {
@@ -158,12 +167,12 @@ app.get('/', (_req, res) => {
     <html>
       <head><title>FilmovéNovinky Addon</title></head>
       <body>
-        <h1>FilmovéNovinky CZ/SK filmy</h1>
+        <h1>FilmovéNovinky CZ/SK filmy a seriály</h1>
         <p>Manifest: <a href="/manifest.json">/manifest.json</a></p>
         <p>Health: <a href="/health">/health</a></p>
         <p>Stats: <a href="/stats">/stats</a></p>
         <p>Refresh async: <a href="/refresh">/refresh</a></p>
-        <p>Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené</p>
+        <p>Katalógy: CZ/SK filmy, Tipy na film, Tipy na seriál, Najlepšie hodnotené</p>
         <p>Debug find: <a href="/debug/find?q=carodejnik">/debug/find?q=carodejnik</a></p>
         <p>Debug unmatched: <a href="/debug/unmatched">/debug/unmatched</a></p>
         <p>Debug latest: <a href="/debug/latest">/debug/latest</a></p>

@@ -323,18 +323,21 @@ function createTipItem(title, ratingText, currentDate, { links = [], detailUrl =
   if (!cleanTitleText || !/\((19\d{2}|20\d{2})\)/.test(cleanTitleText)) return null;
 
   const ratings = parseTipRatings(ratingText);
-  if (ratings.isSeries || /\b(tv seri[aá]l|seri[aá]l|s[eé]ria)\b/i.test(`${cleanTitleText} ${ratingText}`)) return null;
+  const itemType = ratings.isSeries || /\b(tv seri[aá]l|seri[aá]l|s[eé]ria)\b/i.test(`${cleanTitleText} ${ratingText}`)
+    ? 'series'
+    : 'movie';
 
   const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');
-  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, 'movie');
+  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, itemType);
   if (!item) return null;
+  item.type = itemType;
 
   item.titleRaw = clean(`${cleanTitleText} ${ratingText || ''}`);
   item.lang = ratings.lang || item.lang;
   item.dateAdded = currentDate || parseDate(cleanTitleText) || today();
   item.sourceUrl = TIPS_SOURCE_URL;
   item.sourcePage = 'tips';
-  item.catalogIds = ['filmovenovinky-tipy'];
+  item.catalogIds = itemType === 'series' ? ['filmovenovinky-tipy-serialy'] : ['filmovenovinky-tipy'];
   item.detailUrl = detailUrl;
   item.csfdUrl = csfdUrl;
   item.links = uniqueStrings(links);
@@ -441,7 +444,7 @@ export async function scrapeMovies(maxItems = 1000) {
     if (items.length === 0) items = parseTextList($.text(), MOVIES_SOURCE_URL, 'movie');
   }
 
-  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));
+  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));
   await enrichItemsFromDetailPages(items);
   const sourceHash = crypto.createHash('sha1').update(items.map(i => i.key).join('|') || raw).digest('hex');
   console.log('[scrape] movies items=', items.length, 'mode=', mode);
