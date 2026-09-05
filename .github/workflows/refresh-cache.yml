@@ -17,12 +17,15 @@ on:
     paths:
       - "src/**"
       - "data/metadata-overrides.json"
-      - "scripts/**"
       - "package*.json"
       - ".github/workflows/refresh-cache.yml"
 
 permissions:
   contents: write
+
+concurrency:
+  group: refresh-filmovenovinky-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   refresh-cache:
@@ -33,27 +36,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Apply tip catalog source patch
-        run: node scripts/apply-tipy-catalogs.js
-
-      - name: Commit source patches before refresh
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add src/catalog.js src/public-meta.js src/scrape.js package.json
-          if git diff --cached --quiet; then
-            echo "No source patch changes"
-          else
-            git commit -m "Separate tip catalogs and add poster fallback"
-            git pull --rebase --autostash
-            git push
-          fi
 
       - name: Install dependencies
         run: npm install --omit=dev
@@ -99,11 +87,17 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          git fetch origin main
+          git pull --rebase --autostash origin main
           git add data/catalog-cache.json
           if git diff --cached --quiet; then
             echo "No cache changes"
             exit 0
           fi
           git commit -m "Refresh FilmovéNovinky cache"
-          git pull --rebase --autostash
-          git push
+          for i in 1 2 3; do
+            git push origin main && exit 0
+            echo "Push failed, retrying after rebase ($i/3)"
+            git pull --rebase --autostash origin main
+          done
+          exit 1
