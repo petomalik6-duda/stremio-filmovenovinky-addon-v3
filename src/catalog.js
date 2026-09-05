@@ -15,7 +15,7 @@ const DETAIL_REPAIR_LIMIT = Number(process.env.DETAIL_REPAIR_LIMIT || 100);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
-const MATCH_VERSION = 3;
+const MATCH_VERSION = 4;
 const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
@@ -28,7 +28,7 @@ function setStage(value) {
   console.log('[refresh-stage]', value);
 }
 
-function stremioId(item, csfd, tmdb) { return tmdb?.imdbId || csfd?.imdbId || localStremioId(item); }
+function stremioId(item, csfd, tmdb) { return tmdb?.imdbId || csfd?.imdbId || item?.imdbId || localStremioId(item); }
 function score(meta) { const n = Number(meta.imdbRating || 0); return Number.isFinite(n) ? n : 0; }
 function tmdbUrl(type, id) { return `https://www.themoviedb.org/${type === 'series' ? 'tv' : 'movie'}/${id}`; }
 function placeholderPoster(name) { return `https://placehold.co/500x750?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`; }
@@ -39,13 +39,14 @@ function localMeta(item) {
 
 function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
   const type = item.type === 'series' ? 'series' : 'movie';
-  const id = stremioId(item, csfd, tmdb);
-  const imdbId = tmdb?.imdbId || csfd?.imdbId || null;
+  const imdbId = tmdb?.imdbId || csfd?.imdbId || item?.imdbId || null;
+  const tmdbId = tmdb?.tmdbId || item?.tmdbId || null;
+  const id = imdbId || localStremioId(item);
   const displayName = item.name || tmdb?.name || 'Bez názvu';
   const links = [
     item.csfdUrl ? { name: 'ČSFD', category: 'Info', url: item.csfdUrl } : null,
     imdbId ? { name: 'IMDb', category: 'Info', url: `https://www.imdb.com/title/${imdbId}/` } : null,
-    tmdb?.tmdbId ? { name: 'TMDB', category: 'Info', url: tmdbUrl(type, tmdb.tmdbId) } : null,
+    tmdbId ? { name: 'TMDB', category: 'Info', url: tmdbUrl(type, tmdbId) } : null,
     tmdb?.trailer ? { name: 'Trailer', category: 'Video', url: `https://www.youtube.com/watch?v=${tmdb.trailer}` } : null,
     item.detailUrl ? { name: 'FilmovéNovinky', category: 'Info', url: item.detailUrl } : null,
     item.sourceUrl ? { name: 'Zdroj', category: 'Info', url: item.sourceUrl } : null
@@ -58,7 +59,7 @@ function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
     item.dateAdded ? `Pridané: ${item.dateAdded}` : null,
     item.csfdUrl ? `ČSFD: ${item.csfdUrl}` : null,
     imdbId ? `IMDb: ${imdbId}` : null,
-    tmdb?.tmdbId ? `TMDB: ${tmdb.tmdbId}` : null
+    tmdbId ? `TMDB: ${tmdbId}` : null
   ].filter(Boolean);
 
   return {
@@ -88,7 +89,7 @@ function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
       lang: item.lang,
       csfdUrl: item.csfdUrl || null,
       imdbId,
-      tmdbId: tmdb?.tmdbId || null,
+      tmdbId: tmdbId || null,
       tmdbYear: tmdb?.releaseInfo || null,
       matchVersion: MATCH_VERSION,
       sourceType: type,
@@ -134,8 +135,8 @@ function titleCandidates(item, csfd = {}) {
 async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}) {
   const verifiedOverride = getVerifiedSourceOverride(item);
 
-  // Posledné overené edge cases viažeme na stabilné ČSFD ID. Tým sa vyhneme
-  // agresívnejšiemu fuzzy matchingu pre celý katalóg.
+  // Posledné overené edge cases viažeme na stabilné ČSFD ID alebo presné aliasy.
+  // Tým sa vyhneme agresívnejšiemu fuzzy matchingu pre celý katalóg.
   if (verifiedOverride?.excludedReason) {
     return toMeta(item, {}, null, {
       excludedReason: verifiedOverride.excludedReason,
@@ -163,7 +164,7 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
   // pomalému ČSFD/Jina requestu pre položky, ktoré už boli spoľahlivo spárované.
   // Ak rýchla cesta zlyhá, pokračujeme pôvodnými fallbackmi nižšie.
   if (fastKnownLookup) {
-    const existingTmdbId = existing?._addon?.tmdbId;
+    const existingTmdbId = item?.tmdbId || existing?._addon?.tmdbId;
     if (existingTmdbId) {
       try {
         const directTmdb = item.type === 'series'
@@ -175,7 +176,7 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
       }
     }
 
-    const existingImdbId = existing?._addon?.imdbId || (typeof existing?.id === 'string' && existing.id.startsWith('tt') ? existing.id : null);
+    const existingImdbId = item?.imdbId || existing?._addon?.imdbId || (typeof existing?.id === 'string' && existing.id.startsWith('tt') ? existing.id : null);
     if (existingImdbId) {
       try {
         const directTmdb = await tmdbByImdb(existingImdbId, item.type);
@@ -206,14 +207,14 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
   // Dôkladná fallback cesta. Pri full refreshe sa sem ide priamo, aby sa zachovalo
   // pôvodné overenie cez ČSFD/Jina + TMDB matcher.
   let tmdb = null;
-  const existingTmdbId = existing?._addon?.tmdbId;
+  const existingTmdbId = item?.tmdbId || existing?._addon?.tmdbId;
   if (existingTmdbId) {
     tmdb = item.type === 'series'
       ? await tmdbSeries(existingTmdbId)
       : await tmdbMovie(existingTmdbId);
   }
 
-  const knownImdbId = existing?._addon?.imdbId || csfd.imdbId || null;
+  const knownImdbId = item?.imdbId || existing?._addon?.imdbId || csfd.imdbId || null;
   if (!tmdb && knownImdbId) {
     tmdb = await tmdbByImdb(knownImdbId, item.type);
   }
@@ -250,11 +251,15 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
 
 function metaNeedsRematch(item, meta) {
   if (!meta) return true;
-  // Overené source corrections sa migráciou týkajú iba konkrétnych ČSFD ID.
-  // Kontrola musí byť pred excludedReason, aby sa vedela aktualizovať aj staršia
-  // vylúčená položka, ak sa override verzia zmení.
+  // Overené source corrections sa migráciou týkajú iba konkrétnych ČSFD ID alebo
+  // presných názvových aliasov. Kontrola musí byť pred excludedReason, aby sa
+  // vedela aktualizovať aj staršia vylúčená položka, ak sa override verzia zmení.
   if (sourceOverrideNeedsMigration(item, meta)) return true;
   if (meta?._addon?.excludedReason) return false;
+
+  if (item?.csfdUrl && meta?._addon?.csfdUrl !== item.csfdUrl) return true;
+  if (item?.imdbId && meta?._addon?.imdbId !== item.imdbId) return true;
+  if (item?.tmdbId && Number(meta?._addon?.tmdbId || 0) !== Number(item.tmdbId)) return true;
 
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
   if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
@@ -417,7 +422,6 @@ export async function refreshCache({ forceFull = false } = {}) {
   }
 }
 
-
 export async function repairIncompleteMetadata({ limit = DETAIL_REPAIR_LIMIT } = {}) {
   if (!cache.at) await loadFromDisk();
 
@@ -568,12 +572,36 @@ export async function getCatalogStats() {
   };
 }
 
-export function searchCatalog(metas, query) {
-  const q = String(query || '').trim().toLowerCase();
-  if (!q) return metas;
-  return metas.filter(m => `${m.name} ${m.description || ''} ${(m.genres || []).join(' ')} ${m._addon?.titleRaw || ''}`.toLowerCase().includes(q));
+export function normalizeSearchText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
+export function searchCatalog(metas, query) {
+  const q = normalizeSearchText(query);
+  if (!q) return metas;
+
+  return metas.filter(m => {
+    const haystack = normalizeSearchText([
+      m.name,
+      m.description,
+      (m.genres || []).join(' '),
+      m._addon?.titleRaw,
+      m._addon?.imdbId,
+      m._addon?.tmdbId,
+      m._addon?.csfdUrl,
+      m.id,
+      ...(m.links || []).map(link => `${link.name || ''} ${link.url || ''}`)
+    ].filter(Boolean).join(' '));
+
+    return haystack.includes(q);
+  });
+}
 
 function looksLikeRealMovieMeta(meta) {
   if (meta?._addon?.excludedReason) return false;
