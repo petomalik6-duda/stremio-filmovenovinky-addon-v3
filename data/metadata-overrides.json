@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "description": "Verified metadata overrides for FilmovéNovinky items that cannot be matched reliably from the source HTML alone.",
+  "items": [
+    {
+      "version": 2,
+      "year": "2025",
+      "csfdId": "1700848",
+      "csfdUrl": "https://www.csfd.sk/film/1700848-carodejnik-z-kremla/",
+      "tmdbId": 1291659,
+      "imdbId": "tt32386654",
+      "aliases": [
+        "Čarodejník z Kremľa",
+        "Čarodejník z Kremľu",
+        "Čaroděj z Kremlu",
+        "The Wizard of the Kremlin",
+        "Le Mage du Kremlin",
+        "Le mage du Kremlin"
+      ]
+    }
+  ]
+}
