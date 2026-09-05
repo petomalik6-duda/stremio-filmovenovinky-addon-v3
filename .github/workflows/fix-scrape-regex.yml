@@ -29,14 +29,13 @@ jobs:
 
       - name: Fix malformed tip rating parser
         run: |
-          node --input-type=commonjs <<'NODE'
-          const fs = require('fs');
-          const file = 'src/scrape.js';
-          let src = fs.readFileSync(file, 'utf8');
-
-          src = src.replace(
-            /function parseNumber\(value\) \{[\s\S]*?\n\}\n\nfunction parseTipRatings\(text\) \{[\s\S]*?\n\}\n\nfunction collectFollowingTipInfo/,
-            String.raw`function parseNumber(value) {
+          python3 - <<'PY'
+          from pathlib import Path
+          file = Path("src/scrape.js")
+          src = file.read_text(encoding="utf-8")
+          start = src.index("function parseNumber(value) {")
+          end = src.index("function collectFollowingTipInfo", start)
+          replacement = r"""function parseNumber(value) {
   if (!value || /^n\/?a$/i.test(String(value).trim())) return null;
   const n = Number(String(value).replace(',', '.'));
   return Number.isFinite(n) ? n : null;
@@ -68,11 +67,9 @@ function parseTipRatings(text) {
   };
 }
 
-function collectFollowingTipInfo`
-          );
-
-          fs.writeFileSync(file, src);
-          NODE
+"""
+          file.write_text(src[:start] + replacement + src[end:], encoding="utf-8")
+          PY
 
       - name: Commit regex fix
         run: |
