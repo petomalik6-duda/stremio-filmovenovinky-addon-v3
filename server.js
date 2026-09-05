@@ -17,6 +17,8 @@ const PUBLIC_URL = (process.env.PUBLIC_URL || `http://127.0.0.1:${PORT}`).replac
 const AUTO_REFRESH = String(process.env.AUTO_REFRESH || 'false').toLowerCase() === 'true';
 const REFRESH_ON_START = String(process.env.REFRESH_ON_START || 'false').toLowerCase() === 'true';
 const AUTO_REFRESH_MINUTES = Math.max(15, Number(process.env.AUTO_REFRESH_MINUTES || 360));
+const ADDON_ID = process.env.ADDON_ID || 'sk.filmovenovinky.filmy.only';
+const ADDON_VERSION = process.env.npm_package_version || '3.7.7';
 
 const catalogs = [
   {
@@ -31,8 +33,8 @@ const catalogs = [
 ];
 
 const manifest = {
-  id: 'sk.filmovenovinky.filmy.only.v385',
-  version: '3.7.6',
+  id: ADDON_ID,
+  version: ADDON_VERSION,
   name: 'FilmovéNovinky CZ/SK filmy',
   description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',
   logo: `${PUBLIC_URL}/logo.png`,
@@ -79,6 +81,50 @@ function catalogOk(type, id) {
   return catalogs.some(c => c.type === type && c.id === id);
 }
 
+function intParam(value, fallback, { min = 0, max = 500 } = {}) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.floor(n)));
+}
+
+function hasExternalMeta(meta) {
+  return Boolean(
+    meta?._addon?.tmdbId ||
+    meta?._addon?.imdbId ||
+    meta?._addon?.csfdUrl ||
+    (typeof meta?.id === 'string' && meta.id.startsWith('tt'))
+  );
+}
+
+function debugMeta(meta) {
+  return {
+    id: meta?.id || null,
+    type: meta?.type || null,
+    name: meta?.name || null,
+    year: meta?.year || null,
+    releaseInfo: meta?.releaseInfo || null,
+    imdbRating: meta?.imdbRating || null,
+    genres: meta?.genres || [],
+    poster: meta?.poster || null,
+    background: meta?.background || null,
+    links: meta?.links || [],
+    addon: {
+      key: meta?._addon?.key || null,
+      dateAdded: meta?._addon?.dateAdded || null,
+      lang: meta?._addon?.lang || null,
+      csfdUrl: meta?._addon?.csfdUrl || null,
+      imdbId: meta?._addon?.imdbId || null,
+      tmdbId: meta?._addon?.tmdbId || null,
+      localId: meta?._addon?.localId || null,
+      matchVersion: meta?._addon?.matchVersion || null,
+      lookupPath: meta?._addon?.lookupPath || null,
+      excludedReason: meta?._addon?.excludedReason || null,
+      detectedTmdbId: meta?._addon?.detectedTmdbId || null,
+      titleRaw: meta?._addon?.titleRaw || null
+    }
+  };
+}
+
 async function catalogResponse(type, id, extra = {}) {
   if (!typeOk(type) || !catalogOk(type, id)) return { metas: [] };
 
@@ -92,13 +138,17 @@ async function catalogResponse(type, id, extra = {}) {
 app.get('/', (_req, res) => {
   res.type('html').send(`
     <html>
-      <head><title>FilmovéNovinky Addon Fixed</title></head>
+      <head><title>FilmovéNovinky Addon</title></head>
       <body>
         <h1>FilmovéNovinky CZ/SK filmy</h1>
         <p>Manifest: <a href="/manifest.json">/manifest.json</a></p>
         <p>Health: <a href="/health">/health</a></p>
         <p>Stats: <a href="/stats">/stats</a></p>
         <p>Refresh async: <a href="/refresh">/refresh</a></p>
+        <p>Debug find: <a href="/debug/find?q=carodejnik">/debug/find?q=carodejnik</a></p>
+        <p>Debug unmatched: <a href="/debug/unmatched">/debug/unmatched</a></p>
+        <p>Debug latest: <a href="/debug/latest">/debug/latest</a></p>
+        <p>Debug excluded: <a href="/debug/excluded">/debug/excluded</a></p>
       </body>
     </html>
   `);
@@ -141,10 +191,56 @@ app.get('/search/:type/:query.json', async (req, res, next) => {
   }
 });
 
+app.get('/debug/find/:query?', async (req, res, next) => {
+  try {
+    const query = String(req.query.q || req.query.query || req.params.query || '').trim();
+    const limit = intParam(req.query.limit, 50, { min: 1, max: 200 });
+    const metas = query ? searchCatalog(await getCatalog(), query) : [];
+    res.json({ ok: true, query, count: metas.length, metas: metas.slice(0, limit).map(debugMeta) });
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.get('/debug/unmatched', async (req, res, next) => {
+  try {
+    const limit = intParam(req.query.limit, 100, { min: 1, max: 500 });
+    const metas = (await getCatalog())
+      .filter(m => !m?._addon?.excludedReason && !hasExternalMeta(m))
+      .sort((a, b) => String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || '')));
+    res.json({ ok: true, count: metas.length, metas: metas.slice(0, limit).map(debugMeta) });
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.get('/debug/latest', async (req, res, next) => {
+  try {
+    const limit = intParam(req.query.limit, 50, { min: 1, max: 200 });
+    const metas = filterCatalog(await getCatalog(), 'filmovenovinky-filmy', 'movie').slice(0, limit);
+    res.json({ ok: true, count: metas.length, metas: metas.map(debugMeta) });
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.get('/debug/excluded', async (req, res, next) => {
+  try {
+    const limit = intParam(req.query.limit, 100, { min: 1, max: 500 });
+    const metas = (await getCatalog())
+      .filter(m => Boolean(m?._addon?.excludedReason))
+      .sort((a, b) => String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || '')));
+    res.json({ ok: true, count: metas.length, metas: metas.slice(0, limit).map(debugMeta) });
+  } catch (e) {
+    next(e);
+  }
+});
+
 app.get('/health', async (_req, res) => {
   const stats = await getCatalogStats().catch(e => ({ error: e.message }));
   res.json({
     ok: true,
+    id: manifest.id,
     version: manifest.version,
     autoRefresh: AUTO_REFRESH,
     refreshOnStart: REFRESH_ON_START,
@@ -189,11 +285,10 @@ app.get('/refresh-now', async (req, res, next) => {
   }
 });
 
-
 app.get('/reset-refresh', async (_req, res) => {
   res.json({
     ok: true,
-    message: 'Ak refresh visel, reštartuj Render službu. V3.2 má lock timeout a už by nemal visieť donekonečna.'
+    message: 'Ak refresh visel, reštartuj Render službu. Lock timeout a background refresh by už nemali visieť donekonečna.'
   });
 });
 
