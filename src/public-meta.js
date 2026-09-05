@@ -7,6 +7,10 @@ const META_FIELDS = new Set([
   'awards', 'website', 'behaviorHints'
 ]);
 
+function placeholderPoster(name) {
+  return `https://placehold.co/500x750/222222/ffffff.png?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`;
+}
+
 function asString(value) {
   if (value === undefined || value === null) return undefined;
   const out = String(value).trim();
@@ -111,6 +115,13 @@ export function cleanPublicMeta(meta) {
 
   // First strip internal/non-standard cache fields and normalize strict types.
   const safeMeta = cleanKnownMetaFields(meta);
+
+  // Serve-time fallback so older cache entries and newly added tip items never
+  // render as blank cards in Stremio/Nuvio/Fusion.
+  const displayName = safeMeta.name || meta.name || 'CZ/SK';
+  if (!safeMeta.poster) safeMeta.poster = placeholderPoster(displayName);
+  if (!safeMeta.posterShape) safeMeta.posterShape = 'poster';
+  if (!safeMeta.background) safeMeta.background = safeMeta.poster;
 
   if (safeMeta.type === 'movie') {
     // Cross-client compatibility: stream-only addons are normally registered
