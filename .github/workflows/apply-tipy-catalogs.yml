@@ -28,114 +28,205 @@ jobs:
           git checkout main
           git reset --hard origin/main
 
-      - name: Patch tip catalog separation and poster fallback
+      - name: Patch tip movie and series catalogs
         run: |
           python3 <<'PY'
           from pathlib import Path
           import json
           import re
 
-          catalog = Path('src/catalog.js')
-          src = catalog.read_text(encoding='utf-8')
-          src = re.sub(r"const BEST_IMDB_MIN = Number\(process\.env\.BEST_IMDB_MIN \|\| [0-9.]+\);", "const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.2);", src)
-          src = re.sub(r"const BEST_CSFD_MIN = Number\(process\.env\.BEST_CSFD_MIN \|\| [0-9.]+\);", "const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 78);", src)
+          # 1) Scraper: keep TV series from the Tips page instead of dropping them.
+          scrape = Path('src/scrape.js')
+          src = scrape.read_text(encoding='utf-8')
 
-          if 'function sortBestTipsByRating' not in src:
-            block_re = re.compile(r"function isBestRatedTip\(meta\) \{[\s\S]*?\n\}\n\nfunction sortByDateThenRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog")
-            replacement = """function tipImdb(meta) {
-  return numeric(meta?._addon?.tipImdbRating);
-}
+          old = """  const ratings = parseTipRatings(ratingText);
+  if (ratings.isSeries || /\\b(tv seri[aá]l|seri[aá]l|s[eé]ria)\\b/i.test(`${cleanTitleText} ${ratingText}`)) return null;
 
-function tipCsfd(meta) {
-  return numeric(meta?._addon?.tipCsfdPercent);
-}
-
-function tipScore(meta) {
-  const csfd = tipCsfd(meta) ? tipCsfd(meta) / 10 : 0;
-  const imdb = tipImdb(meta);
-  return Math.max(csfd, imdb);
-}
-
-function isBestRatedTip(meta) {
-  const imdb = tipImdb(meta);
-  const csfd = tipCsfd(meta);
-
-  // Najlepšie hodnotené má byť menší a odlišný výber zo sekcie Tipy.
-  // Preto používame iba ratingy načítané zo stránky FilmovéNovinky, nie TMDB fallback.
-  return imdb >= BEST_IMDB_MIN || csfd >= BEST_CSFD_MIN;
-}
-
-function sortTipsByDate(a, b) {
-  const byDate = String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
-  if (byDate) return byDate;
-  return String(a.name || '').localeCompare(String(b.name || ''), 'sk');
-}
-
-function sortBestTipsByRating(a, b) {
-  const byScore = tipScore(b) - tipScore(a);
-  if (byScore) return byScore;
-
-  const byCsfd = tipCsfd(b) - tipCsfd(a);
-  if (byCsfd) return byCsfd;
-
-  const byImdb = tipImdb(b) - tipImdb(a);
-  if (byImdb) return byImdb;
-
-  return sortTipsByDate(a, b);
-}
-
-export function filterCatalog"""
-            src, count = block_re.subn(replacement, src)
-            if count != 1:
-              raise SystemExit(f'catalog sort block replacement count={count}')
-
-          src = src.replace("  return arr.sort(sortByDateThenRating);\n}", "  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;\n  return arr.sort(sortFn);\n}")
-          catalog.write_text(src, encoding='utf-8')
-
-          public = Path('src/public-meta.js')
-          pub = public.read_text(encoding='utf-8')
-          if 'function placeholderPoster(name)' not in pub:
-            pub = pub.replace(
-              "function asString(value) {\n",
-              "function placeholderPoster(name) {\n  return `https://placehold.co/500x750/222222/ffffff.png?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`;\n}\n\nfunction asString(value) {\n"
-            )
-          marker = "  // First strip internal/non-standard cache fields and normalize strict types.\n  const safeMeta = cleanKnownMetaFields(meta);\n"
-          insertion = """  // First strip internal/non-standard cache fields and normalize strict types.
-  const safeMeta = cleanKnownMetaFields(meta);
-
-  // Serve-time fallback so older cache entries and newly added tip items never
-  // render as blank cards in Stremio/Nuvio/Fusion.
-  const displayName = safeMeta.name || meta.name || 'CZ/SK';
-  if (!safeMeta.poster) safeMeta.poster = placeholderPoster(displayName);
-  if (!safeMeta.posterShape) safeMeta.posterShape = 'poster';
-  if (!safeMeta.background) safeMeta.background = safeMeta.poster;
+  const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');
+  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, 'movie');
+  if (!item) return null;
 """
-          if 'Serve-time fallback so older cache entries' not in pub:
-            if marker not in pub:
-              raise SystemExit('public-meta insert marker not found')
-            pub = pub.replace(marker, insertion)
-          public.write_text(pub, encoding='utf-8')
+          new = """  const ratings = parseTipRatings(ratingText);
+  const itemType = ratings.isSeries || /\\b(tv seri[aá]l|seri[aá]l|s[eé]ria)\\b/i.test(`${cleanTitleText} ${ratingText}`)
+    ? 'series'
+    : 'movie';
 
+  const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');
+  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, itemType);
+  if (!item) return null;
+  item.type = itemType;
+"""
+          if old in src:
+            src = src.replace(old, new, 1)
+          elif "const itemType = ratings.isSeries" not in src:
+            raise SystemExit('scrape createTipItem series marker not found')
+
+          src = src.replace(
+            "  item.catalogIds = ['filmovenovinky-tipy'];\n",
+            "  item.catalogIds = itemType === 'series' ? ['filmovenovinky-tipy-serialy'] : ['filmovenovinky-tipy'];\n",
+            1
+          )
+
+          src = src.replace(
+            "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));\n",
+            "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));\n",
+            1
+          )
+
+          if "filmovenovinky-tipy-serialy" not in src or "item.type = itemType" not in src:
+            raise SystemExit('scrape series patch verification failed')
+          scrape.write_text(src, encoding='utf-8')
+
+          # 2) Catalog filtering: expose movie tips and series tips as their proper Stremio types.
+          catalog = Path('src/catalog.js')
+          cat = catalog.read_text(encoding='utf-8')
+          filter_re = re.compile(r"export function filterCatalog\(metas, id, type\) \{[\s\S]*?\n\}\s*$")
+          filter_new = """export function filterCatalog(metas, id, type) {
+  if (!['movie', 'series'].includes(type)) return [];
+
+  let arr = [...metas].filter(m => m.type === type).filter(looksLikeRealMovieMeta);
+
+  if (id === 'filmovenovinky-filmy') {
+    if (type !== 'movie') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-filmy'));
+  } else if (id === 'filmovenovinky-tipy') {
+    if (type !== 'movie') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy'));
+  } else if (id === 'filmovenovinky-tipy-serialy') {
+    if (type !== 'series') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy-serialy'));
+  } else if (id === 'filmovenovinky-najlepsie') {
+    if (type !== 'movie') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(isBestRatedTip);
+  } else {
+    return [];
+  }
+
+  if (HIDE_UNMATCHED_ITEMS) {
+    arr = arr.filter(m =>
+      Boolean(m._addon?.tmdbId) ||
+      Boolean(m._addon?.imdbId) ||
+      Boolean(m._addon?.csfdUrl) ||
+      (typeof m.id === 'string' && m.id.startsWith('tt'))
+    );
+  }
+
+  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : ((id === 'filmovenovinky-tipy' || id === 'filmovenovinky-tipy-serialy') ? sortTipsByPageOrder : sortByDateThenOrder);
+  return arr.sort(sortFn);
+}
+"""
+          cat, count = filter_re.subn(filter_new, cat)
+          if count != 1:
+            raise SystemExit(f'catalog filter replacement count={count}')
+          catalog.write_text(cat, encoding='utf-8')
+
+          # 3) Manifest/server: advertise a dedicated series Tips catalog and accept series metadata routes.
+          server = Path('server.js')
+          srv = server.read_text(encoding='utf-8')
+          catalogs_re = re.compile(r"const catalogs = \[[\s\S]*?\n\];\n\nconst manifest =")
+          catalogs_new = """const catalogs = [
+  {
+    type: 'movie',
+    id: 'filmovenovinky-filmy',
+    name: 'FilmovéNovinky – CZ/SK filmy',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'movie',
+    id: 'filmovenovinky-tipy',
+    name: 'FilmovéNovinky – Tipy na film',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'series',
+    id: 'filmovenovinky-tipy-serialy',
+    name: 'FilmovéNovinky – Tipy na seriál',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'movie',
+    id: 'filmovenovinky-najlepsie',
+    name: 'FilmovéNovinky – Najlepšie hodnotené',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  }
+];
+
+const manifest ="""
+          srv, count = catalogs_re.subn(catalogs_new, srv)
+          if count != 1:
+            raise SystemExit(f'server catalogs replacement count={count}')
+
+          srv = srv.replace("  name: 'FilmovéNovinky CZ/SK filmy',", "  name: 'FilmovéNovinky CZ/SK filmy a seriály',", 1)
+          srv = srv.replace(
+            "  description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',",
+            "  description: 'CZ/SK filmy a tipy na filmy aj seriály z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',",
+            1
+          )
+          srv = srv.replace(
+            "    { name: 'meta', types: ['movie'], idPrefixes: ['tt', 'filmovenovinky:'] }",
+            "    { name: 'meta', types: ['movie', 'series'], idPrefixes: ['tt', 'filmovenovinky:'] }",
+            1
+          )
+          srv = srv.replace("  types: ['movie'],", "  types: ['movie', 'series'],", 1)
+          srv = srv.replace(
+            "function typeOk(type) {\n  return type === 'movie';\n}",
+            "function typeOk(type) {\n  return type === 'movie' || type === 'series';\n}",
+            1
+          )
+          srv = srv.replace(
+            "        <h1>FilmovéNovinky CZ/SK filmy</h1>",
+            "        <h1>FilmovéNovinky CZ/SK filmy a seriály</h1>",
+            1
+          )
+          srv = srv.replace(
+            "        <p>Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené</p>",
+            "        <p>Katalógy: CZ/SK filmy, Tipy na film, Tipy na seriál, Najlepšie hodnotené</p>",
+            1
+          )
+
+          if "id: 'filmovenovinky-tipy-serialy'" not in srv or "types: ['movie', 'series']" not in srv:
+            raise SystemExit('server series manifest patch verification failed')
+          server.write_text(srv, encoding='utf-8')
+
+          # 4) Version bump.
           package = Path('package.json')
           pkg = json.loads(package.read_text(encoding='utf-8'))
-          pkg['version'] = '3.7.14'
+          pkg['version'] = '3.7.16'
+          pkg['description'] = 'FilmoveNovinky addon with CZ/SK latest movies plus separate movie and series tip catalogs, metadata overrides, diagnostics and strict Stremio/Nuvio/Fusion metadata normalization.'
           package.write_text(json.dumps(pkg, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
 
-      - name: Verify syntax
+      - name: Verify syntax and patch markers
         run: |
+          node --check src/scrape.js
           node --check src/catalog.js
-          node --check src/public-meta.js
+          node --check server.js
+          grep -q "filmovenovinky-tipy-serialy" src/scrape.js
+          grep -q "filmovenovinky-tipy-serialy" src/catalog.js
+          grep -q "filmovenovinky-tipy-serialy" server.js
+          grep -q "types: \['movie', 'series'\]" server.js
 
       - name: Commit source changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add src/catalog.js src/public-meta.js package.json
+          git add src/scrape.js src/catalog.js server.js package.json
           if git diff --cached --quiet; then
             echo "No source changes"
             exit 0
           fi
-          git commit -m "Separate tip catalogs and add poster fallback"
+          git commit -m "Add series to FilmovéNovinky tips catalog"
           git pull --rebase --autostash origin main
           git push origin main
