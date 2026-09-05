@@ -1,4 +1,5 @@
 name: Refresh FilmovéNovinky cache
+# Tipy may contain both movies and TV series; keep cache refresh active after scraper changes.
 
 on:
   workflow_dispatch:
