@@ -5,35 +5,49 @@ import * as cheerio from 'cheerio';
 export const MOVIES_SOURCE_URL = process.env.MOVIES_SOURCE_URL || 'https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes';
 export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';
 export const TIPS_SOURCE_URL = process.env.TIPS_SOURCE_URL || 'https://www.filmovenovinky.sk/top-filmy/tipy-na-dobry-film-a-serial-s-dabingom-aj-s-titulkami';
+
 const ENABLE_TIPS_CATALOG = String(process.env.ENABLE_TIPS_CATALOG || 'true').toLowerCase() !== 'false';
 const TIPS_MAX_ITEMS = Number(process.env.TIPS_MAX_ITEMS || 250);
 const DISABLE_SERIES = String(process.env.DISABLE_SERIES || 'true').toLowerCase() === 'true';
-
-const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.7.7; +https://www.stremio.com/)';
 const USE_READER_FALLBACK = String(process.env.USE_READER_FALLBACK || 'true').toLowerCase() !== 'false';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
 const REQUIRE_YEAR_FOR_LOCAL_ITEMS = String(process.env.REQUIRE_YEAR_FOR_LOCAL_ITEMS || 'true').toLowerCase() !== 'false';
 const DETAIL_LINK_ENRICH_LIMIT = Math.max(0, Number(process.env.DETAIL_LINK_ENRICH_LIMIT || 80));
+const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.7.11; +https://www.stremio.com/)';
 
-function absUrl(href, base) { if (!href) return null; try { return new URL(href, base).toString(); } catch { return null; } }
-function clean(text) { return String(text || '').replace(/\s+/g, ' ').trim(); }
+function absUrl(href, base) {
+  if (!href) return null;
+  try { return new URL(href, base).toString(); } catch { return null; }
+}
+
+function clean(text) {
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
 function parseDate(text) {
   const m = clean(text).match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
-  return m ? `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}` : null;
+  return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : null;
 }
-function today() { return new Date().toISOString().slice(0, 10); }
-function langFromText(text) { return text.match(/\((CZ\/SK|SK\/CZ|CZ|SK)\)/i)?.[1]?.toUpperCase().replace('SK/CZ', 'CZ/SK') || 'CZ/SK'; }
-export function itemKey(item) { return `${item.type}|${item.name}|${item.originalName || ''}|${item.year}|${item.lang}`.toLowerCase(); }
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function langFromText(text) {
+  return text.match(/\((CZ\/SK|SK\/CZ|CZ|SK)\)/i)?.[1]?.toUpperCase().replace('SK/CZ', 'CZ/SK') || 'CZ/SK';
+}
+
+export function itemKey(item) {
+  return `${item.type}|${item.name}|${item.originalName || ''}|${item.year}|${item.lang}`.toLowerCase();
+}
 
 function readerUrl(url) {
-  // Jina Reader vie vrátiť HTML stránku ako jednoduchý markdown/text.
-  // Pre https://example.com je správny tvar https://r.jina.ai/https://example.com.
   return `https://r.jina.ai/${url}`;
 }
 
-function parseTitleParts(raw, fallbackType='movie') {
+function parseTitleParts(raw, fallbackType = 'movie') {
   const lang = langFromText(raw);
-  const years = [...raw.matchAll(/\((\d{4})\)/g)].map(m => m[1]);
+  const years = [...String(raw || '').matchAll(/\((\d{4})\)/g)].map(m => m[1]);
   const year = years[years.length - 1] || '';
   const isSeries = /\b(tv seri[aá]l|seri[aá]l|s[eé]ria|season|\d+\.\s*s[eé]ria)\b/i.test(raw) || fallbackType === 'series';
 
@@ -80,16 +94,16 @@ function safeHost(url) {
   try { return new URL(url).hostname; } catch { return ''; }
 }
 
-function imdbIdFromUrl(value) {
-  return String(value || '').match(/\/title\/(tt\d{6,12})/i)?.[1] || null;
-}
-
 function isCsfdUrl(url) {
   return /(^|\.)csfd\.(cz|sk)$/i.test(safeHost(url));
 }
 
 function isImdbUrl(url) {
   return /(^|\.)imdb\.com$/i.test(safeHost(url)) && /\/title\/tt\d+/i.test(url);
+}
+
+function imdbIdFromUrl(value) {
+  return String(value || '').match(/\/title\/(tt\d{6,12})/i)?.[1] || null;
 }
 
 function uniqueStrings(values) {
@@ -103,7 +117,6 @@ function extractExternalIdsFromDetailHtml(html, detailUrl) {
   const csfdUrl = links.find(isCsfdUrl) || null;
   const imdbUrl = links.find(isImdbUrl) || null;
   const imdbId = imdbIdFromUrl(imdbUrl) || raw.match(/tt\d{6,12}/i)?.[0] || null;
-
   return { csfdUrl, imdbId, links };
 }
 
@@ -133,7 +146,6 @@ async function enrichItemsFromDetailPages(items, { limit = DETAIL_LINK_ENRICH_LI
         changed = true;
       }
       if (found.links.length) item.links = uniqueStrings([...(item.links || []), ...found.links]);
-
       if (changed) enriched += 1;
     } catch (error) {
       console.warn('[scrape] detail link enrichment failed:', item.name, error.message);
@@ -144,7 +156,6 @@ async function enrichItemsFromDetailPages(items, { limit = DETAIL_LINK_ENRICH_LI
   return items;
 }
 
-
 function parseNumber(value) {
   if (!value || /^n\/?a$/i.test(String(value).trim())) return null;
   const n = Number(String(value).replace(',', '.'));
@@ -153,18 +164,18 @@ function parseNumber(value) {
 
 function parseTipRatings(text) {
   const t = clean(text);
-  const imdbMatch = t.match(/IMDbs*(N/?A|[0-9]+(?:[,.][0-9]+)?)s*/s*10/i);
-  const csfdMatch = t.match(/ČSFDs*([0-9]{1,3})s*%/i);
-  const availabilityMatch = t.match(/(CZ/SK|SK/CZ|CZ|SK|Tit|Titulky)/i);
+  const imdbMatch = t.match(/IMDb\s*(N\/?A|[0-9]+(?:[,.][0-9]+)?)\s*\/\s*10/i);
+  const csfdMatch = t.match(/ČSFD\s*([0-9]{1,3})\s*%/i);
+  const availabilityMatch = t.match(/\b(CZ\/SK|SK\/CZ|CZ|SK|Tit|Titulky)\b/i);
   const availability = availabilityMatch?.[1] || null;
   const lang = availability
     ? availability.toUpperCase().replace('SK/CZ', 'CZ/SK').replace('TITULKY', 'TIT').replace('TIT', 'TIT')
     : 'CZ/SK';
-  const isSeries = /TVs*seri[aá]l/i.test(t);
+  const isSeries = /\bTV\s*seri[aá]l\b/i.test(t);
   const genre = clean(t
-    .replace(/TVs*seri[aá]l/ig, '')
-    .replace(/IMDb[sS]*$/i, '')
-    .replace(/ČSFD[sS]*$/i, '')
+    .replace(/\bTV\s*seri[aá]l\b/ig, '')
+    .replace(/IMDb[\s\S]*$/i, '')
+    .replace(/ČSFD[\s\S]*$/i, '')
   ) || null;
 
   return {
@@ -188,84 +199,17 @@ function collectFollowingTipInfo($, el) {
     if (/^h[1-4]$/.test(tag)) break;
 
     const text = clean(node.text());
-    if (/^d{1,2}.d{1,2}.d{4}$/.test(text)) break;
+    if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(text)) break;
     if (text) parts.push(text);
     if (/IMDb|ČSFD/i.test(text)) break;
-
     node = node.next();
   }
 
   return clean(parts.join(' '));
 }
 
-function createTipItem(title, ratingText, currentDate, { links = [], detailUrl = null, csfdUrl = null } = {}) {
-  const cleanTitleText = clean(String(title || '').replace(/^#+s*/, ''));
-  if (!cleanTitleText || !/((19d{2}|20d{2}))/.test(cleanTitleText)) return null;
-
-  const ratings = parseTipRatings(ratingText);
-  if (ratings.isSeries) return null;
-
-  // Tipy môžu byť aj iba s titulkami. Shape parser potrebuje CZ/SK značku,
-  // ale pôvodnú dostupnosť zachováme v item.lang a tipAvailability.
-  const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');
-  const item = makeMovieItemFromText(cleanTitleText + ' (' + parseLang + ')', currentDate, TIPS_SOURCE_URL, 'movie');
-  if (!item) return null;
-
-  item.titleRaw = clean(cleanTitleText + ' ' + (ratingText || ''));
-  item.lang = ratings.lang || item.lang;
-  item.dateAdded = currentDate || parseDate(cleanTitleText) || today();
-  item.sourceUrl = TIPS_SOURCE_URL;
-  item.sourcePage = 'tips';
-  item.catalogIds = ['filmovenovinky-tipy'];
-  item.detailUrl = detailUrl;
-  item.csfdUrl = csfdUrl;
-  item.links = uniqueStrings(links);
-  item.tipGenre = ratings.genre;
-  item.tipImdbRating = ratings.imdbRating;
-  item.tipCsfdPercent = ratings.csfdPercent;
-  item.tipAvailability = ratings.availability || ratings.lang || null;
-  item.key = itemKey(item);
-  return item;
-}
-
-function parseTipsTextList(rawText) {
-  const lines = String(rawText || '')
-    .split(/?
-/)
-    .map(line => clean(line.replace(/[([^]]+)](([^)]+))/g, '$1')))
-    .filter(Boolean);
-
-  const items = [];
-  let currentDate = null;
-  let pendingTitle = null;
-
-  for (const line of lines) {
-    const date = parseDate(line);
-    if (date && line.length < 80) {
-      currentDate = date;
-      pendingTitle = null;
-      continue;
-    }
-
-    const titleLine = clean(line.replace(/^#+s*/, ''));
-    if (/((19d{2}|20d{2}))/.test(titleLine) && !/IMDb|ČSFD/i.test(titleLine)) {
-      pendingTitle = titleLine;
-      continue;
-    }
-
-    if (pendingTitle && /IMDb|ČSFD/i.test(line)) {
-      const item = createTipItem(pendingTitle, line, currentDate);
-      if (item) items.push(item);
-      pendingTitle = null;
-    }
-  }
-
-  return unique(items).slice(0, TIPS_MAX_ITEMS).map((x, i) => ({ ...x, order: i }));
-}
-
 function isProbablyNotMovieLine(text) {
   const t = clean(text).toLowerCase();
-
   if (!t) return true;
   if (t.length < 5 || t.length > 220) return true;
 
@@ -303,28 +247,18 @@ function isProbablyNotMovieLine(text) {
   ];
 
   if (badPatterns.some(rx => rx.test(t))) return true;
-
-  // Neber extrémne všeobecné riadky typu "CZ dabing", "SK titulky" atď.
   if (/^(cz|sk|cz\/sk|dabing|titulky|film|filmy)\b/i.test(t) && t.split(' ').length < 4) return true;
-
   return false;
 }
 
 function hasMovieShape(text) {
   const t = clean(text);
-
-  // Najbezpečnejší tvar stránky: Názov / Original (2026) (CZ)
   const hasLang = /\((CZ\/SK|SK\/CZ|CZ|SK)\)/i.test(t);
   const hasYear = /\((19\d{2}|20\d{2})\)/.test(t) || /\b(19\d{2}|20\d{2})\b/.test(t);
-
   if (!hasLang) return false;
   if (REQUIRE_YEAR_FOR_LOCAL_ITEMS && !hasYear) return false;
-
-  // Musí mať aspoň trochu názvu pred značkou jazyka.
   const beforeLang = clean(t.split(/\((CZ\/SK|SK\/CZ|CZ|SK)\)/i)[0]);
-  if (beforeLang.length < 3) return false;
-
-  return true;
+  return beforeLang.length >= 3;
 }
 
 function normalizeMovieNameForReject(name) {
@@ -336,7 +270,6 @@ function normalizeMovieNameForReject(name) {
 
 function isBadParsedTitle(name) {
   const n = normalizeMovieNameForReject(name);
-
   if (!n || n.length < 2 || n.length > 120) return true;
 
   const bad = [
@@ -361,9 +294,12 @@ function makeMovieItemFromText(text, currentDate, sourceUrl = MOVIES_SOURCE_URL,
     ...parts,
     dateAdded: currentDate || parseDate(text) || today(),
     sourceUrl,
+    sourcePage: sourceUrl === TIPS_SOURCE_URL ? 'tips' : 'movies',
+    catalogIds: sourceUrl === TIPS_SOURCE_URL ? ['filmovenovinky-tipy'] : ['filmovenovinky-filmy'],
     detailUrl: null,
     csfdUrl: null,
     imdbId: null,
+    tmdbId: null,
     links: []
   };
   item.key = itemKey(item);
@@ -373,14 +309,40 @@ function makeMovieItemFromText(text, currentDate, sourceUrl = MOVIES_SOURCE_URL,
 function makeMovieItem($, el, text, currentDate) {
   const links = extractLinks($, el, MOVIES_SOURCE_URL);
   const csfdUrl = links.find(isCsfdUrl) || null;
-  const imdbUrl = links.find(isImdbUrl) || null;
-  const detailUrl = links.find(href => !isCsfdUrl(href) && !isImdbUrl(href)) || null;
+  const detailUrl = links.find(href => !isCsfdUrl(href)) || null;
   const item = makeMovieItemFromText(text, currentDate, MOVIES_SOURCE_URL, 'movie');
   if (!item) return null;
   item.csfdUrl = csfdUrl;
-  item.imdbId = imdbIdFromUrl(imdbUrl);
   item.detailUrl = detailUrl;
   item.links = links;
+  return item;
+}
+
+function createTipItem(title, ratingText, currentDate, { links = [], detailUrl = null, csfdUrl = null } = {}) {
+  const cleanTitleText = clean(String(title || '').replace(/^#+\s*/, ''));
+  if (!cleanTitleText || !/\((19\d{2}|20\d{2})\)/.test(cleanTitleText)) return null;
+
+  const ratings = parseTipRatings(ratingText);
+  if (ratings.isSeries || /\b(tv seri[aá]l|seri[aá]l|s[eé]ria)\b/i.test(`${cleanTitleText} ${ratingText}`)) return null;
+
+  const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');
+  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, 'movie');
+  if (!item) return null;
+
+  item.titleRaw = clean(`${cleanTitleText} ${ratingText || ''}`);
+  item.lang = ratings.lang || item.lang;
+  item.dateAdded = currentDate || parseDate(cleanTitleText) || today();
+  item.sourceUrl = TIPS_SOURCE_URL;
+  item.sourcePage = 'tips';
+  item.catalogIds = ['filmovenovinky-tipy'];
+  item.detailUrl = detailUrl;
+  item.csfdUrl = csfdUrl;
+  item.links = uniqueStrings(links);
+  item.tipGenre = ratings.genre;
+  item.tipImdbRating = ratings.imdbRating;
+  item.tipCsfdPercent = ratings.csfdPercent;
+  item.tipAvailability = ratings.availability || ratings.lang || null;
+  item.key = itemKey(item);
   return item;
 }
 
@@ -410,6 +372,47 @@ function parseTextList(rawText, sourceUrl, fallbackType = 'movie') {
   return unique(items);
 }
 
+function parseTipsTextList(rawText) {
+  const lines = String(rawText || '')
+    .split(/\r?\n/)
+    .map(line => clean(line.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')))
+    .filter(Boolean);
+
+  const items = [];
+  let currentDate = null;
+  let pendingTitle = null;
+
+  for (const line of lines) {
+    const date = parseDate(line);
+    if (date && line.length < 80) {
+      currentDate = date;
+      pendingTitle = null;
+      continue;
+    }
+
+    const titleLine = clean(line.replace(/^#+\s*/, ''));
+    if (/\((19\d{2}|20\d{2})\)/.test(titleLine) && !/IMDb|ČSFD/i.test(titleLine)) {
+      pendingTitle = titleLine;
+      continue;
+    }
+
+    if (pendingTitle && /IMDb|ČSFD/i.test(line)) {
+      const item = createTipItem(pendingTitle, line, currentDate);
+      if (item) items.push(item);
+      pendingTitle = null;
+      continue;
+    }
+
+    if (/\((19\d{2}|20\d{2})\)/.test(titleLine) && /IMDb|ČSFD/i.test(titleLine)) {
+      const [title, ...rest] = titleLine.split(/\s+(?=IMDb|ČSFD)/i);
+      const item = createTipItem(title, rest.join(' '), currentDate);
+      if (item) items.push(item);
+    }
+  }
+
+  return unique(items).slice(0, TIPS_MAX_ITEMS).map((x, i) => ({ ...x, order: i }));
+}
+
 export async function scrapeMovies(maxItems = 1000) {
   const { data, mode } = await fetchPage(MOVIES_SOURCE_URL);
   const raw = String(data || '');
@@ -435,18 +438,15 @@ export async function scrapeMovies(maxItems = 1000) {
       if (item) items.push(item);
     });
 
-    if (items.length === 0) {
-      items = parseTextList($.text(), MOVIES_SOURCE_URL, 'movie');
-    }
+    if (items.length === 0) items = parseTextList($.text(), MOVIES_SOURCE_URL, 'movie');
   }
 
   items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));
-  items = await enrichItemsFromDetailPages(items);
+  await enrichItemsFromDetailPages(items);
   const sourceHash = crypto.createHash('sha1').update(items.map(i => i.key).join('|') || raw).digest('hex');
   console.log('[scrape] movies items=', items.length, 'mode=', mode);
   return { sourceUrl: MOVIES_SOURCE_URL, sourceHash, items };
 }
-
 
 export async function scrapeTips(maxItems = TIPS_MAX_ITEMS) {
   const { data, mode } = await fetchPage(TIPS_SOURCE_URL);
@@ -469,7 +469,7 @@ export async function scrapeTips(maxItems = TIPS_MAX_ITEMS) {
       }
 
       if (!/^h[3-4]$/.test(tag || '')) return;
-      if (!/((19d{2}|20d{2}))/.test(text)) return;
+      if (!/\((19\d{2}|20\d{2})\)/.test(text)) return;
 
       const ratingText = collectFollowingTipInfo($, el);
       if (!/IMDb|ČSFD/i.test(ratingText)) return;
@@ -479,7 +479,7 @@ export async function scrapeTips(maxItems = TIPS_MAX_ITEMS) {
         .map((_j, a) => absUrl($(a).attr('href'), TIPS_SOURCE_URL)).get().filter(Boolean);
       const allLinks = uniqueStrings([...links, ...siblingLinks]);
       const csfdUrl = allLinks.find(isCsfdUrl) || null;
-      const detailUrl = allLinks.find(href => /(^|.)filmovenovinky.sk$/i.test(safeHost(href)) && href !== TIPS_SOURCE_URL) || null;
+      const detailUrl = allLinks.find(href => /(^|\.)filmovenovinky\.sk$/i.test(safeHost(href)) && href !== TIPS_SOURCE_URL) || null;
       const item = createTipItem(text, ratingText, currentDate, { links: allLinks, detailUrl, csfdUrl });
       if (item) items.push(item);
     });
@@ -488,6 +488,7 @@ export async function scrapeTips(maxItems = TIPS_MAX_ITEMS) {
   }
 
   items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));
+  await enrichItemsFromDetailPages(items, { limit: Math.min(20, DETAIL_LINK_ENRICH_LIMIT) });
   const sourceHash = crypto.createHash('sha1').update(items.map(i => i.key).join('|') || raw).digest('hex');
   console.log('[scrape] tips items=', items.length, 'mode=', mode);
   return { sourceUrl: TIPS_SOURCE_URL, sourceHash, items };
@@ -513,14 +514,12 @@ export async function scrapeSeries(maxItems = 40) {
 
       const date = parseDate(text) || today();
       const parts = parseTitleParts(title, 'series');
-      const item = { titleRaw: title, ...parts, type: 'series', dateAdded: date, sourceUrl: SERIES_SOURCE_URL, detailUrl: href, csfdUrl: null, imdbId: null, links: href ? [href] : [] };
+      const item = { titleRaw: title, ...parts, type: 'series', dateAdded: date, sourceUrl: SERIES_SOURCE_URL, detailUrl: href, csfdUrl: null, links: href ? [href] : [], catalogIds: ['filmovenovinky-serialy'] };
       item.key = itemKey(item);
       items.push(item);
     });
 
-    if (items.length === 0) {
-      items = parseTextList($.text(), SERIES_SOURCE_URL, 'series').map(x => ({ ...x, type: 'series' }));
-    }
+    if (items.length === 0) items = parseTextList($.text(), SERIES_SOURCE_URL, 'series').map(x => ({ ...x, type: 'series' }));
   }
 
   items = unique(items).slice(0, maxItems);
@@ -538,19 +537,16 @@ function unique(items) {
   });
 }
 
-
 function mergeCatalogItems(items) {
   const byKey = new Map();
 
   for (const item of items || []) {
     if (!item) continue;
-    const key = String(item.type || '') + '|' + String(item.name || '') + '|' + String(item.originalName || '') + '|' + String(item.year || '');
-    const normalizedKey = key.toLowerCase();
-    const existing = byKey.get(normalizedKey);
+    const key = `${item.type}|${item.name}|${item.originalName || ''}|${item.year}`.toLowerCase();
+    const existing = byKey.get(key);
 
     if (!existing) {
-      const catalogIds = item.catalogIds || ['filmovenovinky-filmy'];
-      byKey.set(normalizedKey, { ...item, catalogIds: uniqueStrings(catalogIds) });
+      byKey.set(key, { ...item, catalogIds: uniqueStrings(item.catalogIds || ['filmovenovinky-filmy']) });
       continue;
     }
 
@@ -597,7 +593,7 @@ export async function scrapeFilmovenovinky(maxItems = 1000) {
     console.log('[scrape] series disabled');
   }
 
-  const sourceHash = crypto.createHash('sha1').update(moviesResult.sourceHash + '|' + tipsResult.sourceHash + '|' + seriesResult.sourceHash).digest('hex');
+  const sourceHash = crypto.createHash('sha1').update(`${moviesResult.sourceHash}|${tipsResult.sourceHash}|${seriesResult.sourceHash}`).digest('hex');
   const items = mergeCatalogItems([...moviesResult.items, ...tipsResult.items, ...seriesResult.items]);
   return { sourceUrl: MOVIES_SOURCE_URL, sourceHash, items };
 }
