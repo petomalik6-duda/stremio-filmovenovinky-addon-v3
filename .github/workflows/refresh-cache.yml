@@ -16,6 +16,7 @@ on:
       - main
     paths:
       - "src/**"
+      - "data/metadata-overrides.json"
       - "scripts/**"
       - "package*.json"
       - ".github/workflows/refresh-cache.yml"
@@ -60,6 +61,7 @@ jobs:
           TMDB_FACTUAL_SUMMARY_FALLBACK: "true"
           ENRICH_LIMIT: 1000
           DETAIL_REPAIR_LIMIT: 200
+          DETAIL_LINK_ENRICH_LIMIT: 80
           TMDB_YEAR_TOLERANCE: 2
           TMDB_SEARCH_LIMIT: 8
           TMDB_MIN_TITLE_SCORE: 80
