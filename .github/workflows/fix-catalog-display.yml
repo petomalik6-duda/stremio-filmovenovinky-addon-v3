@@ -1,0 +1,84 @@
+name: Fix catalog display
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fix-catalog-display.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Reset to latest main
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+      - name: Patch catalog display
+        run: |
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+
+          def replace_required(text, old, new, name):
+              if old not in text:
+                  raise SystemExit(f"marker not found: {name}")
+              return text.replace(old, new, 1)
+
+          catalog = Path('src/catalog.js')
+          s = catalog.read_text()
+          s = s.replace("const MATCH_VERSION = 5;", "const MATCH_VERSION = 4;")
+          s = s.replace("const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 6.5);", "const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.0);")
+          s = s.replace("const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 65);", "const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 75);")
+          s = s.replace("https://placehold.co/500x750?text=", "https://placehold.co/500x750/png?text=")
+          if "posterShape: 'poster'," not in s:
+              s = replace_required(
+                  s,
+                  "    poster: tmdb?.poster || csfd.poster || placeholderPoster(displayName),\n    background:",
+                  "    poster: tmdb?.poster || csfd.poster || placeholderPoster(displayName),\n    posterShape: 'poster',\n    background:",
+                  "posterShape"
+              )
+          catalog.write_text(s)
+
+          server = Path('server.js')
+          ss = server.read_text()
+          ss = ss.replace("const ADDON_VERSION = process.env.npm_package_version || '3.7.8';", "const ADDON_VERSION = process.env.npm_package_version || '3.7.12';")
+          server.write_text(ss)
+
+          pkg_path = Path('package.json')
+          pkg = json.loads(pkg_path.read_text())
+          pkg['version'] = '3.7.12'
+          pkg_path.write_text(json.dumps(pkg, ensure_ascii=False, indent=2) + '\n')
+          PY
+
+      - name: Verify syntax
+        run: |
+          node --check src/catalog.js
+          node --check src/scrape.js
+          node --check server.js
+
+      - name: Commit catalog display fix
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add src/catalog.js server.js package.json
+          if git diff --cached --quiet; then
+            echo "No source changes"
+            exit 0
+          fi
+          git commit -m "Fix tip catalog display and posters"
+          git pull --rebase --autostash origin main
+          git push origin main
