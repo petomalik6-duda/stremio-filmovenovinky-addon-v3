@@ -1,0 +1,56 @@
+name: Fix scrape regex
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fix-scrape-regex.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Reset to latest main
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+      - name: Fix malformed N/A regex
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const fs = require('fs');
+          const file = 'src/scrape.js';
+          let src = fs.readFileSync(file, 'utf8');
+          const bad = 'if (!value || /n/?a/i.test(String(value))) return null;';
+          const good = 'if (!value || /^n\\/?a$/i.test(String(value).trim())) return null;';
+          if (!src.includes(good)) {
+            if (!src.includes(bad)) throw new Error('Malformed N/A regex marker not found');
+            src = src.replace(bad, good);
+          }
+          fs.writeFileSync(file, src);
+          NODE
+
+      - name: Commit regex fix
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add src/scrape.js
+          if git diff --cached --quiet; then
+            echo "No source changes"
+            exit 0
+          fi
+          git commit -m "Fix malformed tip rating regex"
+          git pull --rebase --autostash origin main
+          git push origin main
