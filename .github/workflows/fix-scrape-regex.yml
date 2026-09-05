@@ -27,18 +27,50 @@ jobs:
           git checkout main
           git reset --hard origin/main
 
-      - name: Fix malformed N/A regex
+      - name: Fix malformed tip rating parser
         run: |
           node --input-type=commonjs <<'NODE'
           const fs = require('fs');
           const file = 'src/scrape.js';
           let src = fs.readFileSync(file, 'utf8');
-          const bad = 'if (!value || /n/?a/i.test(String(value))) return null;';
-          const good = 'if (!value || /^n\\/?a$/i.test(String(value).trim())) return null;';
-          if (!src.includes(good)) {
-            if (!src.includes(bad)) throw new Error('Malformed N/A regex marker not found');
-            src = src.replace(bad, good);
-          }
+
+          src = src.replace(
+            /function parseNumber\(value\) \{[\s\S]*?\n\}\n\nfunction parseTipRatings\(text\) \{[\s\S]*?\n\}\n\nfunction collectFollowingTipInfo/,
+            String.raw`function parseNumber(value) {
+  if (!value || /^n\/?a$/i.test(String(value).trim())) return null;
+  const n = Number(String(value).replace(',', '.'));
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseTipRatings(text) {
+  const t = clean(text);
+  const imdbMatch = t.match(/IMDb\s*(N\/?A|[0-9]+(?:[,.][0-9]+)?)\s*\/\s*10/i);
+  const csfdMatch = t.match(/ČSFD\s*([0-9]{1,3})\s*%/i);
+  const availabilityMatch = t.match(/\b(CZ\/SK|SK\/CZ|CZ|SK|Tit|Titulky)\b/i);
+  const availability = availabilityMatch?.[1] || null;
+  const lang = availability
+    ? availability.toUpperCase().replace('SK/CZ', 'CZ/SK').replace('TITULKY', 'TIT').replace('TIT', 'TIT')
+    : 'CZ/SK';
+  const isSeries = /\bTV\s*seri[aá]l\b/i.test(t);
+  const genre = clean(t
+    .replace(/\bTV\s*seri[aá]l\b/ig, '')
+    .replace(/IMDb[\s\S]*$/i, '')
+    .replace(/ČSFD[\s\S]*$/i, '')
+  ) || null;
+
+  return {
+    imdbRating: parseNumber(imdbMatch?.[1]),
+    csfdPercent: parseNumber(csfdMatch?.[1]),
+    lang,
+    genre,
+    availability,
+    isSeries
+  };
+}
+
+function collectFollowingTipInfo`
+          );
+
           fs.writeFileSync(file, src);
           NODE
 
@@ -51,6 +83,6 @@ jobs:
             echo "No source changes"
             exit 0
           fi
-          git commit -m "Fix malformed tip rating regex"
+          git commit -m "Fix malformed tip rating parser regexes"
           git pull --rebase --autostash origin main
           git push origin main
