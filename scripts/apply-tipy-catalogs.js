@@ -2,10 +2,77 @@ import fs from 'fs';
 
 function read(file) { return fs.readFileSync(file, 'utf8'); }
 function write(file, content) { fs.writeFileSync(file, content); }
+
 function replaceRegex(content, regex, replacement, label) {
   const next = content.replace(regex, replacement);
   if (next === content) throw new Error('No change for ' + label);
   return next;
+}
+
+function patchScrape() {
+  const file = 'src/scrape.js';
+  let src = read(file);
+
+  // Tipy musia zostať samostatné položky aj keď rovnaký film existuje v hlavnom
+  // katalógu noviniek. Inak sa zlúčia a zdedia dátum/poradie z hlavnej stránky.
+  src = src.replace(
+    /(function createTipItem\([\s\S]*?)(\n\s*item\.key = itemKey\(item\);\n\s*return item;\n\}\n\nfunction parseTextList)/,
+    (_m, before, after) => `${before}\n  item.key = ` + '`tips|${itemKey(item)}`' + `;${after.replace(/\n\s*item\.key = itemKey\(item\);/, '')}`
+  );
+
+  if (!src.includes('tips|${itemKey(item)}')) {
+    throw new Error('createTipItem key prefix was not applied');
+  }
+
+  const mergeFn = `function mergeCatalogItems(items) {
+  const byKey = new Map();
+
+  for (const item of items || []) {
+    if (!item) continue;
+
+    // Používame presný item.key. Tipy majú prefix tips|..., takže sa nezlúčia
+    // s rovnakým filmom z hlavného CZ/SK katalógu a zachovajú si vlastné poradie.
+    const key = item.key || itemKey(item);
+    const existing = byKey.get(key);
+
+    if (!existing) {
+      byKey.set(key, { ...item, key, catalogIds: uniqueStrings(item.catalogIds || ['filmovenovinky-filmy']) });
+      continue;
+    }
+
+    existing.catalogIds = uniqueStrings([...(existing.catalogIds || []), ...(item.catalogIds || [])]);
+    existing.links = uniqueStrings([...(existing.links || []), ...(item.links || [])]);
+    existing.detailUrl = existing.detailUrl || item.detailUrl || null;
+    existing.csfdUrl = existing.csfdUrl || item.csfdUrl || null;
+    existing.imdbId = existing.imdbId || item.imdbId || null;
+    existing.tmdbId = existing.tmdbId || item.tmdbId || null;
+    existing.tipGenre = existing.tipGenre || item.tipGenre || null;
+    existing.tipImdbRating = existing.tipImdbRating ?? item.tipImdbRating ?? null;
+    existing.tipCsfdPercent = existing.tipCsfdPercent ?? item.tipCsfdPercent ?? null;
+    existing.tipAvailability = existing.tipAvailability || item.tipAvailability || null;
+    existing.sourcePage = existing.sourcePage || item.sourcePage || null;
+    existing.titleRaw = existing.titleRaw || item.titleRaw;
+    existing.order = Number.isFinite(Number(existing.order)) ? Number(existing.order) : item.order;
+    existing.key = key;
+  }
+
+  return [...byKey.values()].map((item, index) => ({
+    ...item,
+    order: Number.isFinite(Number(item.order)) ? Number(item.order) : index,
+    key: item.key || itemKey(item)
+  }));
+}
+
+export async function scrapeFilmovenovinky`;
+
+  src = replaceRegex(
+    src,
+    /function mergeCatalogItems\(items\) \{[\s\S]*?\n\}\n\nexport async function scrapeFilmovenovinky/,
+    mergeFn,
+    'mergeCatalogItems exact-key split'
+  );
+
+  write(file, src);
 }
 
 function patchCatalog() {
@@ -15,37 +82,46 @@ function patchCatalog() {
   src = src.replace(/const BEST_IMDB_MIN = Number\(process\.env\.BEST_IMDB_MIN \|\| [0-9.]+\);/, "const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.2);");
   src = src.replace(/const BEST_CSFD_MIN = Number\(process\.env\.BEST_CSFD_MIN \|\| [0-9.]+\);/, "const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 78);");
 
-  if (!src.includes('function sortBestTipsByRating')) {
-    src = replaceRegex(
-      src,
-      /function isBestRatedTip\(meta\) \{[\s\S]*?\n\}\n\nfunction sortByDateThenRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog/,
-      `function tipImdb(meta) {
-  return numeric(meta?._addon?.tipImdbRating);
+  if (!src.includes('sourceOrder: Number.isFinite(Number(item.order))')) {
+    src = src.replace(
+      '      titleRaw: item.titleRaw,\n      // Stabilný alias',
+      '      titleRaw: item.titleRaw,\n      sourceOrder: Number.isFinite(Number(item.order)) ? Number(item.order) : null,\n      // Stabilný alias'
+    );
+  }
+
+  if (!src.includes('meta?._addon?.sourceOrder')) {
+    src = src.replace(
+      '  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;\n\n  // Staršie cache',
+      `  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;
+  const itemOrder = Number.isFinite(Number(item?.order)) ? Number(item.order) : null;
+  const metaOrder = Number.isFinite(Number(meta?._addon?.sourceOrder)) ? Number(meta._addon.sourceOrder) : null;
+  if (itemOrder !== metaOrder) return true;
+
+  // Staršie cache`
+    );
+  }
+
+  const sortBlock = `function sourceOrder(meta) {
+  const n = Number(meta?._addon?.sourceOrder);
+  return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
 }
 
-function tipCsfd(meta) {
-  return numeric(meta?._addon?.tipCsfdPercent);
+function compareDatesDesc(a, b) {
+  return String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
 }
 
-function tipScore(meta) {
-  const csfd = tipCsfd(meta) ? tipCsfd(meta) / 10 : 0;
-  const imdb = tipImdb(meta);
-  return Math.max(csfd, imdb);
-}
-
-function isBestRatedTip(meta) {
-  const imdb = tipImdb(meta);
-  const csfd = tipCsfd(meta);
-
-  // Najlepšie hodnotené má byť menší a odlišný výber zo sekcie Tipy.
-  // Preto používame iba ratingy načítané zo stránky FilmovéNovinky, nie TMDB fallback.
-  return imdb >= BEST_IMDB_MIN || csfd >= BEST_CSFD_MIN;
-}
-
-function sortTipsByDate(a, b) {
-  const byDate = String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
+function sortByDateThenOrder(a, b) {
+  const byDate = compareDatesDesc(a, b);
   if (byDate) return byDate;
+  const byOrder = sourceOrder(a) - sourceOrder(b);
+  if (Number.isFinite(byOrder) && byOrder) return byOrder;
   return String(a.name || '').localeCompare(String(b.name || ''), 'sk');
+}
+
+function sortTipsByPageOrder(a, b) {
+  const byOrder = sourceOrder(a) - sourceOrder(b);
+  if (Number.isFinite(byOrder) && byOrder) return byOrder;
+  return sortByDateThenOrder(a, b);
 }
 
 function sortBestTipsByRating(a, b) {
@@ -58,20 +134,22 @@ function sortBestTipsByRating(a, b) {
   const byImdb = tipImdb(b) - tipImdb(a);
   if (byImdb) return byImdb;
 
-  return sortTipsByDate(a, b);
+  return sortTipsByPageOrder(a, b);
 }
 
-export function filterCatalog`,
-      'catalog rating/sort block'
-    );
-  }
+export function filterCatalog`;
 
-  if (src.includes('return arr.sort(sortByDateThenRating);')) {
-    src = src.replace(
-      '  return arr.sort(sortByDateThenRating);\n}',
-      "  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;\n  return arr.sort(sortFn);\n}"
-    );
-  }
+  src = replaceRegex(
+    src,
+    /function sortTipsByDate\(a, b\) \{[\s\S]*?\n\}\n\nfunction sortBestTipsByRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog/,
+    sortBlock,
+    'catalog sort block with sourceOrder'
+  );
+
+  src = src.replace(
+    "const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;",
+    "const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : (id === 'filmovenovinky-tipy' ? sortTipsByPageOrder : sortByDateThenOrder);"
+  );
 
   write(file, src);
 }
@@ -111,11 +189,12 @@ function patchPublicMeta() {
 function patchPackage() {
   const file = 'package.json';
   const pkg = JSON.parse(read(file));
-  pkg.version = '3.7.14';
+  pkg.version = '3.7.15';
   write(file, JSON.stringify(pkg, null, 2) + '\n');
 }
 
+patchScrape();
 patchCatalog();
 patchPublicMeta();
 patchPackage();
-console.log('Tip catalog separation + poster fallback patch applied.');
+console.log('Tip catalog source-order separation patch applied.');
