@@ -18,7 +18,7 @@ const AUTO_REFRESH = String(process.env.AUTO_REFRESH || 'false').toLowerCase() =
 const REFRESH_ON_START = String(process.env.REFRESH_ON_START || 'false').toLowerCase() === 'true';
 const AUTO_REFRESH_MINUTES = Math.max(15, Number(process.env.AUTO_REFRESH_MINUTES || 360));
 const ADDON_ID = process.env.ADDON_ID || 'sk.filmovenovinky.filmy.only';
-const ADDON_VERSION = process.env.npm_package_version || '3.7.8';
+const ADDON_VERSION = process.env.npm_package_version || '3.7.12';
 
 const catalogs = [
   {

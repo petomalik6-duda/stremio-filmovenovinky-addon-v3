@@ -15,10 +15,10 @@ const DETAIL_REPAIR_LIMIT = Number(process.env.DETAIL_REPAIR_LIMIT || 100);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
-const MATCH_VERSION = 5;
+const MATCH_VERSION = 4;
 const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);
-const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 6.5);
-const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 65);
+const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.0);
+const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 75);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
@@ -33,7 +33,7 @@ function setStage(value) {
 function stremioId(item, csfd, tmdb) { return tmdb?.imdbId || csfd?.imdbId || item?.imdbId || localStremioId(item); }
 function score(meta) { const n = Number(meta.imdbRating || 0); return Number.isFinite(n) ? n : 0; }
 function tmdbUrl(type, id) { return `https://www.themoviedb.org/${type === 'series' ? 'tv' : 'movie'}/${id}`; }
-function placeholderPoster(name) { return `https://placehold.co/500x750?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`; }
+function placeholderPoster(name) { return `https://placehold.co/500x750/png?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`; }
 
 function localMeta(item) {
   return toMeta(item, {}, null);
@@ -69,6 +69,7 @@ function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
     type,
     name: displayName,
     poster: tmdb?.poster || csfd.poster || placeholderPoster(displayName),
+    posterShape: 'poster',
     background: tmdb?.background || tmdb?.poster || csfd.poster || placeholderPoster(displayName),
     description: descriptionParts.join('\n\n'),
     // Rok zo zdroja FilmovéNovinky je pre katalóg autoritatívny. TMDB rok si
