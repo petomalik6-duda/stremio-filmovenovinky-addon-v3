@@ -39,6 +39,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Apply tip catalog source patch
+        run: node scripts/apply-tipy-catalogs.js
+
       - name: Install dependencies
         run: npm install --omit=dev
 
@@ -79,15 +82,15 @@ jobs:
           POSTPROCESS_LIMIT: 1000
           POSTPROCESS_DELAY_MS: 200
 
-      - name: Commit updated cache
+      - name: Commit updated cache and source patches
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add data/catalog-cache.json
+          git add data/catalog-cache.json src/catalog.js src/public-meta.js package.json
           if git diff --cached --quiet; then
-            echo "No cache changes"
+            echo "No cache or source changes"
             exit 0
           fi
-          git commit -m "Refresh FilmovéNovinky cache"
+          git commit -m "Refresh cache and separate tip catalogs"
           git pull --rebase --autostash
           git push
