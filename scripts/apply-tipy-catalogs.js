@@ -3,11 +3,6 @@ import fs from 'fs';
 function read(file) { return fs.readFileSync(file, 'utf8'); }
 function write(file, content) { fs.writeFileSync(file, content); }
 
-function replaceRequired(content, before, after, label) {
-  if (!content.includes(before)) throw new Error(`Missing marker for ${label}`);
-  return content.replace(before, after);
-}
-
 function patchScrape() {
   const file = 'src/scrape.js';
   let src = read(file);
@@ -52,9 +47,34 @@ function patchScrape() {
 
   src = src.slice(0, createStart) + block + src.slice(parseTextStart);
 
+  const neutralMap = "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));";
   const forcedMovieMap = "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));";
-  if (src.includes(forcedMovieMap)) {
-    src = src.replace(forcedMovieMap, "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));");
+
+  // Hlavný filmový scraper môže typ explicitne fixovať na movie.
+  let moviesStart = src.indexOf('export async function scrapeMovies(');
+  let tipsStart = src.indexOf('export async function scrapeTips(', moviesStart);
+  if (moviesStart < 0 || tipsStart < 0) throw new Error('scrapeMovies/scrapeTips block not found');
+  let moviesBlock = src.slice(moviesStart, tipsStart);
+  if (!moviesBlock.includes(forcedMovieMap) && moviesBlock.includes(neutralMap)) {
+    moviesBlock = moviesBlock.replace(neutralMap, forcedMovieMap);
+    src = src.slice(0, moviesStart) + moviesBlock + src.slice(tipsStart);
+  }
+
+  // Tipy sú zmiešané: movie aj series. Tu sa typ NESMIE prepisovať na movie.
+  tipsStart = src.indexOf('export async function scrapeTips(');
+  const seriesStart = src.indexOf('export async function scrapeSeries(', tipsStart);
+  if (tipsStart < 0 || seriesStart < 0) throw new Error('scrapeTips/scrapeSeries block not found');
+  let tipsBlock = src.slice(tipsStart, seriesStart);
+  if (tipsBlock.includes(forcedMovieMap)) {
+    tipsBlock = tipsBlock.replace(forcedMovieMap, neutralMap);
+    src = src.slice(0, tipsStart) + tipsBlock + src.slice(seriesStart);
+  }
+
+  tipsStart = src.indexOf('export async function scrapeTips(');
+  const finalSeriesStart = src.indexOf('export async function scrapeSeries(', tipsStart);
+  tipsBlock = src.slice(tipsStart, finalSeriesStart);
+  if (tipsBlock.includes("type: 'movie', order: i") || !tipsBlock.includes(neutralMap)) {
+    throw new Error('scrapeTips still forces movie type');
   }
 
   write(file, src);
