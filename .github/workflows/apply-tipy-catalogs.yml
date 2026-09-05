@@ -36,6 +36,57 @@ jobs:
       - name: Apply patch
         run: node scripts/apply-tipy-catalogs.js
 
+      - name: Repair tip parser and package version
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          scrape = Path("src/scrape.js")
+          src = scrape.read_text(encoding="utf-8")
+          start = src.index("function parseNumber(value) {")
+          end = src.index("function collectFollowingTipInfo", start)
+          replacement = r"""function parseNumber(value) {
+  if (!value || /^n\/?a$/i.test(String(value).trim())) return null;
+  const n = Number(String(value).replace(',', '.'));
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseTipRatings(text) {
+  const t = clean(text);
+  const imdbMatch = t.match(/IMDb\s*(N\/?A|[0-9]+(?:[,.][0-9]+)?)\s*\/\s*10/i);
+  const csfdMatch = t.match(/ČSFD\s*([0-9]{1,3})\s*%/i);
+  const availabilityMatch = t.match(/\b(CZ\/SK|SK\/CZ|CZ|SK|Tit|Titulky)\b/i);
+  const availability = availabilityMatch?.[1] || null;
+  const lang = availability
+    ? availability.toUpperCase().replace('SK/CZ', 'CZ/SK').replace('TITULKY', 'TIT').replace('TIT', 'TIT')
+    : 'CZ/SK';
+  const isSeries = /\bTV\s*seri[aá]l\b/i.test(t);
+  const genre = clean(t
+    .replace(/\bTV\s*seri[aá]l\b/ig, '')
+    .replace(/IMDb[\s\S]*$/i, '')
+    .replace(/ČSFD[\s\S]*$/i, '')
+  ) || null;
+
+  return {
+    imdbRating: parseNumber(imdbMatch?.[1]),
+    csfdPercent: parseNumber(csfdMatch?.[1]),
+    lang,
+    genre,
+    availability,
+    isSeries
+  };
+}
+
+"""
+          scrape.write_text(src[:start] + replacement + src[end:], encoding="utf-8")
+
+          pkg_path = Path("package.json")
+          pkg = json.loads(pkg_path.read_text(encoding="utf-8"))
+          pkg["version"] = "3.7.11"
+          pkg_path.write_text(json.dumps(pkg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
       - name: Commit source changes
         run: |
           git config user.name "github-actions"
