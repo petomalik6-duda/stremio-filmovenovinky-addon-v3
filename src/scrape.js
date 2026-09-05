@@ -146,7 +146,7 @@ async function enrichItemsFromDetailPages(items, { limit = DETAIL_LINK_ENRICH_LI
 
 
 function parseNumber(value) {
-  if (!value || /n/?a/i.test(String(value))) return null;
+  if (!value || /^n\/?a$/i.test(String(value).trim())) return null;
   const n = Number(String(value).replace(',', '.'));
   return Number.isFinite(n) ? n : null;
 }
