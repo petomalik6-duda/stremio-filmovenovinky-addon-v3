@@ -342,7 +342,7 @@ function createTipItem(title, ratingText, currentDate, { links = [], detailUrl =
   item.tipImdbRating = ratings.imdbRating;
   item.tipCsfdPercent = ratings.csfdPercent;
   item.tipAvailability = ratings.availability || ratings.lang || null;
-  item.key = itemKey(item);
+  item.key = `tips|${itemKey(item)}`;
   return item;
 }
 
@@ -542,15 +542,18 @@ function mergeCatalogItems(items) {
 
   for (const item of items || []) {
     if (!item) continue;
-    const key = `${item.type}|${item.name}|${item.originalName || ''}|${item.year}`.toLowerCase();
+
+    // Používame presný item.key. Tipy majú prefix tips|..., takže sa nezlúčia
+    // s rovnakým filmom z hlavného CZ/SK katalógu a zachovajú si vlastné poradie.
+    const key = item.key || itemKey(item);
     const existing = byKey.get(key);
 
     if (!existing) {
-      byKey.set(key, { ...item, catalogIds: uniqueStrings(item.catalogIds || ['filmovenovinky-filmy']) });
+      byKey.set(key, { ...item, key, catalogIds: uniqueStrings(item.catalogIds || ['filmovenovinky-filmy']) });
       continue;
     }
 
-    existing.catalogIds = uniqueStrings([...(existing.catalogIds || ['filmovenovinky-filmy']), ...(item.catalogIds || ['filmovenovinky-filmy'])]);
+    existing.catalogIds = uniqueStrings([...(existing.catalogIds || []), ...(item.catalogIds || [])]);
     existing.links = uniqueStrings([...(existing.links || []), ...(item.links || [])]);
     existing.detailUrl = existing.detailUrl || item.detailUrl || null;
     existing.csfdUrl = existing.csfdUrl || item.csfdUrl || null;
@@ -560,12 +563,17 @@ function mergeCatalogItems(items) {
     existing.tipImdbRating = existing.tipImdbRating ?? item.tipImdbRating ?? null;
     existing.tipCsfdPercent = existing.tipCsfdPercent ?? item.tipCsfdPercent ?? null;
     existing.tipAvailability = existing.tipAvailability || item.tipAvailability || null;
-    existing.sourcePage = existing.sourcePage === 'tips' ? existing.sourcePage : (item.sourcePage || existing.sourcePage || null);
+    existing.sourcePage = existing.sourcePage || item.sourcePage || null;
     existing.titleRaw = existing.titleRaw || item.titleRaw;
-    existing.key = itemKey(existing);
+    existing.order = Number.isFinite(Number(existing.order)) ? Number(existing.order) : item.order;
+    existing.key = key;
   }
 
-  return [...byKey.values()].map((item, index) => ({ ...item, order: index, key: itemKey(item) }));
+  return [...byKey.values()].map((item, index) => ({
+    ...item,
+    order: Number.isFinite(Number(item.order)) ? Number(item.order) : index,
+    key: item.key || itemKey(item)
+  }));
 }
 
 export async function scrapeFilmovenovinky(maxItems = 1000) {
