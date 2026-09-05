@@ -1,3 +1,10 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const OVERRIDES_FILE = path.resolve(__dirname, '../data/metadata-overrides.json');
+
 function csfdIdFromUrl(value) {
   const match = String(value || '').match(/\/film\/(\d+)(?:-|\/|$)/i);
   return match?.[1] || null;
@@ -49,13 +56,44 @@ function itemYearMatches(item, override) {
   return String(item?.year || '').trim() === expected;
 }
 
+function normalizeOverride(raw = {}, source = 'builtin') {
+  const csfdId = String(raw.csfdId || csfdIdFromUrl(raw.csfdUrl) || '').trim();
+  const aliases = Array.isArray(raw.aliases) ? raw.aliases.map(x => String(x || '').trim()).filter(Boolean) : [];
+
+  return {
+    ...raw,
+    version: Number(raw.version || 1),
+    year: raw.year ? String(raw.year) : undefined,
+    csfdId: csfdId || undefined,
+    csfdUrl: raw.csfdUrl || (csfdId ? `https://www.csfd.sk/film/${csfdId}/` : undefined),
+    tmdbId: raw.tmdbId ? Number(raw.tmdbId) : undefined,
+    imdbId: raw.imdbId ? String(raw.imdbId) : undefined,
+    aliases,
+    overrideFile: source
+  };
+}
+
+function readJsonOverrides() {
+  try {
+    if (!fs.existsSync(OVERRIDES_FILE)) return [];
+    const parsed = JSON.parse(fs.readFileSync(OVERRIDES_FILE, 'utf8'));
+    const items = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.items) ? parsed.items : []);
+    return items.map(item => normalizeOverride(item, 'data/metadata-overrides.json'));
+  } catch (error) {
+    console.warn('[source-overrides] Cannot read metadata-overrides.json:', error.message);
+    return [];
+  }
+}
+
 function withSideEffects(item, override, source) {
   if (!override) return null;
 
-  // Dôležité: catalog.js používa item.csfdUrl pri skladaní links/description.
-  // Ak FilmovéNovinky pri danej položke priamy ČSFD link nedá, doplníme ho
-  // z overeného override ešte predtým, než sa zavolá toMeta().
+  // Dôležité: catalog.js používa item.csfdUrl / item.imdbId pri skladaní links,
+  // verejného Stremio ID a diagnostiky. Ak ich zdrojový zoznam nedá, doplníme
+  // ich z overeného override ešte predtým, než sa zavolá toMeta().
   if (item && override.csfdUrl && !item.csfdUrl) item.csfdUrl = override.csfdUrl;
+  if (item && override.imdbId && !item.imdbId) item.imdbId = override.imdbId;
+  if (item && override.tmdbId && !item.tmdbId) item.tmdbId = override.tmdbId;
 
   return {
     ...override,
@@ -64,67 +102,41 @@ function withSideEffects(item, override, source) {
   };
 }
 
-// Ručne overené edge cases zo zdroja FilmovéNovinky/ČSFD.
-// Primárne sú viazané na stabilné ČSFD ID. Pre prípady, kde zdrojový zoznam
-// ČSFD link vôbec neobsahuje, máme bezpečný fallback podľa presných aliasov + roku.
-const VERIFIED_SOURCE_OVERRIDES = new Map([
-  ['1389729', {
+// Ručne overené edge cases, ktoré majú zostať v kóde kvôli spätnej kompatibilite.
+const BUILT_IN_SOURCE_OVERRIDES = [
+  ['1389729', normalizeOverride({
     version: 1,
     tmdbId: 1129188,
     imdbId: 'tt27803347',
     aliases: ['Avenue of the Giants', 'The Optimist', 'The Optimist: The Bravest Act Is Truth']
-  }],
-  ['1767154', {
+  })],
+  ['1767154', normalizeOverride({
     version: 1,
     excludedReason: 'csfd_theatre_recording'
-  }],
-  ['1633561', {
+  })],
+  ['1633561', normalizeOverride({
     version: 1,
     imdbId: 'tt37039145',
     description: 'Časozberný dokument z roku 2023 sleduje ochranu outloňov v Indonézii, boj proti nelegálnemu obchodu so zvieratami a činnosť Záchranného programu Kukang. Réžia: Ondřej Smékal.',
     genres: ['Dokumentárny']
-  }],
-  ['1690274', {
+  })],
+  ['1690274', normalizeOverride({
     version: 1,
     tmdbId: 1470334,
     imdbId: 'tt6930962',
     aliases: ['Spiked', 'Bodlinka: Pichlavé dobrodružství', 'Pichľavé dobrodružstvo']
-  }],
-  ['1700848', {
-    version: 2,
-    csfdId: '1700848',
-    csfdUrl: 'https://www.csfd.sk/film/1700848-carodejnik-z-kremla/',
-    tmdbId: 1291659,
-    imdbId: 'tt32386654',
-    aliases: [
-      'Čarodejník z Kremľa',
-      'Čarodejník z Kremľu',
-      'Čaroděj z Kremlu',
-      'The Wizard of the Kremlin',
-      'Le Mage du Kremlin',
-      'Le mage du Kremlin'
-    ]
-  }]
-]);
-
-const VERIFIED_TITLE_OVERRIDES = [
-  {
-    version: 2,
-    year: '2025',
-    csfdId: '1700848',
-    csfdUrl: 'https://www.csfd.sk/film/1700848-carodejnik-z-kremla/',
-    tmdbId: 1291659,
-    imdbId: 'tt32386654',
-    aliases: [
-      'Čarodejník z Kremľa',
-      'Čarodejník z Kremľu',
-      'Čaroděj z Kremlu',
-      'The Wizard of the Kremlin',
-      'Le Mage du Kremlin',
-      'Le mage du Kremlin'
-    ]
-  }
+  })]
 ];
+
+const JSON_OVERRIDES = readJsonOverrides();
+
+const VERIFIED_SOURCE_OVERRIDES = new Map(BUILT_IN_SOURCE_OVERRIDES);
+for (const override of JSON_OVERRIDES) {
+  const id = override.csfdId || csfdIdFromUrl(override.csfdUrl);
+  if (id) VERIFIED_SOURCE_OVERRIDES.set(String(id), override);
+}
+
+const VERIFIED_TITLE_OVERRIDES = JSON_OVERRIDES.filter(override => Array.isArray(override.aliases) && override.aliases.length);
 
 function findTitleOverride(item) {
   const variants = new Set(itemTitleVariants(item));
@@ -164,4 +176,4 @@ export function sourceOverrideNeedsMigration(item, meta) {
   return false;
 }
 
-export { csfdIdFromUrl };
+export { csfdIdFromUrl, normalizeTitle };
