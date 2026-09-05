@@ -1,0 +1,43 @@
+name: Apply FilmovéNovinky tip catalogs patch
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/apply-tipy-catalogs.js"
+      - ".github/workflows/apply-tipy-catalogs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Apply patch
+        run: node scripts/apply-tipy-catalogs.js
+
+      - name: Commit source changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add server.js src/catalog.js src/scrape.js package.json .github/workflows/refresh-cache.yml
+          if git diff --cached --quiet; then
+            echo "No source changes"
+            exit 0
+          fi
+          git commit -m "Add FilmovéNovinky tip catalogs"
+          git pull --rebase --autostash
+          git push
