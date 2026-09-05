@@ -46,7 +46,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add src/catalog.js src/public-meta.js package.json
+          git add src/catalog.js src/public-meta.js src/scrape.js package.json
           if git diff --cached --quiet; then
             echo "No source patch changes"
           else
