@@ -17,8 +17,8 @@ const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false')
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
 const MATCH_VERSION = 4;
 const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);
-const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.0);
-const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 75);
+const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.2);
+const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 78);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
@@ -658,18 +658,46 @@ function numeric(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
+function tipImdb(meta) {
+  return numeric(meta?._addon?.tipImdbRating);
+}
+
+function tipCsfd(meta) {
+  return numeric(meta?._addon?.tipCsfdPercent);
+}
+
+function tipScore(meta) {
+  const csfd = tipCsfd(meta) ? tipCsfd(meta) / 10 : 0;
+  const imdb = tipImdb(meta);
+  return Math.max(csfd, imdb);
+}
+
 function isBestRatedTip(meta) {
-  const imdb = numeric(meta?._addon?.tipImdbRating || meta?.imdbRating);
-  const csfd = numeric(meta?._addon?.tipCsfdPercent);
+  const imdb = tipImdb(meta);
+  const csfd = tipCsfd(meta);
+
+  // Najlepšie hodnotené má byť menší a odlišný výber zo sekcie Tipy.
+  // Preto používame iba ratingy načítané zo stránky FilmovéNovinky, nie TMDB fallback.
   return imdb >= BEST_IMDB_MIN || csfd >= BEST_CSFD_MIN;
 }
 
-function sortByDateThenRating(a, b) {
+function sortTipsByDate(a, b) {
   const byDate = String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
   if (byDate) return byDate;
-  const bScore = Math.max(numeric(b?._addon?.tipCsfdPercent) / 10, numeric(b?._addon?.tipImdbRating || b?.imdbRating));
-  const aScore = Math.max(numeric(a?._addon?.tipCsfdPercent) / 10, numeric(a?._addon?.tipImdbRating || a?.imdbRating));
-  return bScore - aScore;
+  return String(a.name || '').localeCompare(String(b.name || ''), 'sk');
+}
+
+function sortBestTipsByRating(a, b) {
+  const byScore = tipScore(b) - tipScore(a);
+  if (byScore) return byScore;
+
+  const byCsfd = tipCsfd(b) - tipCsfd(a);
+  if (byCsfd) return byCsfd;
+
+  const byImdb = tipImdb(b) - tipImdb(a);
+  if (byImdb) return byImdb;
+
+  return sortTipsByDate(a, b);
 }
 
 export function filterCatalog(metas, id, type) {
@@ -696,5 +724,6 @@ export function filterCatalog(metas, id, type) {
     );
   }
 
-  return arr.sort(sortByDateThenRating);
+  const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;
+  return arr.sort(sortFn);
 }
