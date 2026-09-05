@@ -6,10 +6,11 @@ export const MOVIES_SOURCE_URL = process.env.MOVIES_SOURCE_URL || 'https://www.f
 export const SERIES_SOURCE_URL = process.env.SERIES_SOURCE_URL || '';
 const DISABLE_SERIES = String(process.env.DISABLE_SERIES || 'true').toLowerCase() === 'true';
 
-const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.4.1; +https://www.stremio.com/)';
+const UA = 'Mozilla/5.0 (compatible; StremioFilmovenovinkyAddon/3.7.7; +https://www.stremio.com/)';
 const USE_READER_FALLBACK = String(process.env.USE_READER_FALLBACK || 'true').toLowerCase() !== 'false';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
 const REQUIRE_YEAR_FOR_LOCAL_ITEMS = String(process.env.REQUIRE_YEAR_FOR_LOCAL_ITEMS || 'true').toLowerCase() !== 'false';
+const DETAIL_LINK_ENRICH_LIMIT = Math.max(0, Number(process.env.DETAIL_LINK_ENRICH_LIMIT || 80));
 
 function absUrl(href, base) { if (!href) return null; try { return new URL(href, base).toString(); } catch { return null; } }
 function clean(text) { return String(text || '').replace(/\s+/g, ' ').trim(); }
@@ -76,6 +77,69 @@ function safeHost(url) {
   try { return new URL(url).hostname; } catch { return ''; }
 }
 
+function imdbIdFromUrl(value) {
+  return String(value || '').match(/\/title\/(tt\d{6,12})/i)?.[1] || null;
+}
+
+function isCsfdUrl(url) {
+  return /(^|\.)csfd\.(cz|sk)$/i.test(safeHost(url));
+}
+
+function isImdbUrl(url) {
+  return /(^|\.)imdb\.com$/i.test(safeHost(url)) && /\/title\/tt\d+/i.test(url);
+}
+
+function uniqueStrings(values) {
+  return [...new Set((values || []).filter(Boolean))];
+}
+
+function extractExternalIdsFromDetailHtml(html, detailUrl) {
+  const raw = String(html || '');
+  const $ = cheerio.load(raw);
+  const links = $('a').map((_j, a) => absUrl($(a).attr('href'), detailUrl)).get().filter(Boolean);
+  const csfdUrl = links.find(isCsfdUrl) || null;
+  const imdbUrl = links.find(isImdbUrl) || null;
+  const imdbId = imdbIdFromUrl(imdbUrl) || raw.match(/tt\d{6,12}/i)?.[0] || null;
+
+  return { csfdUrl, imdbId, links };
+}
+
+async function enrichItemsFromDetailPages(items, { limit = DETAIL_LINK_ENRICH_LIMIT } = {}) {
+  if (!limit) return items;
+
+  let checked = 0;
+  let enriched = 0;
+
+  for (const item of items) {
+    if (checked >= limit) break;
+    if (!item?.detailUrl || (item.csfdUrl && item.imdbId)) continue;
+    if (!/(^|\.)filmovenovinky\.sk$/i.test(safeHost(item.detailUrl))) continue;
+
+    checked += 1;
+    try {
+      const { data } = await getWithRetry(item.detailUrl, { headers: { 'User-Agent': UA } });
+      const found = extractExternalIdsFromDetailHtml(data, item.detailUrl);
+      let changed = false;
+
+      if (found.csfdUrl && !item.csfdUrl) {
+        item.csfdUrl = found.csfdUrl;
+        changed = true;
+      }
+      if (found.imdbId && !item.imdbId) {
+        item.imdbId = found.imdbId;
+        changed = true;
+      }
+      if (found.links.length) item.links = uniqueStrings([...(item.links || []), ...found.links]);
+
+      if (changed) enriched += 1;
+    } catch (error) {
+      console.warn('[scrape] detail link enrichment failed:', item.name, error.message);
+    }
+  }
+
+  console.log(`[scrape] detail link enrichment checked=${checked} enriched=${enriched}`);
+  return items;
+}
 
 function isProbablyNotMovieLine(text) {
   const t = clean(text).toLowerCase();
@@ -177,6 +241,7 @@ function makeMovieItemFromText(text, currentDate, sourceUrl = MOVIES_SOURCE_URL,
     sourceUrl,
     detailUrl: null,
     csfdUrl: null,
+    imdbId: null,
     links: []
   };
   item.key = itemKey(item);
@@ -185,11 +250,13 @@ function makeMovieItemFromText(text, currentDate, sourceUrl = MOVIES_SOURCE_URL,
 
 function makeMovieItem($, el, text, currentDate) {
   const links = extractLinks($, el, MOVIES_SOURCE_URL);
-  const csfdUrl = links.find(href => /(^|\.)csfd\.(cz|sk)/i.test(safeHost(href))) || null;
-  const detailUrl = links.find(href => !/(^|\.)csfd\.(cz|sk)/i.test(safeHost(href))) || null;
+  const csfdUrl = links.find(isCsfdUrl) || null;
+  const imdbUrl = links.find(isImdbUrl) || null;
+  const detailUrl = links.find(href => !isCsfdUrl(href) && !isImdbUrl(href)) || null;
   const item = makeMovieItemFromText(text, currentDate, MOVIES_SOURCE_URL, 'movie');
   if (!item) return null;
   item.csfdUrl = csfdUrl;
+  item.imdbId = imdbIdFromUrl(imdbUrl);
   item.detailUrl = detailUrl;
   item.links = links;
   return item;
@@ -252,6 +319,7 @@ export async function scrapeMovies(maxItems = 1000) {
   }
 
   items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));
+  items = await enrichItemsFromDetailPages(items);
   const sourceHash = crypto.createHash('sha1').update(items.map(i => i.key).join('|') || raw).digest('hex');
   console.log('[scrape] movies items=', items.length, 'mode=', mode);
   return { sourceUrl: MOVIES_SOURCE_URL, sourceHash, items };
@@ -277,7 +345,7 @@ export async function scrapeSeries(maxItems = 40) {
 
       const date = parseDate(text) || today();
       const parts = parseTitleParts(title, 'series');
-      const item = { titleRaw: title, ...parts, type: 'series', dateAdded: date, sourceUrl: SERIES_SOURCE_URL, detailUrl: href, csfdUrl: null, links: href ? [href] : [] };
+      const item = { titleRaw: title, ...parts, type: 'series', dateAdded: date, sourceUrl: SERIES_SOURCE_URL, detailUrl: href, csfdUrl: null, imdbId: null, links: href ? [href] : [] };
       item.key = itemKey(item);
       items.push(item);
     });
