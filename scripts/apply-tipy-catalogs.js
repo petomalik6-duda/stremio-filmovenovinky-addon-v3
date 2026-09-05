@@ -3,78 +3,58 @@ import fs from 'fs';
 function read(file) { return fs.readFileSync(file, 'utf8'); }
 function write(file, content) { fs.writeFileSync(file, content); }
 
-function replaceRegex(content, regex, replacement, label) {
-  const next = content.replace(regex, replacement);
-  if (next === content) throw new Error('No change for ' + label);
-  return next;
+function replaceRequired(content, before, after, label) {
+  if (!content.includes(before)) throw new Error(`Missing marker for ${label}`);
+  return content.replace(before, after);
 }
 
 function patchScrape() {
   const file = 'src/scrape.js';
   let src = read(file);
 
-  // Tipy musia zostať samostatné položky aj keď rovnaký film existuje v hlavnom
-  // katalógu noviniek. Inak sa zlúčia a zdedia dátum/poradie z hlavnej stránky.
-  if (!src.includes('item.key = `tips|${itemKey(item)}`;')) {
-    const re = /function createTipItem\([\s\S]*?\n\}\n\nfunction parseTextList/;
-    const block = src.match(re)?.[0];
-    if (!block) throw new Error('createTipItem block not found');
-    const patched = block.replace(
-      '  item.key = itemKey(item);\n  return item;\n}\n\nfunction parseTextList',
-      '  item.key = `tips|${itemKey(item)}`;\n  return item;\n}\n\nfunction parseTextList'
-    );
-    if (patched === block) throw new Error('createTipItem key marker not found');
-    src = src.replace(block, patched);
+  const createStart = src.indexOf('function createTipItem(');
+  const parseTextStart = src.indexOf('\nfunction parseTextList', createStart);
+  if (createStart < 0 || parseTextStart < 0) throw new Error('createTipItem block not found');
+
+  let block = src.slice(createStart, parseTextStart);
+
+  if (!block.includes('const itemType = ratings.isSeries')) {
+    const ratingsStart = block.indexOf('  const ratings = parseTipRatings(ratingText);');
+    const itemEndMarker = '  if (!item) return null;';
+    const itemEnd = block.indexOf(itemEndMarker, ratingsStart);
+    if (ratingsStart < 0 || itemEnd < 0) throw new Error('createTipItem rating/movie-only block not found');
+
+    const replacement = [
+      '  const ratings = parseTipRatings(ratingText);',
+      "  const itemType = ratings.isSeries || /\\b(tv seri[aá]l|seri[aá]l|s[eé]ria)\\b/i.test(`${cleanTitleText} ${ratingText}`)",
+      "    ? 'series'",
+      "    : 'movie';",
+      '',
+      "  const parseLang = ratings.lang === 'TIT' ? 'CZ' : (ratings.lang || 'CZ/SK');",
+      '  const item = makeMovieItemFromText(`${cleanTitleText} (${parseLang})`, currentDate, TIPS_SOURCE_URL, itemType);',
+      '  if (!item) return null;',
+      '  item.type = itemType;'
+    ].join('\n');
+
+    block = block.slice(0, ratingsStart) + replacement + block.slice(itemEnd + itemEndMarker.length);
   }
 
-  const mergeFn = `function mergeCatalogItems(items) {
-  const byKey = new Map();
-
-  for (const item of items || []) {
-    if (!item) continue;
-
-    // Používame presný item.key. Tipy majú prefix tips|..., takže sa nezlúčia
-    // s rovnakým filmom z hlavného CZ/SK katalógu a zachovajú si vlastné poradie.
-    const key = item.key || itemKey(item);
-    const existing = byKey.get(key);
-
-    if (!existing) {
-      byKey.set(key, { ...item, key, catalogIds: uniqueStrings(item.catalogIds || ['filmovenovinky-filmy']) });
-      continue;
-    }
-
-    existing.catalogIds = uniqueStrings([...(existing.catalogIds || []), ...(item.catalogIds || [])]);
-    existing.links = uniqueStrings([...(existing.links || []), ...(item.links || [])]);
-    existing.detailUrl = existing.detailUrl || item.detailUrl || null;
-    existing.csfdUrl = existing.csfdUrl || item.csfdUrl || null;
-    existing.imdbId = existing.imdbId || item.imdbId || null;
-    existing.tmdbId = existing.tmdbId || item.tmdbId || null;
-    existing.tipGenre = existing.tipGenre || item.tipGenre || null;
-    existing.tipImdbRating = existing.tipImdbRating ?? item.tipImdbRating ?? null;
-    existing.tipCsfdPercent = existing.tipCsfdPercent ?? item.tipCsfdPercent ?? null;
-    existing.tipAvailability = existing.tipAvailability || item.tipAvailability || null;
-    existing.sourcePage = existing.sourcePage || item.sourcePage || null;
-    existing.titleRaw = existing.titleRaw || item.titleRaw;
-    existing.order = Number.isFinite(Number(existing.order)) ? Number(existing.order) : item.order;
-    existing.key = key;
+  if (block.includes("  item.catalogIds = ['filmovenovinky-tipy'];")) {
+    block = block.replace(
+      "  item.catalogIds = ['filmovenovinky-tipy'];",
+      "  item.catalogIds = itemType === 'series' ? ['filmovenovinky-tipy-serialy'] : ['filmovenovinky-tipy'];"
+    );
   }
 
-  return [...byKey.values()].map((item, index) => ({
-    ...item,
-    order: Number.isFinite(Number(item.order)) ? Number(item.order) : index,
-    key: item.key || itemKey(item)
-  }));
-}
+  if (!block.includes("filmovenovinky-tipy-serialy") || !block.includes('item.type = itemType')) {
+    throw new Error('createTipItem series patch failed');
+  }
 
-export async function scrapeFilmovenovinky`;
+  src = src.slice(0, createStart) + block + src.slice(parseTextStart);
 
-  if (!src.includes('Používame presný item.key')) {
-    src = replaceRegex(
-      src,
-      /function mergeCatalogItems\(items\) \{[\s\S]*?\n\}\n\nexport async function scrapeFilmovenovinky/,
-      mergeFn,
-      'mergeCatalogItems exact-key split'
-    );
+  const forcedMovieMap = "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, type: 'movie', order: i }));";
+  if (src.includes(forcedMovieMap)) {
+    src = src.replace(forcedMovieMap, "  items = unique(items).slice(0, maxItems).map((x, i) => ({ ...x, order: i }));");
   }
 
   write(file, src);
@@ -84,110 +64,123 @@ function patchCatalog() {
   const file = 'src/catalog.js';
   let src = read(file);
 
-  src = src.replace(/const BEST_IMDB_MIN = Number\(process\.env\.BEST_IMDB_MIN \|\| [0-9.]+\);/, "const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 7.2);");
-  src = src.replace(/const BEST_CSFD_MIN = Number\(process\.env\.BEST_CSFD_MIN \|\| [0-9.]+\);/, "const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 78);");
+  const start = src.indexOf('export function filterCatalog(metas, id, type) {');
+  if (start < 0) throw new Error('filterCatalog not found');
 
-  if (!src.includes('sourceOrder: Number.isFinite(Number(item.order))')) {
-    src = src.replace(
-      '      titleRaw: item.titleRaw,\n      // Stabilný alias',
-      '      titleRaw: item.titleRaw,\n      sourceOrder: Number.isFinite(Number(item.order)) ? Number(item.order) : null,\n      // Stabilný alias'
+  const replacement = `export function filterCatalog(metas, id, type) {
+  if (!['movie', 'series'].includes(type)) return [];
+
+  let arr = [...metas].filter(m => m.type === type).filter(looksLikeRealMovieMeta);
+
+  if (id === 'filmovenovinky-filmy') {
+    if (type !== 'movie') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-filmy'));
+  } else if (id === 'filmovenovinky-tipy') {
+    if (type !== 'movie') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy'));
+  } else if (id === 'filmovenovinky-tipy-serialy') {
+    if (type !== 'series') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy-serialy'));
+  } else if (id === 'filmovenovinky-najlepsie') {
+    if (type !== 'movie') return [];
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(isBestRatedTip);
+  } else {
+    return [];
+  }
+
+  if (HIDE_UNMATCHED_ITEMS) {
+    arr = arr.filter(m =>
+      Boolean(m._addon?.tmdbId) ||
+      Boolean(m._addon?.imdbId) ||
+      Boolean(m._addon?.csfdUrl) ||
+      (typeof m.id === 'string' && m.id.startsWith('tt'))
     );
   }
 
-  if (!src.includes('meta?._addon?.sourceOrder')) {
-    src = src.replace(
-      '  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;\n\n  // Staršie cache',
-      `  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;
-  const itemOrder = Number.isFinite(Number(item?.order)) ? Number(item.order) : null;
-  const metaOrder = Number.isFinite(Number(meta?._addon?.sourceOrder)) ? Number(meta._addon.sourceOrder) : null;
-  if (itemOrder !== metaOrder) return true;
-
-  // Staršie cache`
-    );
-  }
-
-  const sortBlock = `function sourceOrder(meta) {
-  const n = Number(meta?._addon?.sourceOrder);
-  return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
+  const sortFn = id === 'filmovenovinky-najlepsie'
+    ? sortBestTipsByRating
+    : ((id === 'filmovenovinky-tipy' || id === 'filmovenovinky-tipy-serialy') ? sortTipsByPageOrder : sortByDateThenOrder);
+  return arr.sort(sortFn);
 }
+`;
 
-function compareDatesDesc(a, b) {
-  return String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
-}
-
-function sortByDateThenOrder(a, b) {
-  const byDate = compareDatesDesc(a, b);
-  if (byDate) return byDate;
-  const byOrder = sourceOrder(a) - sourceOrder(b);
-  if (Number.isFinite(byOrder) && byOrder) return byOrder;
-  return String(a.name || '').localeCompare(String(b.name || ''), 'sk');
-}
-
-function sortTipsByPageOrder(a, b) {
-  const byOrder = sourceOrder(a) - sourceOrder(b);
-  if (Number.isFinite(byOrder) && byOrder) return byOrder;
-  return sortByDateThenOrder(a, b);
-}
-
-function sortBestTipsByRating(a, b) {
-  const byScore = tipScore(b) - tipScore(a);
-  if (byScore) return byScore;
-
-  const byCsfd = tipCsfd(b) - tipCsfd(a);
-  if (byCsfd) return byCsfd;
-
-  const byImdb = tipImdb(b) - tipImdb(a);
-  if (byImdb) return byImdb;
-
-  return sortTipsByPageOrder(a, b);
-}
-
-export function filterCatalog`;
-
-  if (!src.includes('function sortTipsByPageOrder')) {
-    src = replaceRegex(
-      src,
-      /function sortTipsByDate\(a, b\) \{[\s\S]*?\n\}\n\nfunction sortBestTipsByRating\(a, b\) \{[\s\S]*?\n\}\n\nexport function filterCatalog/,
-      sortBlock,
-      'catalog sort block with sourceOrder'
-    );
-  }
-
-  src = src.replace(
-    "const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : sortTipsByDate;",
-    "const sortFn = id === 'filmovenovinky-najlepsie' ? sortBestTipsByRating : (id === 'filmovenovinky-tipy' ? sortTipsByPageOrder : sortByDateThenOrder);"
-  );
-
+  src = src.slice(0, start) + replacement;
   write(file, src);
 }
 
-function patchPublicMeta() {
-  const file = 'src/public-meta.js';
+function patchServer() {
+  const file = 'server.js';
   let src = read(file);
 
-  if (!src.includes('function placeholderPoster(name)')) {
-    src = src.replace(
-      'function asString(value) {\n',
-      "function placeholderPoster(name) {\n  return `https://placehold.co/500x750/222222/ffffff.png?text=${encodeURIComponent(String(name || 'CZ/SK').slice(0, 35))}`;\n}\n\nfunction asString(value) {\n"
-    );
+  const catalogsStart = src.indexOf('const catalogs = [');
+  const manifestMarker = '\n\nconst manifest = {';
+  const manifestStart = src.indexOf(manifestMarker, catalogsStart);
+  if (catalogsStart < 0 || manifestStart < 0) throw new Error('server catalogs block not found');
+
+  const catalogs = `const catalogs = [
+  {
+    type: 'movie',
+    id: 'filmovenovinky-filmy',
+    name: 'FilmovéNovinky – CZ/SK filmy',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'movie',
+    id: 'filmovenovinky-tipy',
+    name: 'FilmovéNovinky – Tipy na film',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'series',
+    id: 'filmovenovinky-tipy-serialy',
+    name: 'FilmovéNovinky – Tipy na seriál',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'movie',
+    id: 'filmovenovinky-najlepsie',
+    name: 'FilmovéNovinky – Najlepšie hodnotené',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
   }
+];`;
 
-  if (!src.includes('Serve-time fallback so older cache entries')) {
-    const marker = '  // First strip internal/non-standard cache fields and normalize strict types.\n  const safeMeta = cleanKnownMetaFields(meta);\n';
-    if (!src.includes(marker)) throw new Error('public-meta insertion marker not found');
-    src = src.replace(
-      marker,
-      `  // First strip internal/non-standard cache fields and normalize strict types.
-  const safeMeta = cleanKnownMetaFields(meta);
+  src = src.slice(0, catalogsStart) + catalogs + src.slice(manifestStart);
 
-  // Serve-time fallback so older cache entries and newly added tip items never
-  // render as blank cards in Stremio/Nuvio/Fusion.
-  const displayName = safeMeta.name || meta.name || 'CZ/SK';
-  if (!safeMeta.poster) safeMeta.poster = placeholderPoster(displayName);
-  if (!safeMeta.posterShape) safeMeta.posterShape = 'poster';
-  if (!safeMeta.background) safeMeta.background = safeMeta.poster;
-`
-    );
+  src = src.replace("const ADDON_VERSION = process.env.npm_package_version || '3.7.12';", "const ADDON_VERSION = process.env.npm_package_version || '3.7.16';");
+  src = src.replace("  name: 'FilmovéNovinky CZ/SK filmy',", "  name: 'FilmovéNovinky CZ/SK filmy a seriály',");
+  src = src.replace(
+    "  description: 'Jeden katalóg CZ/SK dabovaných filmov z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',",
+    "  description: 'CZ/SK filmy a tipy na filmy aj seriály z FilmovéNovinky.sk. Cache sa ukladá do GitHub repozitára.',"
+  );
+  src = src.replace(
+    "    { name: 'meta', types: ['movie'], idPrefixes: ['tt', 'filmovenovinky:'] }",
+    "    { name: 'meta', types: ['movie', 'series'], idPrefixes: ['tt', 'filmovenovinky:'] }"
+  );
+  src = src.replace("  types: ['movie'],", "  types: ['movie', 'series'],");
+  src = src.replace(
+    "function typeOk(type) {\n  return type === 'movie';\n}",
+    "function typeOk(type) {\n  return type === 'movie' || type === 'series';\n}"
+  );
+  src = src.replace('<h1>FilmovéNovinky CZ/SK filmy</h1>', '<h1>FilmovéNovinky CZ/SK filmy a seriály</h1>');
+  src = src.replace(
+    '<p>Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené</p>',
+    '<p>Katalógy: CZ/SK filmy, Tipy na film, Tipy na seriál, Najlepšie hodnotené</p>'
+  );
+
+  if (!src.includes("id: 'filmovenovinky-tipy-serialy'") || !src.includes("types: ['movie', 'series']")) {
+    throw new Error('server series manifest patch failed');
   }
 
   write(file, src);
@@ -196,12 +189,13 @@ function patchPublicMeta() {
 function patchPackage() {
   const file = 'package.json';
   const pkg = JSON.parse(read(file));
-  pkg.version = '3.7.15';
+  pkg.version = '3.7.16';
+  pkg.description = 'FilmoveNovinky addon with CZ/SK latest movies plus separate movie and series tip catalogs, metadata overrides, diagnostics and strict Stremio/Nuvio/Fusion metadata normalization.';
   write(file, JSON.stringify(pkg, null, 2) + '\n');
 }
 
 patchScrape();
 patchCatalog();
-patchPublicMeta();
+patchServer();
 patchPackage();
-console.log('Tip catalog source-order separation patch applied.');
+console.log('Tip movie + series catalog patch applied.');
