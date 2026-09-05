@@ -11,6 +11,15 @@ on:
   schedule:
     - cron: "20 3 * * *"
 
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "package*.json"
+      - ".github/workflows/refresh-cache.yml"
+
 permissions:
   contents: write
 
