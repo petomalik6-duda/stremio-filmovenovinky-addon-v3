@@ -18,13 +18,31 @@ const AUTO_REFRESH = String(process.env.AUTO_REFRESH || 'false').toLowerCase() =
 const REFRESH_ON_START = String(process.env.REFRESH_ON_START || 'false').toLowerCase() === 'true';
 const AUTO_REFRESH_MINUTES = Math.max(15, Number(process.env.AUTO_REFRESH_MINUTES || 360));
 const ADDON_ID = process.env.ADDON_ID || 'sk.filmovenovinky.filmy.only';
-const ADDON_VERSION = process.env.npm_package_version || '3.7.7';
+const ADDON_VERSION = process.env.npm_package_version || '3.7.8';
 
 const catalogs = [
   {
     type: 'movie',
     id: 'filmovenovinky-filmy',
     name: 'FilmovéNovinky – CZ/SK filmy',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'movie',
+    id: 'filmovenovinky-tipy',
+    name: 'FilmovéNovinky – Tipy na film',
+    extra: [
+      { name: 'skip', isRequired: false },
+      { name: 'search', isRequired: false }
+    ]
+  },
+  {
+    type: 'movie',
+    id: 'filmovenovinky-najlepsie',
+    name: 'FilmovéNovinky – Najlepšie hodnotené',
     extra: [
       { name: 'skip', isRequired: false },
       { name: 'search', isRequired: false }
@@ -145,6 +163,7 @@ app.get('/', (_req, res) => {
         <p>Health: <a href="/health">/health</a></p>
         <p>Stats: <a href="/stats">/stats</a></p>
         <p>Refresh async: <a href="/refresh">/refresh</a></p>
+        <p>Katalógy: CZ/SK filmy, Tipy na film, Najlepšie hodnotené</p>
         <p>Debug find: <a href="/debug/find?q=carodejnik">/debug/find?q=carodejnik</a></p>
         <p>Debug unmatched: <a href="/debug/unmatched">/debug/unmatched</a></p>
         <p>Debug latest: <a href="/debug/latest">/debug/latest</a></p>

@@ -1,7 +1,7 @@
 {
   "name": "stremio-filmovenovinky-filmy-only",
-  "version": "3.7.7",
-  "description": "FilmoveNovinky movie-only addon with metadata downgrade protection, debug diagnostics, detail-page metadata extraction and strict Stremio/Nuvio/Fusion metadata normalization.",
+  "version": "3.7.8",
+  "description": "FilmoveNovinky movie-only addon with CZ/SK latest movies, tip catalogs, metadata overrides, debug diagnostics and strict Stremio/Nuvio/Fusion metadata normalization.",
   "type": "module",
   "main": "server.js",
   "scripts": {

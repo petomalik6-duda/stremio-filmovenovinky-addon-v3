@@ -15,8 +15,10 @@ const DETAIL_REPAIR_LIMIT = Number(process.env.DETAIL_REPAIR_LIMIT || 100);
 const REFRESH_LOCK_TIMEOUT_MS = Number(process.env.REFRESH_LOCK_TIMEOUT_MS || 180000);
 const HIDE_UNMATCHED_ITEMS = String(process.env.HIDE_UNMATCHED_ITEMS || 'false').toLowerCase() === 'true';
 const STRICT_MOVIE_FILTER = String(process.env.STRICT_MOVIE_FILTER || 'true').toLowerCase() !== 'false';
-const MATCH_VERSION = 4;
+const MATCH_VERSION = 5;
 const CACHE_MATCH_YEAR_TOLERANCE = Number(process.env.CACHE_MATCH_YEAR_TOLERANCE || process.env.TMDB_YEAR_TOLERANCE || 2);
+const BEST_IMDB_MIN = Number(process.env.BEST_IMDB_MIN || 6.5);
+const BEST_CSFD_MIN = Number(process.env.BEST_CSFD_MIN || 65);
 
 let cache = { at: 0, metas: [], byId: new Map(), items: [], sourceHash: '', lastError: null };
 let running = null;
@@ -74,8 +76,8 @@ function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
     releaseInfo: item.year || tmdb?.releaseInfo || undefined,
     year: Number(item.year || tmdb?.releaseInfo) || undefined,
     runtime: tmdb?.runtime,
-    genres: [...new Set([...(tmdb?.genres || []), ...(csfd.genres || []), item.lang].filter(Boolean))],
-    imdbRating: tmdb?.imdbRating,
+    genres: [...new Set([...(tmdb?.genres || []), ...(csfd.genres || []), item.tipGenre, item.lang].filter(Boolean))],
+    imdbRating: tmdb?.imdbRating || item.tipImdbRating,
     director: tmdb?.director,
     cast: tmdb?.cast,
     links,
@@ -87,6 +89,12 @@ function toMeta(item, csfd = {}, tmdb = null, extraAddon = {}) {
       key: item.key || itemKey(item),
       dateAdded: item.dateAdded,
       lang: item.lang,
+      catalogIds: Array.isArray(item.catalogIds) && item.catalogIds.length ? item.catalogIds : ['filmovenovinky-filmy'],
+      sourcePage: item.sourcePage || null,
+      tipGenre: item.tipGenre || null,
+      tipImdbRating: item.tipImdbRating ?? null,
+      tipCsfdPercent: item.tipCsfdPercent ?? null,
+      tipAvailability: item.tipAvailability || null,
       csfdUrl: item.csfdUrl || null,
       imdbId,
       tmdbId: tmdbId || null,
@@ -249,6 +257,11 @@ async function enrichItem(item, existing = null, { fastKnownLookup = true } = {}
   } : {});
 }
 
+function sortedCatalogIds(value) {
+  const ids = Array.isArray(value) && value.length ? value : ['filmovenovinky-filmy'];
+  return [...new Set(ids.filter(Boolean))].sort();
+}
+
 function metaNeedsRematch(item, meta) {
   if (!meta) return true;
   // Overené source corrections sa migráciou týkajú iba konkrétnych ČSFD ID alebo
@@ -260,6 +273,12 @@ function metaNeedsRematch(item, meta) {
   if (item?.csfdUrl && meta?._addon?.csfdUrl !== item.csfdUrl) return true;
   if (item?.imdbId && meta?._addon?.imdbId !== item.imdbId) return true;
   if (item?.tmdbId && Number(meta?._addon?.tmdbId || 0) !== Number(item.tmdbId)) return true;
+
+  const itemCatalogIds = sortedCatalogIds(item?.catalogIds);
+  const metaCatalogIds = sortedCatalogIds(meta?._addon?.catalogIds);
+  if (itemCatalogIds.join('|') !== metaCatalogIds.join('|')) return true;
+  if ((item?.tipImdbRating ?? null) !== (meta?._addon?.tipImdbRating ?? null)) return true;
+  if ((item?.tipCsfdPercent ?? null) !== (meta?._addon?.tipCsfdPercent ?? null)) return true;
 
   // Staršie cache vznikli pred opravou matcheru a musia sa postupne prepočítať.
   if (Number(meta._addon?.matchVersion || 0) < MATCH_VERSION) return true;
@@ -623,10 +642,49 @@ function looksLikeRealMovieMeta(meta) {
   return true;
 }
 
+function catalogIdsForMeta(meta) {
+  return Array.isArray(meta?._addon?.catalogIds) && meta._addon.catalogIds.length
+    ? meta._addon.catalogIds
+    : ['filmovenovinky-filmy'];
+}
+
+function hasCatalog(meta, catalogId) {
+  return catalogIdsForMeta(meta).includes(catalogId);
+}
+
+function numeric(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function isBestRatedTip(meta) {
+  const imdb = numeric(meta?._addon?.tipImdbRating || meta?.imdbRating);
+  const csfd = numeric(meta?._addon?.tipCsfdPercent);
+  return imdb >= BEST_IMDB_MIN || csfd >= BEST_CSFD_MIN;
+}
+
+function sortByDateThenRating(a, b) {
+  const byDate = String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || ''));
+  if (byDate) return byDate;
+  const bScore = Math.max(numeric(b?._addon?.tipCsfdPercent) / 10, numeric(b?._addon?.tipImdbRating || b?.imdbRating));
+  const aScore = Math.max(numeric(a?._addon?.tipCsfdPercent) / 10, numeric(a?._addon?.tipImdbRating || a?.imdbRating));
+  return bScore - aScore;
+}
+
 export function filterCatalog(metas, id, type) {
+  if (type !== 'movie') return [];
+
   let arr = [...metas].filter(m => m.type === 'movie').filter(looksLikeRealMovieMeta);
 
-  if (id !== 'filmovenovinky-filmy') return [];
+  if (id === 'filmovenovinky-filmy') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-filmy'));
+  } else if (id === 'filmovenovinky-tipy') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy'));
+  } else if (id === 'filmovenovinky-najlepsie') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(isBestRatedTip);
+  } else {
+    return [];
+  }
 
   if (HIDE_UNMATCHED_ITEMS) {
     arr = arr.filter(m =>
@@ -637,5 +695,5 @@ export function filterCatalog(metas, id, type) {
     );
   }
 
-  return arr.sort((a, b) => String(b._addon?.dateAdded || '').localeCompare(String(a._addon?.dateAdded || '')));
+  return arr.sort(sortByDateThenRating);
 }
