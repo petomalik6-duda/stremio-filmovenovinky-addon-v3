@@ -1,5 +1,5 @@
 {
-  "at": 1788594042800,
+  "at": 1788596536556,
   "sourceHash": "f010e6d012b4b451b79e7d7ee90e28c03cdad81c",
   "items": [
     {
@@ -46,7 +46,7 @@
       "dateAdded": "2026-09-04",
       "sourceUrl": "https://www.filmovenovinky.sk/nove-filmy/nove-filmy-s-dabingom-cz-sk-zistite-co-pribudlo-dnes",
       "detailUrl": "https://www.filmovenovinky.sk/dramy/carodejnik-z-kremla-the-wizard-of-the-kremlin-2025-jude-law-paul-dano",
-      "csfdUrl": null,
+      "csfdUrl": "https://www.csfd.sk/film/1700848-carodejnik-z-kremla/",
       "links": [
         "https://www.filmovenovinky.sk/dramy/carodejnik-z-kremla-the-wizard-of-the-kremlin-2025-jude-law-paul-dano"
       ],
@@ -14660,18 +14660,54 @@
       }
     },
     {
-      "id": "filmovenovinky:bW92aWUtxIxhcm9kZWpuw61rIHogS3JlbcS-YS0yMDI1LUNa",
+      "id": "tt32386654",
       "type": "movie",
       "name": "Čarodejník z Kremľa",
-      "poster": "https://placehold.co/500x750?text=%C4%8Carodejn%C3%ADk%20z%20Krem%C4%BEa",
-      "background": "https://placehold.co/500x750?text=%C4%8Carodejn%C3%ADk%20z%20Krem%C4%BEa",
-      "description": "Originálny názov: The Wizard of the Kremlin\n\nDabing: CZ\n\nPridané: 2026-09-04",
+      "poster": "https://image.tmdb.org/t/p/w500/1zmwAR7IjU3CMse99mAUVkq6nxc.jpg",
+      "background": "https://image.tmdb.org/t/p/w1280/bDBVzSp24aesVWJBBmWxDcoOSRw.jpg",
+      "description": "Rusko na počátku 90. let. Sovětský svaz se rozpadl a na jeho troskách vzniká nový svět – chaotický, dravý a bez skrupulí. Vadim Baranov, mimořádně bystrý a inteligentní mladík, se z prostředí umění a televizní zábavy nečekaně dostává až do samotného centra moci. Stává se neoficiálním poradcem a architektem veřejného obrazu nenápadného muže z tajných služeb – Vladimira Putina. Baranov ovládá slova, obrazy i iluze. V zákulisí Kremlu vytváří příběhy, které formují novou ruskou realitu. Učí Vladimira, jak mluvit k lidem. Jak nahrazovat pravdu manipulací. Jak proměnit víru v nástroj kontroly. Jediným člověkem, kterého Baranov nedokáže ovládnout, je Ksenia – žena, která mu připomíná, že existuje i jiný život než ten ve stínu Kremlu. Po patnácti letech mlčení Baranov promlouvá. Jeho výpověď odhaluje zákulisí režimu, který pomáhal vybudovat.\n\nOriginálny názov: The Wizard of the Kremlin\n\nDabing: CZ\n\nPridané: 2026-09-04\n\nČSFD: https://www.csfd.sk/film/1700848-carodejnik-z-kremla/\n\nIMDb: tt32386654\n\nTMDB: 1291659",
       "releaseInfo": "2025",
       "year": 2025,
+      "runtime": "136 min",
       "genres": [
+        "Drama",
         "CZ"
       ],
+      "imdbRating": "6.5",
+      "director": [
+        "Olivier Assayas"
+      ],
+      "cast": [
+        "Paul Dano",
+        "Jude Law",
+        "Alicia Vikanderová",
+        "Tom Sturridge",
+        "Will Keen",
+        "Jeffrey Wright",
+        "Andrei Zayats",
+        "Kaspars Kambala"
+      ],
       "links": [
+        {
+          "name": "ČSFD",
+          "category": "Info",
+          "url": "https://www.csfd.sk/film/1700848-carodejnik-z-kremla/"
+        },
+        {
+          "name": "IMDb",
+          "category": "Info",
+          "url": "https://www.imdb.com/title/tt32386654/"
+        },
+        {
+          "name": "TMDB",
+          "category": "Info",
+          "url": "https://www.themoviedb.org/movie/1291659"
+        },
+        {
+          "name": "Trailer",
+          "category": "Video",
+          "url": "https://www.youtube.com/watch?v=AiPY-diYNX4"
+        },
         {
           "name": "FilmovéNovinky",
           "category": "Info",
@@ -14684,20 +14720,22 @@
         }
       ],
       "behaviorHints": {
-        "defaultVideoId": "filmovenovinky:bW92aWUtxIxhcm9kZWpuw61rIHogS3JlbcS-YS0yMDI1LUNa"
+        "defaultVideoId": "tt32386654"
       },
       "_addon": {
         "key": "movie|čarodejník z kremľa|the wizard of the kremlin|2025|cz",
         "dateAdded": "2026-09-04",
         "lang": "CZ",
-        "csfdUrl": null,
-        "imdbId": null,
-        "tmdbId": null,
-        "tmdbYear": null,
+        "csfdUrl": "https://www.csfd.sk/film/1700848-carodejnik-z-kremla/",
+        "imdbId": "tt32386654",
+        "tmdbId": 1291659,
+        "tmdbYear": "2026",
         "matchVersion": 3,
         "sourceType": "movie",
         "titleRaw": "Čarodejník z Kremľa / The Wizard of the Kremlin (2025) (CZ)",
-        "localId": "filmovenovinky:bW92aWUtxIxhcm9kZWpuw61rIHogS3JlbcS-YS0yMDI1LUNa"
+        "localId": "filmovenovinky:bW92aWUtxIxhcm9kZWpuw61rIHogS3JlbcS-YS0yMDI1LUNa",
+        "lookupPath": "verified_csfd_tmdb_override",
+        "sourceOverrideVersion": 2
       }
     },
     {
