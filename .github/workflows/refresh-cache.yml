@@ -55,11 +55,11 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add src/catalog.js package.json
+          git add src/catalog.js src/scrape.js package.json
           if git diff --cached --quiet; then
             echo "No source patch changes"
           else
-            git commit -m "Filter tip catalogs to stream-compatible IDs"
+            git commit -m "Keep tip items separate from main catalog"
             git pull --rebase --autostash origin main
             git push origin main
           fi
