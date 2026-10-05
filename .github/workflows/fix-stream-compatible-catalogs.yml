@@ -1,0 +1,99 @@
+name: Fix stream-compatible catalogs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/fix-stream-compatible-catalogs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Patch stream-compatible catalog filtering
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json, re
+
+          path = Path('src/catalog.js')
+          src = path.read_text(encoding='utf-8')
+
+          if 'function hasStreamCompatibleId(meta)' not in src:
+            marker = "function hasCatalog(meta, catalogId) {\n  return catalogIdsForMeta(meta).includes(catalogId);\n}\n"
+            insert = marker + """
+
+function hasStreamCompatibleId(meta) {
+  const imdb = meta?._addon?.imdbId || (typeof meta?.id === 'string' && /^tt\\d+$/.test(meta.id) ? meta.id : null);
+  return Boolean(imdb && /^tt\\d+$/.test(String(imdb)));
+}
+"""
+            if marker not in src:
+              raise SystemExit('hasCatalog marker not found')
+            src = src.replace(marker, insert)
+
+          old = """  if (id === 'filmovenovinky-filmy') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-filmy'));
+  } else if (id === 'filmovenovinky-tipy') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy'));
+  } else if (id === 'filmovenovinky-tipy-serialy') {
+    arr = arr.filter(m => m.type === 'series').filter(m => hasCatalog(m, 'filmovenovinky-tipy-serialy'));
+  } else if (id === 'filmovenovinky-najlepsie') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(isBestRatedTip);
+  } else {
+    return [];
+  }
+"""
+          new = """  if (id === 'filmovenovinky-filmy') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-filmy'));
+  } else if (id === 'filmovenovinky-tipy') {
+    // Stream addons are normally keyed by IMDb tt ids. Hide local-only tip
+    // entries so users do not see catalog cards that can never find streams.
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(hasStreamCompatibleId);
+  } else if (id === 'filmovenovinky-tipy-serialy') {
+    arr = arr.filter(m => m.type === 'series').filter(m => hasCatalog(m, 'filmovenovinky-tipy-serialy')).filter(hasStreamCompatibleId);
+  } else if (id === 'filmovenovinky-najlepsie') {
+    arr = arr.filter(m => hasCatalog(m, 'filmovenovinky-tipy')).filter(isBestRatedTip).filter(hasStreamCompatibleId);
+  } else {
+    return [];
+  }
+"""
+          if old not in src:
+            raise SystemExit('filterCatalog catalog block not found')
+          src = src.replace(old, new)
+          path.write_text(src, encoding='utf-8')
+
+          pkg_path = Path('package.json')
+          pkg = json.loads(pkg_path.read_text(encoding='utf-8'))
+          pkg['version'] = '3.7.17'
+          pkg_path.write_text(json.dumps(pkg, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Verify syntax
+        run: |
+          node --check src/catalog.js
+          node --check server.js
+
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add src/catalog.js package.json
+          if git diff --cached --quiet; then
+            echo "No source changes"
+            exit 0
+          fi
+          git commit -m "Filter tip catalogs to stream-compatible IDs"
+          git pull --rebase --autostash origin main
+          git push origin main
