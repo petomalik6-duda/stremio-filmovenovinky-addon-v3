@@ -17,6 +17,7 @@ on:
       - main
     paths:
       - "src/**"
+      - "scripts/**"
       - "data/metadata-overrides.json"
       - "package*.json"
       - ".github/workflows/refresh-cache.yml"
@@ -46,6 +47,22 @@ jobs:
 
       - name: Install dependencies
         run: npm install --omit=dev
+
+      - name: Apply stream-compatible catalog filter
+        run: node scripts/apply-stream-compatible-filter.js
+
+      - name: Commit source patch before refresh
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add src/catalog.js package.json
+          if git diff --cached --quiet; then
+            echo "No source patch changes"
+          else
+            git commit -m "Filter tip catalogs to stream-compatible IDs"
+            git pull --rebase --autostash origin main
+            git push origin main
+          fi
 
       - name: Refresh cache with safe repair
         run: npm run refresh-cache-with-safe-repair
