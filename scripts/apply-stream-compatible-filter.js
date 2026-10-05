@@ -57,7 +57,31 @@ if (src.includes(oldBlock)) {
 
 write(file, src);
 
+// Tipy are a separate editorial list. If the same title also appears in
+// the main CZ/SK novinky catalog, it must not merge into the main item,
+// otherwise Tipy inherits the wrong date/order and the list no longer
+// matches FilmovéNovinky.sk. Prefix tip keys to keep them distinct.
+const scrapeFile = 'src/scrape.js';
+let scrape = read(scrapeFile);
+const tipKeyMarker = `  item.key = itemKey(item);
+  return item;
+}
+
+function parseTipsTextList`;
+const tipKeyReplacement = `  item.baseKey = itemKey(item);
+  item.key = 'tips|' + item.baseKey;
+  return item;
+}
+
+function parseTipsTextList`;
+if (scrape.includes(tipKeyMarker)) {
+  scrape = scrape.replace(tipKeyMarker, tipKeyReplacement);
+} else if (!scrape.includes("item.key = 'tips|' + item.baseKey")) {
+  throw new Error('createTipItem key marker not found');
+}
+write(scrapeFile, scrape);
+
 const pkgPath = 'package.json';
 const pkg = JSON.parse(read(pkgPath));
-pkg.version = '3.7.17';
+pkg.version = '3.7.18';
 write(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
