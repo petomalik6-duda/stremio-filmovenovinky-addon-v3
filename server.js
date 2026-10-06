@@ -18,7 +18,7 @@ const AUTO_REFRESH = String(process.env.AUTO_REFRESH || 'false').toLowerCase() =
 const REFRESH_ON_START = String(process.env.REFRESH_ON_START || 'false').toLowerCase() === 'true';
 const AUTO_REFRESH_MINUTES = Math.max(15, Number(process.env.AUTO_REFRESH_MINUTES || 360));
 const ADDON_ID = process.env.ADDON_ID || 'sk.filmovenovinky.filmy.only';
-const ADDON_VERSION = process.env.npm_package_version || '3.7.16';
+const ADDON_VERSION = process.env.npm_package_version || '3.7.17';
 
 const catalogs = [
   {
@@ -67,11 +67,11 @@ const manifest = {
   logo: `${PUBLIC_URL}/logo.png`,
   resources: [
     'catalog',
-    { name: 'meta', types: ['movie', 'series'], idPrefixes: ['tt', 'filmovenovinky:'] }
+    { name: 'meta', types: ['movie', 'series'], idPrefixes: ['tt', 'tmdb:', 'filmovenovinky:'] }
   ],
   types: ['movie', 'series'],
   catalogs,
-  idPrefixes: ['tt', 'filmovenovinky:'],
+  idPrefixes: ['tt', 'tmdb:', 'filmovenovinky:'],
   behaviorHints: { configurable: false }
 };
 
@@ -285,7 +285,6 @@ app.get('/stats', async (_req, res, next) => {
   }
 });
 
-// Rýchly refresh endpoint: odpovie hneď a refresh beží na pozadí.
 app.get('/refresh', async (req, res) => {
   const forceFull = req.query.full === '1' || req.query.full === 'true';
 
@@ -302,7 +301,6 @@ app.get('/refresh', async (req, res) => {
   });
 });
 
-// Blokujúci endpoint len na manuálne testovanie mimo Stremia.
 app.get('/refresh-now', async (req, res, next) => {
   try {
     const forceFull = req.query.full === '1' || req.query.full === 'true';
