@@ -77,10 +77,6 @@ function cleanKnownMetaFields(meta) {
   out.awards = asString(out.awards);
   out.website = asString(out.website);
 
-  // Stremio Meta schema requires director/cast/genres to be arrays of strings.
-  // Older FilmovéNovinky cache stored director as a comma-separated string;
-  // normalize it here so already-generated GitHub cache becomes client-safe
-  // immediately, without requiring a full refresh.
   out.director = asStringArray(out.director, { splitComma: true });
   out.cast = asStringArray(out.cast);
   out.genres = asStringArray(out.genres);
@@ -112,33 +108,36 @@ export function cleanPublicMeta(meta) {
   const addon = meta._addon || {};
   const originalId = meta.id;
   const localId = publicLocalId(meta);
-
-  // First strip internal/non-standard cache fields and normalize strict types.
   const safeMeta = cleanKnownMetaFields(meta);
 
-  // Serve-time fallback so older cache entries and newly added tip items never
-  // render as blank cards in Stremio/Nuvio/Fusion.
   const displayName = safeMeta.name || meta.name || 'CZ/SK';
   if (!safeMeta.poster) safeMeta.poster = placeholderPoster(displayName);
   if (!safeMeta.posterShape) safeMeta.posterShape = 'poster';
   if (!safeMeta.background) safeMeta.background = safeMeta.poster;
 
   if (safeMeta.type === 'movie') {
-    // Cross-client compatibility: stream-only addons are normally registered
-    // for IMDb `tt` ids. Therefore every matched FilmovéNovinky movie must use
-    // its IMDb id as the PUBLIC meta/video id. Our addon still serves the rich
-    // `/meta/movie/tt....json` response, while buildMetaIndex keeps the old
-    // filmovenovinky: id as an alias for clients with stale detail links.
+    // Reference-addon identity model used by Nuvio aggregation:
+    // IMDb first, otherwise TMDB, and only then a local FilmovéNovinky fallback.
     const imdbId = addon.imdbId ||
       (typeof originalId === 'string' && /^tt\d+$/.test(originalId) ? originalId : null);
-    const publicId = imdbId || localId;
+    const rawTmdbId = addon.tmdbId ||
+      (typeof originalId === 'string' && /^tmdb:\d+$/.test(originalId)
+        ? originalId.slice('tmdb:'.length)
+        : null);
+    const tmdbId = rawTmdbId && Number(rawTmdbId) > 0 ? `tmdb:${Number(rawTmdbId)}` : null;
+    const publicId = imdbId || tmdbId || localId;
 
     safeMeta.id = publicId;
-    safeMeta.behaviorHints = { defaultVideoId: String(publicId) };
 
-    // Movies do not need a videos array when the meta id itself is the IMDb
-    // video id. Omitting it also avoids clients interpreting a movie as a
-    // series/episode collection.
+    // Standard tt/tmdb IDs must remain clean so Nuvio can ask every compatible
+    // stream addon for the same video ID. Local-only entries keep their direct hint.
+    if (/^tt\d+$/.test(publicId) || /^tmdb:\d+$/.test(publicId)) {
+      delete safeMeta.behaviorHints;
+    } else {
+      safeMeta.behaviorHints = { defaultVideoId: String(publicId) };
+    }
+
+    // Movies use meta.id itself as the playback identity; no embedded videos.
     delete safeMeta.videos;
   }
 
