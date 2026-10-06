@@ -14,9 +14,15 @@ export function buildMetaIndex(metas = [], items = []) {
     if (!meta?.id) continue;
     index.set(meta.id, meta);
 
-    // Klient môže mať ešte v cache pôvodné lokálne ID z času, keď sa IMDb/TMDB
-    // nepodarilo nájsť. Po neskoršom enrichmente sa ID zmení na tt..., ale starý
-    // detail request musí stále fungovať.
+    // Always index known shared external identities as aliases too. This lets
+    // serve-time public IDs switch from filmovenovinky: to tmdb:/tt immediately,
+    // even when the persisted cache was generated before the identity change.
+    const imdbId = meta?._addon?.imdbId;
+    if (imdbId && /^tt\d+$/.test(String(imdbId))) index.set(String(imdbId), meta);
+
+    const tmdbId = Number(meta?._addon?.tmdbId || 0);
+    if (tmdbId > 0) index.set(`tmdb:${tmdbId}`, meta);
+
     const explicitLocalId = meta?._addon?.localId;
     if (explicitLocalId) index.set(explicitLocalId, meta);
 
