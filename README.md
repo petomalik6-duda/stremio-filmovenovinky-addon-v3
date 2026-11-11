@@ -91,3 +91,7 @@ Oprava nesprávne načítaných filmov/remakov:
 - `/stats` ukazuje `matchVersion` a `pendingRematch`.
 
 Po prvom nasadení v3.6.0 odporúčame spustiť GitHub Actions refresh s `force_full=true`.
+
+## Manual refresh
+
+Use POST /refresh (background) or POST /refresh-now (wait for completion) with an Authorization: Bearer header matching the REFRESH_TOKEN environment variable. Without REFRESH_TOKEN manual refresh is disabled. GET does not start a refresh. Scheduled GitHub cache updates and local CLI refresh do not need this token.
