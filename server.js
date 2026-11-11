@@ -1,3 +1,4 @@
+import { authorizeRefresh } from './src/refresh-auth.js';
 import 'dotenv/config';
 import express from 'express';
 import {
@@ -171,7 +172,7 @@ app.get('/', (_req, res) => {
         <p>Manifest: <a href="/manifest.json">/manifest.json</a></p>
         <p>Health: <a href="/health">/health</a></p>
         <p>Stats: <a href="/stats">/stats</a></p>
-        <p>Refresh async: <a href="/refresh">/refresh</a></p>
+        <p>Manual refresh: authenticated POST /refresh. Scheduled refresh remains automatic.</p>
         <p>Katalógy: CZ/SK filmy, Tipy na film, Tipy na seriál, Najlepšie hodnotené</p>
         <p>Debug find: <a href="/debug/find?q=carodejnik">/debug/find?q=carodejnik</a></p>
         <p>Debug unmatched: <a href="/debug/unmatched">/debug/unmatched</a></p>
@@ -285,7 +286,7 @@ app.get('/stats', async (_req, res, next) => {
   }
 });
 
-app.get('/refresh', async (req, res) => {
+app.post('/refresh', authorizeRefresh, async (req, res) => {
   const forceFull = req.query.full === '1' || req.query.full === 'true';
 
   if (!isRefreshRunning()) {
@@ -301,7 +302,7 @@ app.get('/refresh', async (req, res) => {
   });
 });
 
-app.get('/refresh-now', async (req, res, next) => {
+app.post('/refresh-now', authorizeRefresh, async (req, res, next) => {
   try {
     const forceFull = req.query.full === '1' || req.query.full === 'true';
     const metas = await refreshCache({ forceFull });
