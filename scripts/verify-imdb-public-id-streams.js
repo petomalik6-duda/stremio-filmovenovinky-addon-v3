@@ -23,7 +23,7 @@ const mothers = cleanPublicMeta(richMovie({
   year: '2023'
 }));
 assert.equal(mothers.id, 'tt20911974');
-assert.equal(mothers.behaviorHints.defaultVideoId, 'tt20911974');
+assert.equal(mothers.behaviorHints, undefined);
 assert.equal(mothers.videos, undefined);
 
 const addition = cleanPublicMeta(richMovie({
@@ -33,7 +33,7 @@ const addition = cleanPublicMeta(richMovie({
   year: '2024'
 }));
 assert.equal(addition.id, 'tt27722524');
-assert.equal(addition.behaviorHints.defaultVideoId, 'tt27722524');
+assert.equal(addition.behaviorHints, undefined);
 assert.equal(addition.videos, undefined);
 
 const bodlinka = cleanPublicMeta(richMovie({
@@ -43,7 +43,7 @@ const bodlinka = cleanPublicMeta(richMovie({
   year: '2025'
 }));
 assert.equal(bodlinka.id, 'tt6930962');
-assert.equal(bodlinka.behaviorHints.defaultVideoId, 'tt6930962');
+assert.equal(bodlinka.behaviorHints, undefined);
 assert.equal(bodlinka.videos, undefined);
 
 const unmatched = cleanPublicMeta(richMovie({

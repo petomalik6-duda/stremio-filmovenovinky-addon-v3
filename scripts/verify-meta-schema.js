@@ -58,20 +58,16 @@ for (const raw of cache.metas || []) {
   }
 
   if (meta.type === 'movie') {
-    if (!meta.id.startsWith('filmovenovinky:')) fail(meta, `movie public id must use filmovenovinky:, got ${meta.id}`);
-    customIds++;
-    if (meta.videos != null) {
-      if (!Array.isArray(meta.videos) || meta.videos.length !== 1) fail(meta, 'movie videos must contain exactly one stream bridge video');
-      const video = meta.videos[0];
-      if (!video || typeof video !== 'object') fail(meta, 'invalid movie video object');
-      if (typeof video.id !== 'string' || !/^tt\d+$/.test(video.id)) fail(meta, 'movie video id must be IMDb tt id');
-      if (typeof video.title !== 'string' || !video.title.trim()) fail(meta, 'movie video title is required');
-      if ('season' in video || 'episode' in video) fail(meta, 'movie video must not expose season/episode');
+    if (!/^(?:tt\d+|tmdb:\d+|filmovenovinky:.+)$/.test(meta.id)) fail(meta, `invalid movie public id: ${meta.id}`);
+    const expectedImdb = raw?._addon?.imdbId || (/^tt\d+$/.test(raw.id || '') ? raw.id : null);
+    if (expectedImdb && meta.id !== expectedImdb) fail(meta, 'IMDb identity changed');
+    if (meta.videos !== undefined) fail(meta, 'movies must not expose episode or embedded stream arrays');
+    if (meta.id.startsWith('filmovenovinky:')) {
+      customIds++;
+      if (meta.behaviorHints?.defaultVideoId !== meta.id) fail(meta, 'local movie playback id changed');
+    } else if (meta.behaviorHints !== undefined) {
+      fail(meta, 'standard movie ids must use normal cross-addon stream aggregation');
     }
-    if (!meta.behaviorHints || typeof meta.behaviorHints !== 'object' || Array.isArray(meta.behaviorHints)) {
-      fail(meta, 'behaviorHints must be an object');
-    }
-    assertString({name: meta.name, defaultVideoId: meta.behaviorHints.defaultVideoId}, 'defaultVideoId', true);
   }
 
   const expected = requiredCases.get(raw?._addon?.imdbId || raw?.id);

@@ -1,5 +1,10 @@
 function isPlaceholderUrl(value) {
-  return /(?:^|\.)placehold\.co\//i.test(String(value || ''));
+  try {
+    const host = new URL(String(value || '')).hostname.toLowerCase();
+    return host === 'placehold.co' || host.endsWith('.placehold.co');
+  } catch {
+    return false;
+  }
 }
 
 
