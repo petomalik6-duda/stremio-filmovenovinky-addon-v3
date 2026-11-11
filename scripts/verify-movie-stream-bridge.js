@@ -20,13 +20,13 @@ const raw = {
 
 const meta = cleanPublicMeta(raw);
 assert.equal(meta.id, 'tt6930962');
-assert.equal(meta.behaviorHints.defaultVideoId, 'tt6930962');
+assert.equal(meta.behaviorHints, undefined);
 assert.equal(meta.videos, undefined);
 assert.equal(meta.type, 'movie');
 
 console.log(JSON.stringify({
   ok: true,
   streamLookupId: meta.id,
-  defaultVideoId: meta.behaviorHints.defaultVideoId,
+  defaultVideoId: meta.behaviorHints?.defaultVideoId || meta.id,
   videosPresent: false
 }, null, 2));

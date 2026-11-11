@@ -23,7 +23,7 @@ for (const [imdbId, expectedName, localId] of cases) {
 
   const meta = cleanPublicMeta(raw);
   assert.equal(meta.id, imdbId, `${expectedName}: public metadata must use IMDb id`);
-  assert.equal(meta.behaviorHints?.defaultVideoId, imdbId);
+  assert.equal(meta.behaviorHints, undefined, 'standard IMDb IDs use the movie id directly');
   assert.equal(meta.videos, undefined, `${expectedName}: movie must not expose videos array`);
   assert.equal(meta.name, expectedName);
   assert.ok(meta.poster && meta.description && meta.background);

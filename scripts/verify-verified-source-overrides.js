@@ -16,7 +16,10 @@ assert.equal(getVerifiedSourceOverride(bodlinka)?.tmdbId, 1470334);
 assert.equal(getVerifiedSourceOverride(bodlinka)?.imdbId, 'tt6930962');
 assert.ok(getVerifiedSourceOverride(bodlinka)?.aliases?.includes('Spiked'));
 assert.equal(sourceOverrideNeedsMigration(avenue, { _addon: {} }), true);
-assert.equal(sourceOverrideNeedsMigration(avenue, { _addon: { sourceOverrideVersion: 1 } }), false);
+const verified = getVerifiedSourceOverride(avenue);
+const migrated = { _addon: { sourceOverrideVersion: verified.version, imdbId: verified.imdbId, tmdbId: verified.tmdbId, csfdUrl: verified.csfdUrl } };
+assert.equal(sourceOverrideNeedsMigration(avenue, migrated), false);
+assert.equal(sourceOverrideNeedsMigration(avenue, { _addon: { ...migrated._addon, imdbId: 'tt0000000' } }), true);
 assert.equal(getVerifiedSourceOverride({ csfdUrl: 'https://www.csfd.cz/film/9999999-other/' }), null);
 
 console.log('Verified source override tests passed.');
